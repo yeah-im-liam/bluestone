@@ -8,11 +8,12 @@ Blue redstone that keeps to itself.
 - Bluestone and redstone ignore each other: redstone dust, torches, repeaters, comparators, blocks and rails never pick up a bluestone signal, and the bluestone versions never pick up a redstone signal. Dust doesn't even bend towards the other kind. Run two circuits right next to each other without them mixing.
 - Everything else works with both: levers, buttons, pressure plates, observers and other switches can start either signal, and both can power pistons, doors, lamps, TNT, dispensers and so on.
 - Bluestone works underwater. Dust, torches, repeaters and comparators can be waterlogged, and flowing water doesn't wash them away.
+- Bluestone ore generates at the same heights as redstone ore. It is much more common in oceans, rivers and swamps, and a vein that touches water is four times as likely to appear as one that doesn't.
 - Programmer Art textures are included.
 
 ## Crafting
 
-Same recipes as the redstone versions, with bluestone dust and bluestone torches in place of redstone dust and redstone torches. Bluestone ore doesn't generate in the world yet.
+Same recipes as the redstone versions, with bluestone dust and bluestone torches in place of redstone dust and redstone torches.
 
 ## Compatibility
 
