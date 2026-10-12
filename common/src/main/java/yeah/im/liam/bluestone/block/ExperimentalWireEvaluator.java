@@ -18,12 +18,12 @@ import org.jspecify.annotations.Nullable;
 /**
  * Used when the world has the redstone experiments enabled, like the game's own experimental evaluator.
  */
-final class ExperimentalBluestoneWireEvaluator extends BluestoneWireEvaluator {
+final class ExperimentalWireEvaluator extends WireEvaluator {
     private final Deque<BlockPos> wiresToTurnOff = new ArrayDeque<>();
     private final Deque<BlockPos> wiresToTurnOn = new ArrayDeque<>();
     private final Object2IntMap<BlockPos> updatedWires = new Object2IntLinkedOpenHashMap<>();
 
-    ExperimentalBluestoneWireEvaluator(BluestoneWireBlock wireBlock) {
+    ExperimentalWireEvaluator(ColoredWireBlock wireBlock) {
         super(wireBlock);
     }
 
@@ -37,12 +37,12 @@ final class ExperimentalBluestoneWireEvaluator extends BluestoneWireEvaluator {
             BlockPos pos = next.getKey();
             int newLevel = unpackPower(next.getIntValue());
             BlockState state = level.getBlockState(pos);
-            if (state.is(wireBlock) && state.getValue(BluestoneWireBlock.POWER) != newLevel) {
+            if (state.is(wireBlock) && state.getValue(ColoredWireBlock.POWER) != newLevel) {
                 int updateFlags = Block.UPDATE_CLIENTS;
                 if (!shapeUpdateWiresAroundInitialPosition || !initialWire) {
                     updateFlags |= Block.UPDATE_SKIP_SHAPE_UPDATE_ON_WIRE;
                 }
-                level.setBlock(pos, state.setValue(BluestoneWireBlock.POWER, newLevel), updateFlags);
+                level.setBlock(pos, state.setValue(ColoredWireBlock.POWER, newLevel), updateFlags);
             } else {
                 iterator.remove();
             }
@@ -74,7 +74,7 @@ final class ExperimentalBluestoneWireEvaluator extends BluestoneWireEvaluator {
     }
 
     private static boolean isConnected(BlockState state, Direction direction) {
-        EnumProperty<RedstoneSide> property = BluestoneWireBlock.PROPERTY_BY_DIRECTION.get(direction);
+        EnumProperty<RedstoneSide> property = ColoredWireBlock.PROPERTY_BY_DIRECTION.get(direction);
         if (property == null) {
             return direction == Direction.DOWN;
         }
@@ -89,7 +89,7 @@ final class ExperimentalBluestoneWireEvaluator extends BluestoneWireEvaluator {
     private void calculateCurrentChanges(Level level, BlockPos initialPosition, Orientation initialOrientation) {
         BlockState initialState = level.getBlockState(initialPosition);
         if (initialState.is(wireBlock)) {
-            setPower(initialPosition, initialState.getValue(BluestoneWireBlock.POWER), initialOrientation);
+            setPower(initialPosition, initialState.getValue(ColoredWireBlock.POWER), initialOrientation);
             wiresToTurnOff.add(initialPosition);
         } else {
             propagateChangeToNeighbors(level, initialPosition, 0, initialOrientation, true);

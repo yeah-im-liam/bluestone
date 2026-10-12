@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
+import yeah.im.liam.bluestone.signal.Channel;
 
 /**
  * Keeps the game's comparator block entity; each loader adds this block to the comparator block entity type.
@@ -87,11 +88,11 @@ public class BluestoneComparatorBlock extends ComparatorBlock implements SimpleW
 
     @Override
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 
     // NeoForge only lets comparators of the game's own block notice containers changing behind a solid block.

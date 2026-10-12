@@ -3,16 +3,23 @@ package yeah.im.liam.bluestone.block;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
+import yeah.im.liam.bluestone.signal.Channel;
+import yeah.im.liam.bluestone.signal.SignalBlock;
 
 /**
  * Marks the blocks that carry bluestone signals instead of redstone ones.
- *
- * <p>Each of them also tells redstone dust not to bend towards it: Minecraft 26.3 asks the block through
- * {@code shouldRedstoneWireConnectTo}, NeoForge on 26.1 and 26.2 through {@code canConnectRedstone}, and on
- * Fabric 26.1 and 26.2 a mixin answers for them.
  */
-public interface BluestoneComponent {
-    default boolean connectsToBluestoneWire(BlockState state, @Nullable Direction direction) {
-        return state.isSignalSource() && direction != null;
+public interface BluestoneComponent extends SignalBlock {
+    @Override
+    default Channel channel(BlockState state) {
+        return Channel.BLUESTONE;
+    }
+
+    /**
+     * Bluestone and purplestone dust bend towards bluestone signal sources; redstone dust never does.
+     */
+    @Override
+    default boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
+        return wire != Channel.REDSTONE && state.isSignalSource() && direction != null;
     }
 }

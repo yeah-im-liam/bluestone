@@ -66,7 +66,7 @@ public final class BluestoneFabric implements ModInitializer {
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(output -> output.insertAfter(Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores())));
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(output -> output.insertAfter(Items.REDSTONE_BLOCK, new ItemStack(BluestoneBlocks.blockItem())));
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> output.insertAfter(Items.REDSTONE_TORCH, new ItemStack(BluestoneBlocks.torchItem())));
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> output.insertAfter(Items.REDSTONE, new ItemStack(BluestoneBlocks.dust())));
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> output.insertAfter(Items.REDSTONE, new ItemStack(BluestoneBlocks.dust()), new ItemStack(BluestoneBlocks.purplestone())));
     }
 
     private static List<ItemStack> stacks(List<Item> items) {

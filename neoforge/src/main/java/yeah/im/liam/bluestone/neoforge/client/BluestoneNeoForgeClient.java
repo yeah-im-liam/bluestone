@@ -13,6 +13,6 @@ import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 public final class BluestoneNeoForgeClient {
     public BluestoneNeoForgeClient(IEventBus modEventBus) {
         modEventBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) ->
-            event.register(List.of(BluestoneTint.wire()), BluestoneBlocks.wire()));
+            BluestoneBlocks.wires().forEach(wire -> event.register(List.of(BluestoneTint.wire(wire)), wire)));
     }
 }

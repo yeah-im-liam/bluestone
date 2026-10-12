@@ -9,17 +9,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
 import org.jspecify.annotations.Nullable;
 
-final class DefaultBluestoneWireEvaluator extends BluestoneWireEvaluator {
-    DefaultBluestoneWireEvaluator(BluestoneWireBlock wireBlock) {
+final class DefaultWireEvaluator extends WireEvaluator {
+    DefaultWireEvaluator(ColoredWireBlock wireBlock) {
         super(wireBlock);
     }
 
     @Override
     public void updatePowerStrength(Level level, BlockPos pos, BlockState state, @Nullable Orientation orientation, boolean skipShapeUpdates) {
         int targetStrength = calculateTargetStrength(level, pos);
-        if (state.getValue(BluestoneWireBlock.POWER) != targetStrength) {
+        if (state.getValue(ColoredWireBlock.POWER) != targetStrength) {
             if (level.getBlockState(pos) == state) {
-                level.setBlock(pos, state.setValue(BluestoneWireBlock.POWER, targetStrength), 2);
+                level.setBlock(pos, state.setValue(ColoredWireBlock.POWER, targetStrength), 2);
             }
             Set<BlockPos> toUpdate = new HashSet<>();
             toUpdate.add(pos);

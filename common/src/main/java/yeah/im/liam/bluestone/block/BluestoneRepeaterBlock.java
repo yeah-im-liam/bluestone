@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import org.jspecify.annotations.Nullable;
+import yeah.im.liam.bluestone.signal.Channel;
 
 public class BluestoneRepeaterBlock extends RepeaterBlock implements SimpleWaterloggedBlock, BluestoneComponent {
     public BluestoneRepeaterBlock(Properties properties) {
@@ -74,17 +75,17 @@ public class BluestoneRepeaterBlock extends RepeaterBlock implements SimpleWater
     }
 
     @Override
-    public boolean connectsToBluestoneWire(BlockState state, @Nullable Direction direction) {
+    public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         Direction facing = state.getValue(FACING);
-        return facing == direction || facing.getOpposite() == direction;
+        return wire != Channel.REDSTONE && (facing == direction || facing.getOpposite() == direction);
     }
 
     @Override
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 }

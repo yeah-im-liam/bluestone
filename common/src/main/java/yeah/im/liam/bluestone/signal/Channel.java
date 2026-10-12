@@ -6,24 +6,34 @@ import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.DiodeBlock;
 import net.minecraft.world.level.block.PoweredBlock;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.block.BluestoneComponent;
 
 /**
- * Redstone and bluestone parts only hear their own kind. Levers, buttons, observers and other
- * plain sources belong to no channel, so both kinds hear them.
+ * Redstone and bluestone parts only hear their own kind; purplestone hears both. Levers, buttons, observers and other
+ * plain sources belong to no channel, so everything hears them.
  */
 public enum Channel {
     REDSTONE,
-    BLUESTONE;
+    BLUESTONE,
+    PURPLESTONE;
 
+    public boolean hears(Channel source) {
+        return this == PURPLESTONE || this == source;
+    }
+
+    /**
+     * The channel a game block listens on when its own code reads signals.
+     */
     public static Channel of(Block block) {
         return block instanceof BluestoneComponent ? BLUESTONE : REDSTONE;
     }
 
-    public static @Nullable Channel ofSource(Block block) {
-        if (block instanceof BluestoneComponent) {
-            return BLUESTONE;
+    public static @Nullable Channel ofSource(BlockState state) {
+        Block block = state.getBlock();
+        if (block instanceof SignalBlock signalBlock) {
+            return signalBlock.channel(state);
         }
         if (block == Blocks.REDSTONE_WIRE
             || block instanceof DiodeBlock

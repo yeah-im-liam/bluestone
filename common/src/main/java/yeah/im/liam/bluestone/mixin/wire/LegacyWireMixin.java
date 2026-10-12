@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import yeah.im.liam.bluestone.block.BluestoneComponent;
 import yeah.im.liam.bluestone.signal.Channel;
+import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 // Minecraft 26.1 and 26.2, where the dust class was still called RedStoneWireBlock.
@@ -26,8 +26,8 @@ abstract class LegacyWireMixin {
     // Fabric's dust asks here whether to bend towards a block; NeoForge asks the block's canConnectRedstone instead.
     @Inject(method = "shouldConnectTo(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;)Z", at = @At("HEAD"), cancellable = true)
     private static void bluestone$skipBluestone(BlockState state, @Nullable Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (state.getBlock() instanceof BluestoneComponent) {
-            cir.setReturnValue(false);
+        if (state.getBlock() instanceof SignalBlock signalBlock) {
+            cir.setReturnValue(signalBlock.connectsToWire(state, Channel.REDSTONE, direction));
         }
     }
 }

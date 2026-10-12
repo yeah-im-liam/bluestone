@@ -9,6 +9,6 @@ import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 public final class BluestoneFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockColorRegistry.register(List.of(BluestoneTint.wire()), BluestoneBlocks.wire());
+        BluestoneBlocks.wires().forEach(wire -> BlockColorRegistry.register(List.of(BluestoneTint.wire(wire)), wire));
     }
 }

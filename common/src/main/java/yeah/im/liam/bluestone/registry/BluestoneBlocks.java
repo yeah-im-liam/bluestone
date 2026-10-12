@@ -26,6 +26,9 @@ import yeah.im.liam.bluestone.block.BluestoneRepeaterBlock;
 import yeah.im.liam.bluestone.block.BluestoneTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
+import yeah.im.liam.bluestone.block.ColoredWireBlock;
+import yeah.im.liam.bluestone.block.ConverterBlock;
+import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
 
 /**
  * Block and item settings copy the redstone versions.
@@ -45,6 +48,8 @@ public final class BluestoneBlocks {
     private static BluestonePoweredRailBlock poweredRail;
     private static BluestonePoweredRailBlock activatorRail;
     private static BluestoneDetectorRailBlock detectorRail;
+    private static PurplestoneWireBlock purplestoneWire;
+    private static ConverterBlock converter;
 
     private static Item dust;
     private static Item blockItem;
@@ -56,15 +61,15 @@ public final class BluestoneBlocks {
     private static Item poweredRailItem;
     private static Item activatorRailItem;
     private static Item detectorRailItem;
+    private static Item purplestone;
+    private static Item converterItem;
 
     private BluestoneBlocks() {
     }
 
     public static void registerBlocks(Registrar<Block> blocks) {
-        wire = blocks.register("bluestone_wire", key -> new BluestoneWireBlock(props(key, BlockBehaviour.Properties.of()
-            .noCollision()
-            .instabreak()
-            .pushReaction(POPPED))));
+        wire = blocks.register("bluestone_wire", key -> new BluestoneWireBlock(props(key, wireProperties())));
+        purplestoneWire = blocks.register("purplestone_wire", key -> new PurplestoneWireBlock(props(key, wireProperties())));
         block = blocks.register("bluestone_block", key -> new BluestoneBlock(props(key, BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_BLUE)
             .requiresCorrectToolForDrops()
@@ -88,6 +93,7 @@ public final class BluestoneBlocks {
             .overrideDescription(torch.getDescriptionId())))));
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
+        converter = blocks.register("converter", key -> new ConverterBlock(props(key, diodeProperties())));
         poweredRail = blocks.register("bluestone_powered_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), false));
         detectorRail = blocks.register("bluestone_detector_rail", key -> new BluestoneDetectorRailBlock(props(key, railProperties())));
         activatorRail = blocks.register("bluestone_activator_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), true));
@@ -96,12 +102,14 @@ public final class BluestoneBlocks {
     public static void registerItems(Registrar<Item> items) {
         dust = items.register("bluestone", key -> new BlockItem(wire, new Item.Properties().setId(key).useItemDescriptionPrefix()
             .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "bluestone"))));
+        purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, new Item.Properties().setId(key).useItemDescriptionPrefix()));
         blockItem = blockItem(items, "bluestone_block", block);
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);
         torchItem = items.register("bluestone_torch", key -> new StandingAndWallBlockItem(torch, wallTorch, Direction.DOWN, itemProps(key)));
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
+        converterItem = blockItem(items, "converter", converter);
         poweredRailItem = blockItem(items, "bluestone_powered_rail", poweredRail);
         detectorRailItem = blockItem(items, "bluestone_detector_rail", detectorRail);
         activatorRailItem = blockItem(items, "bluestone_activator_rail", activatorRail);
@@ -111,8 +119,8 @@ public final class BluestoneBlocks {
         return comparator;
     }
 
-    public static Block wire() {
-        return wire;
+    public static List<ColoredWireBlock> wires() {
+        return List.of(wire, purplestoneWire);
     }
 
     public static Block poweredRail() {
@@ -127,16 +135,20 @@ public final class BluestoneBlocks {
         return dust;
     }
 
+    public static Item purplestone() {
+        return purplestone;
+    }
+
     /**
      * Everything for the mod's own creative tab, in the order the redstone versions appear.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
+        return List.of(dust, purplestone, torchItem, blockItem, repeaterItem, comparatorItem, converterItem,
             poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem);
+        return List.of(dust, purplestone, torchItem, blockItem, repeaterItem, comparatorItem, converterItem);
     }
 
     public static List<Item> rails() {
@@ -165,6 +177,13 @@ public final class BluestoneBlocks {
 
     private static BlockBehaviour.Properties props(ResourceKey<Block> key, BlockBehaviour.Properties properties) {
         return properties.setId(key);
+    }
+
+    private static BlockBehaviour.Properties wireProperties() {
+        return BlockBehaviour.Properties.of()
+            .noCollision()
+            .instabreak()
+            .pushReaction(POPPED);
     }
 
     private static BlockBehaviour.Properties torchProperties(BlockBehaviour.Properties properties) {

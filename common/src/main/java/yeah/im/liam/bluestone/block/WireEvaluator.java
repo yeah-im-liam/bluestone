@@ -7,10 +7,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
 import org.jspecify.annotations.Nullable;
 
-abstract class BluestoneWireEvaluator {
-    protected final BluestoneWireBlock wireBlock;
+abstract class WireEvaluator {
+    protected final ColoredWireBlock wireBlock;
 
-    protected BluestoneWireEvaluator(BluestoneWireBlock wireBlock) {
+    protected WireEvaluator(ColoredWireBlock wireBlock) {
         this.wireBlock = wireBlock;
     }
 
@@ -21,7 +21,7 @@ abstract class BluestoneWireEvaluator {
     }
 
     protected int getWireSignal(BlockPos pos, BlockState state) {
-        return state.is(wireBlock) ? state.getValue(BluestoneWireBlock.POWER) : 0;
+        return state.is(wireBlock) ? state.getValue(ColoredWireBlock.POWER) : 0;
     }
 
     protected int getIncomingWireSignal(Level level, BlockPos pos) {

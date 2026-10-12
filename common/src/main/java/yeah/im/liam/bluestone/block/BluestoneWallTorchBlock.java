@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import org.jspecify.annotations.Nullable;
+import yeah.im.liam.bluestone.signal.Channel;
 
 public class BluestoneWallTorchBlock extends RedstoneWallTorchBlock implements SimpleWaterloggedBlock, BluestoneComponent {
     public BluestoneWallTorchBlock(Properties properties) {
@@ -58,10 +59,10 @@ public class BluestoneWallTorchBlock extends RedstoneWallTorchBlock implements S
 
     @Override
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return false;
+        return connectsToWire(state, Channel.REDSTONE, direction);
     }
 }
