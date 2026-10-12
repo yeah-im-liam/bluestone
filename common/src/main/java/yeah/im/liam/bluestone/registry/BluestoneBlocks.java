@@ -29,6 +29,9 @@ import yeah.im.liam.bluestone.block.BluestoneWireBlock;
  * Block and item settings copy the redstone versions.
  */
 public final class BluestoneBlocks {
+    // Broken off when a piston pushes it. Called DESTROY before Minecraft 26.3.
+    private static final PushReaction POPPED = pushReaction("POPPED", "DESTROY");
+
     private static BluestoneWireBlock wire;
     private static BluestoneBlock block;
     private static BluestoneOreBlock ore;
@@ -59,7 +62,7 @@ public final class BluestoneBlocks {
         wire = blocks.register("bluestone_wire", key -> new BluestoneWireBlock(props(key, BlockBehaviour.Properties.of()
             .noCollision()
             .instabreak()
-            .pushReaction(PushReaction.POPPED))));
+            .pushReaction(POPPED))));
         block = blocks.register("bluestone_block", key -> new BluestoneBlock(props(key, BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_BLUE)
             .requiresCorrectToolForDrops()
@@ -167,14 +170,14 @@ public final class BluestoneBlocks {
             .instabreak()
             .lightLevel(litEmission(7))
             .sound(SoundType.WOOD)
-            .pushReaction(PushReaction.POPPED);
+            .pushReaction(POPPED);
     }
 
     private static BlockBehaviour.Properties diodeProperties() {
         return BlockBehaviour.Properties.of()
             .instabreak()
             .sound(SoundType.STONE)
-            .pushReaction(PushReaction.POPPED);
+            .pushReaction(POPPED);
     }
 
     private static BlockBehaviour.Properties railProperties() {
@@ -182,6 +185,17 @@ public final class BluestoneBlocks {
             .noCollision()
             .strength(0.7F)
             .sound(SoundType.METAL);
+    }
+
+    private static PushReaction pushReaction(String... names) {
+        for (String name : names) {
+            for (PushReaction reaction : PushReaction.values()) {
+                if (reaction.name().equals(name)) {
+                    return reaction;
+                }
+            }
+        }
+        throw new IllegalStateException("No push reaction named " + String.join(" or ", names));
     }
 
     private static ToIntFunction<BlockState> litEmission(int light) {
