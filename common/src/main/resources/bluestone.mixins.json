@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "package": "yeah.im.liam.bluestone.mixin",
+  "plugin": "yeah.im.liam.bluestone.compat.WireMixinPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "mixins": [
+    "BlockStateBaseMixin",
+    "DiodeBlockMixin",
+    "LevelMixin",
+    "PoweredRailBlockMixin",
+    "RedstoneTorchBlockMixin",
+    "RedstoneWallTorchBlockMixin",
+    "wire.LegacyWireMixin",
+    "wire.ModernWireMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

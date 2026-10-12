@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "bluestone",
+  "version": "${version}",
+  "name": "Bluestone",
+  "description": "Blue redstone that keeps to itself: bluestone parts and redstone parts ignore each other, and bluestone works underwater.",
+  "authors": [
+    "yeahimliam"
+  ],
+  "license": "CC-BY-NC-4.0",
+  "icon": "assets/bluestone/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "yeah.im.liam.bluestone.fabric.BluestoneFabric"
+    ],
+    "client": [
+      "yeah.im.liam.bluestone.fabric.client.BluestoneFabricClient"
+    ]
+  },
+  "mixins": [
+    "bluestone.mixins.json",
+    "bluestone-fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_min}",
+    "minecraft": "${fabric_minecraft_range}",
+    "java": ">=${java_version}",
+    "fabric-api": "*"
+  }
+}

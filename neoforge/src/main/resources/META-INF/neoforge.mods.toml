@@ -1,0 +1,32 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "CC-BY-NC-4.0"
+
+[[mods]]
+modId = "bluestone"
+version = "${version}"
+displayName = "Bluestone"
+authors = "yeahimliam"
+description = '''
+Blue redstone that keeps to itself: bluestone parts and redstone parts ignore each other, and bluestone works underwater.
+'''
+logoFile = "assets/bluestone/icon.png"
+# NeoForge 26.2+ reads iconFile and warns when only logoFile is set
+iconFile = "assets/bluestone/icon.png"
+
+[[dependencies.bluestone]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.bluestone]]
+modId = "minecraft"
+type = "required"
+versionRange = "${neoforge_minecraft_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "bluestone.mixins.json"
