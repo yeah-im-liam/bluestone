@@ -11,6 +11,7 @@
   "block.bluestone.bluestone_activator_rail": "Bluestone Activator Rail",
   "block.bluestone.bluestone_detector_rail": "Bluestone Detector Rail",
   "itemGroup.bluestone.main": "Bluestone",
+  "trim_material.bluestone.bluestone": "Bluestone Material",
   "pack.bluestone.programmer_art": "Bluestone Programmer Art",
   "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone"
 }

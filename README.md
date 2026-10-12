@@ -9,6 +9,7 @@ Blue redstone that keeps to itself.
 - Everything else works with both: levers, buttons, pressure plates, observers and other switches can start either signal, and both can power pistons, doors, lamps, TNT, dispensers and so on.
 - Bluestone works underwater. Dust, torches, repeaters and comparators can be waterlogged, and flowing water doesn't wash them away.
 - Bluestone ore generates at the same heights as redstone ore. It is much more common in oceans, rivers and swamps, and a vein that touches water is four times as likely to appear as one that doesn't.
+- Bluestone dust is an armor trim material, with its own blue trim colours.
 - Programmer Art textures are included.
 
 ## Crafting

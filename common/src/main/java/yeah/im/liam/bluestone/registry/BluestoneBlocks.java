@@ -3,6 +3,7 @@ package yeah.im.liam.bluestone.registry;
 import java.util.List;
 import java.util.function.ToIntFunction;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.block.BluestoneBlock;
 import yeah.im.liam.bluestone.block.BluestoneComparatorBlock;
 import yeah.im.liam.bluestone.block.BluestoneDetectorRailBlock;
@@ -92,7 +94,8 @@ public final class BluestoneBlocks {
     }
 
     public static void registerItems(Registrar<Item> items) {
-        dust = items.register("bluestone", key -> new BlockItem(wire, new Item.Properties().setId(key).useItemDescriptionPrefix()));
+        dust = items.register("bluestone", key -> new BlockItem(wire, new Item.Properties().setId(key).useItemDescriptionPrefix()
+            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "bluestone"))));
         blockItem = blockItem(items, "bluestone_block", block);
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);
