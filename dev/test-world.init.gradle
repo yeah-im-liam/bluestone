@@ -1,0 +1,13 @@
+// Starts the dev client in the "New World" test world: gradlew -I dev/test-world.init.gradle :fabric:runClient (or :neoforge:runClient)
+allprojects {
+    afterEvaluate { p ->
+        if (p.name in ['fabric', 'neoforge'] && p.extensions.findByName('loom') != null) {
+            p.loom.runs.configureEach { run ->
+                if (run.name == 'client' && new File(p.projectDir, 'run/saves/New World').exists()) {
+                    run.programArg('--quickPlaySingleplayer')
+                    run.programArg('New World')
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+.gradle/
+.idea/
+.vscode/
+.architectury-transformer/
+build/
+bin/
+out/
+run/
+*.log
+*.zip
