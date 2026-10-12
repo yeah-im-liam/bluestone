@@ -15,6 +15,7 @@
   "block.bluestone.purplestone_wire": "Purplestone Wire",
   "block.bluestone.converter": "Converter",
   "trim_material.bluestone.bluestone": "Bluestone Material",
+  "trim_material.bluestone.purplestone": "Purplestone Material",
   "pack.bluestone.programmer_art": "Bluestone Programmer Art",
   "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone"
 }

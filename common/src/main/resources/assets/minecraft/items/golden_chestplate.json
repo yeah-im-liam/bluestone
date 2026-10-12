@@ -40,6 +40,13 @@
       {
         "model": {
           "type": "minecraft:model",
+          "model": "bluestone:item/golden_chestplate_purplestone_trim"
+        },
+        "when": "bluestone:purplestone"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
           "model": "minecraft:item/golden_chestplate_copper_trim"
         },
         "when": "minecraft:copper"

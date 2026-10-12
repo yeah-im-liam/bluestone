@@ -102,7 +102,8 @@ public final class BluestoneBlocks {
     public static void registerItems(Registrar<Item> items) {
         dust = items.register("bluestone", key -> new BlockItem(wire, new Item.Properties().setId(key).useItemDescriptionPrefix()
             .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "bluestone"))));
-        purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, new Item.Properties().setId(key).useItemDescriptionPrefix()));
+        purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, new Item.Properties().setId(key).useItemDescriptionPrefix()
+            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "purplestone"))));
         blockItem = blockItem(items, "bluestone_block", block);
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);

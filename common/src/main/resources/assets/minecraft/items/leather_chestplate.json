@@ -70,6 +70,19 @@
       {
         "model": {
           "type": "minecraft:model",
+          "model": "bluestone:item/leather_chestplate_purplestone_trim",
+          "tints": [
+            {
+              "type": "minecraft:dye",
+              "default": -6265536
+            }
+          ]
+        },
+        "when": "bluestone:purplestone"
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
           "model": "minecraft:item/leather_chestplate_copper_trim",
           "tints": [
             {

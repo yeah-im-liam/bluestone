@@ -206,6 +206,7 @@ write(A + "lang/en_us.json", {
     "block.bluestone.purplestone_wire": "Purplestone Wire",
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
+    "trim_material.bluestone.purplestone": "Purplestone Material",
     "pack.bluestone.programmer_art": "Bluestone Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone",
 })
@@ -262,7 +263,7 @@ for ours, (theirs, folder) in RECIPES.items():
         write(prefix + D + f"advancement/recipes/{folder}/{ours}.json", json.loads(text))
 
 write(D + "recipe/purplestone.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
-                                     "ingredients": ["minecraft:redstone", "bluestone:bluestone"], "result": {"count": 1, "id": "bluestone:purplestone"}})
+                                     "ingredients": ["minecraft:redstone", "bluestone:bluestone"], "result": {"count": 2, "id": "bluestone:purplestone"}})
 write(D + "recipe/converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
                                    "key": {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
                                    "pattern": ["R#B", "III"], "result": {"id": "bluestone:converter"}})
@@ -300,23 +301,25 @@ write("pack.mcmeta", {
 })
 
 # Armor trims. 26.3 builds trim textures from palette ids; 26.1 and 26.2 from asset names and the armor_trims atlas.
-TRIM_COLOR = "#071697"  # redstone's #971607 with red and blue swapped
-trim_description = {"color": TRIM_COLOR, "translate": "trim_material.bluestone.bluestone"}
-write(D + "trim_material/bluestone.json", {"description": trim_description, "palette_id": "bluestone:trim/bluestone"})
-write("mc26.1/" + D + "trim_material/bluestone.json", {"asset_name": "bluestone", "description": trim_description})
-write("data/minecraft/tags/item/trim_materials.json", {"values": ["bluestone:bluestone"]})
+# Colours are redstone's #971607 run through the same mix as each dust: red and blue swapped, or 60% red plus full blue.
+TRIMS = {"bluestone": "#071697", "purplestone": "#5A1697"}
+for material, color in TRIMS.items():
+    description = {"color": color, "translate": "trim_material.bluestone." + material}
+    write(D + "trim_material/" + material + ".json", {"description": description, "palette_id": "bluestone:trim/" + material})
+    write("mc26.1/" + D + "trim_material/" + material + ".json", {"asset_name": material, "description": description})
+write("data/minecraft/tags/item/trim_materials.json", {"values": ["bluestone:" + material for material in TRIMS]})
 
 items_atlas = vanilla("assets/minecraft/atlases/items.json")["sources"][1]
 write("assets/minecraft/atlases/items.json", {"sources": [{
     "type": "minecraft:paletted_permutations", "palette_key": items_atlas["palette_key"],
-    "permutations": {"bluestone": "bluestone:trim/bluestone"}, "textures": items_atlas["textures"]}]})
+    "permutations": {material: "bluestone:trim/" + material for material in TRIMS}, "textures": items_atlas["textures"]}]})
 for atlas in ["items", "armor_trims"]:
     source = [x for x in vanilla(f"assets/minecraft/atlases/{atlas}.json", legacy)["sources"] if x["type"] == "minecraft:paletted_permutations"][0]
     write(f"mc26.1/assets/minecraft/atlases/{atlas}.json", {"sources": [{
         "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],
-        "permutations": {"bluestone": "bluestone:trims/color_palettes/bluestone"}, "textures": source["textures"]}]})
+        "permutations": {material: "bluestone:trims/color_palettes/" + material for material in TRIMS}, "textures": source["textures"]}]})
 
-# Inventory icons of trimmed armor: one model per armor piece, and a bluestone case in each armor item's model selector.
+# Inventory icons of trimmed armor: one model per armor piece and material, and a case for each in the armor item's model selector.
 for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/items/") and n.endswith(".json")):
     definition = json.loads(z.read(name))
     cases = definition["model"].get("cases", []) if definition["model"].get("type") == "minecraft:select" else []
@@ -324,12 +327,15 @@ for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/ite
     if not redstone:
         continue
     armor = name.split("/")[-1][:-5]
-    model = vanilla(f"assets/minecraft/models/item/{armor}_redstone_trim.json")
-    model["textures"] = {k: v.replace("_trim_redstone", "_trim_bluestone") for k, v in model["textures"].items()}
-    write(A + f"models/item/{armor}_bluestone_trim.json", model)
-    case = json.loads(json.dumps(redstone[0]).replace(f"minecraft:item/{armor}_redstone_trim", f"bluestone:item/{armor}_bluestone_trim"))
-    case["when"] = "bluestone:bluestone"
-    cases.insert(cases.index(redstone[0]) + 1, case)
+    position = cases.index(redstone[0]) + 1
+    for material in TRIMS:
+        model = vanilla(f"assets/minecraft/models/item/{armor}_redstone_trim.json")
+        model["textures"] = {k: v.replace("_trim_redstone", "_trim_" + material) for k, v in model["textures"].items()}
+        write(A + f"models/item/{armor}_{material}_trim.json", model)
+        case = json.loads(json.dumps(redstone[0]).replace(f"minecraft:item/{armor}_redstone_trim", f"bluestone:item/{armor}_{material}_trim"))
+        case["when"] = "bluestone:" + material
+        cases.insert(position, case)
+        position += 1
     write(f"assets/minecraft/items/{armor}.json", definition)
 
 # World generation: the redstone ore vein and heights, plus extra attempts in water biomes.
