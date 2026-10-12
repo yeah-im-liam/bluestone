@@ -1,0 +1,16 @@
+{
+  "item.bluestone.bluestone": "Bluestone Dust",
+  "block.bluestone.bluestone_wire": "Bluestone Wire",
+  "block.bluestone.bluestone_torch": "Bluestone Torch",
+  "block.bluestone.bluestone_block": "Block of Bluestone",
+  "block.bluestone.bluestone_ore": "Bluestone Ore",
+  "block.bluestone.deepslate_bluestone_ore": "Deepslate Bluestone Ore",
+  "block.bluestone.bluestone_repeater": "Bluestone Repeater",
+  "block.bluestone.bluestone_comparator": "Bluestone Comparator",
+  "block.bluestone.bluestone_powered_rail": "Bluestone Powered Rail",
+  "block.bluestone.bluestone_activator_rail": "Bluestone Activator Rail",
+  "block.bluestone.bluestone_detector_rail": "Bluestone Detector Rail",
+  "itemGroup.bluestone.main": "Bluestone",
+  "pack.bluestone.programmer_art": "Bluestone Programmer Art",
+  "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone"
+}

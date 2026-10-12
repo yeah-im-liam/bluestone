@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_bluestone_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bluestone:bluestone_ore"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "bluestone:bluestone_from_blasting_bluestone_ore"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_bluestone_ore"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "bluestone:bluestone_from_blasting_bluestone_ore"
+    ]
+  }
+}
