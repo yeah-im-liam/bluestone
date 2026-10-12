@@ -8,6 +8,7 @@
     "BlockStateBaseMixin",
     "DiodeBlockMixin",
     "LevelMixin",
+    "OreFeatureMixin",
     "PoweredRailBlockMixin",
     "RedstoneTorchBlockMixin",
     "RedstoneWallTorchBlockMixin",

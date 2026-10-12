@@ -3,6 +3,8 @@ package yeah.im.liam.bluestone.fabric;
 import java.util.List;
 import java.util.function.Function;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType;
@@ -12,11 +14,14 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 import yeah.im.liam.bluestone.registry.Registrar;
@@ -30,6 +35,18 @@ public final class BluestoneFabric implements ModInitializer {
         ((FabricBlockEntityType) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("comparator")))
             .addValidBlock(BluestoneBlocks.comparator());
         registerCreativeTabs();
+        addOres();
+    }
+
+    // Same as the NeoForge biome modifiers in data/bluestone/neoforge/biome_modifier.
+    private static void addOres() {
+        for (String feature : new String[]{"ore_bluestone", "ore_bluestone_lower"}) {
+            BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Decoration.UNDERGROUND_ORES, Bluestone.key(Registries.PLACED_FEATURE, feature));
+        }
+        TagKey<Biome> waterBiomes = TagKey.create(Registries.BIOME, Bluestone.id("has_more_bluestone"));
+        for (String feature : new String[]{"ore_bluestone_extra", "ore_bluestone_lower_extra"}) {
+            BiomeModifications.addFeature(BiomeSelectors.tag(waterBiomes), GenerationStep.Decoration.UNDERGROUND_ORES, Bluestone.key(Registries.PLACED_FEATURE, feature));
+        }
     }
 
     private static void registerCreativeTabs() {
