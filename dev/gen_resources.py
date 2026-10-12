@@ -44,6 +44,7 @@ D = "data/bluestone/"
 
 # Blockstates
 write(A + "blockstates/bluestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
+write(A + "blockstates/purplestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
 for name, src in [("bluestone_block", "redstone_block"), ("bluestone_ore", "redstone_ore"), ("deepslate_bluestone_ore", "deepslate_redstone_ore")]:
     write(A + f"blockstates/{name}.json", {"variants": {"": {"model": f"bluestone:block/{name}"}}})
 for name, src, prefix in [
@@ -93,9 +94,64 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
             write(A + f"models/block/bluestone_{rail}{on}{shape}.json",
                   {"parent": f"minecraft:block/{parent}", "textures": {"rail": f"bluestone:block/bluestone_{rail}{on}"}})
 
+
+# The converter: a one-tick repeater whose input-end torch shows the input colour and output-end torch the output colour.
+TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
+           "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
+MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
+
+
+def torch_end(element):
+    """Which torch an element of the repeater_1tick models belongs to: the output torch sits at z 2-4, the input one at z 6-8."""
+    center = [(a + b) / 2 for a, b in zip(element["from"], element["to"])]
+    for end, z in (("out", 3), ("in", 7)):
+        offset = sorted(abs(c - h) for c, h in zip(center, (8, 6, z)))
+        if offset == [0, 0, 3]:
+            return end  # one of the glow boxes around that torch's head
+    return "out" if abs(center[2] - 3) < abs(center[2] - 7) else "in"
+
+
+def converter_model(parent):
+    model = json.loads(json.dumps(parent))
+    for element in model["elements"]:
+        for face in element["faces"].values():
+            if face["texture"] in ("#lit", "#unlit"):
+                face["texture"] = "#" + torch_end(element) + "_" + face["texture"][1:]
+    return model
+
+
+def converter_models(source, prefix):
+    for mode, (input_color, output_color) in MODES.items():
+        for on in ["", "_on"]:
+            for locked in ["", "_locked"]:
+                model = converter_model(source("repeater_1tick" + on + locked))
+                top = "bluestone:block/converter_" + mode + on
+                model["textures"] = {"particle": top, "slab": "minecraft:block/smooth_stone", "top": top, "lock": "minecraft:block/bedrock",
+                                     "in_lit": TORCHES[input_color][0], "in_unlit": TORCHES[input_color][1],
+                                     "out_lit": TORCHES[output_color][0], "out_unlit": TORCHES[output_color][1]}
+                write(prefix + "models/block/converter_" + mode + on + locked + ".json", model)
+
+
+converter_models(lambda name: vanilla("assets/minecraft/models/block/" + name + ".json"), A)
+converter_models(lambda name: json.loads((PROGRAMMER_ART / ("assets/minecraft/models/block/" + name + ".json")).read_text()), "programmer_art/" + A)
+ROTATION = {"south": 0, "west": 90, "north": 180, "east": 270}
+variants = {}
+for facing, y in ROTATION.items():
+    for mode in MODES:
+        for powered in [False, True]:
+            for locked in [False, True]:
+                variant = {"model": "bluestone:block/converter_" + mode + ("_on" if powered else "") + ("_locked" if locked else "")}
+                if y:
+                    variant["y"] = y
+                key = "facing=%s,locked=%s,mode=%s,powered=%s" % (facing, str(locked).lower(), mode, str(powered).lower())
+                variants[key] = variant
+write(A + "blockstates/converter.json", {"variants": variants})
+
 # Item models and item definitions
 GENERATED = {
     "bluestone": "bluestone:item/bluestone",
+    "purplestone": "bluestone:item/purplestone",
+    "converter": "bluestone:item/converter",
     "bluestone_torch": "bluestone:block/bluestone_torch",
     "bluestone_repeater": "bluestone:item/bluestone_repeater",
     "bluestone_comparator": "bluestone:item/bluestone_comparator",
@@ -146,6 +202,9 @@ write(A + "lang/en_us.json", {
     "block.bluestone.bluestone_activator_rail": "Bluestone Activator Rail",
     "block.bluestone.bluestone_detector_rail": "Bluestone Detector Rail",
     "itemGroup.bluestone.main": "Bluestone",
+    "item.bluestone.purplestone": "Purplestone Dust",
+    "block.bluestone.purplestone_wire": "Purplestone Wire",
+    "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "pack.bluestone.programmer_art": "Bluestone Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone",
@@ -171,6 +230,10 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     for old, new in ID_PAIRS[:-1]:
         data = vanilla(f"data/minecraft/loot_table/blocks/{old}.json", jar)
         write(prefix + D + f"loot_table/blocks/{new}.json", swap_ids(data, ID_PAIRS))
+    write(prefix + D + "loot_table/blocks/purplestone_wire.json",
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
+    write(prefix + D + "loot_table/blocks/converter.json",
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/repeater.json", jar), [("repeater", "converter")]))
 
 # Recipes and their recipe-book advancements
 RECIPES = {
@@ -197,6 +260,35 @@ for ours, (theirs, folder) in RECIPES.items():
         text = json.dumps(advancement).replace(f'"minecraft:{theirs}"', f'"bluestone:{ours}"')
         text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", "bluestone"), text)
         write(prefix + D + f"advancement/recipes/{folder}/{ours}.json", json.loads(text))
+
+write(D + "recipe/purplestone.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
+                                     "ingredients": ["minecraft:redstone", "bluestone:bluestone"], "result": {"count": 1, "id": "bluestone:purplestone"}})
+write(D + "recipe/converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
+                                   "key": {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
+                                   "pattern": ["R#B", "III"], "result": {"id": "bluestone:converter"}})
+for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
+    template = vanilla("data/minecraft/advancement/recipes/redstone/repeater.json", jar)
+    recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
+    for recipe, unlocked_by in [("purplestone", "bluestone"), ("converter", "purplestone")]:
+        write(prefix + D + "advancement/recipes/redstone/" + recipe + ".json", {
+            "parent": "minecraft:recipes/root",
+            "criteria": {
+                "has_" + unlocked_by: {"conditions": {"items": [{"items": "bluestone:" + unlocked_by}]}, "trigger": "minecraft:inventory_changed"},
+                "has_the_recipe": {"conditions": {recipe_key: "bluestone:" + recipe}, "trigger": "minecraft:recipe_unlocked"},
+            },
+            "requirements": [["has_the_recipe", "has_" + unlocked_by]],
+            "rewards": {"recipes": ["bluestone:" + recipe]},
+        })
+
+# Clerics sell 2 bluestone dust instead of 2 redstone dust a quarter of the time.
+trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json")
+trade["given_item_modifier"] = [{"type": "minecraft:set_item", "item": "bluestone:bluestone",
+                                 "condition": {"type": "minecraft:random_chance", "chance": 0.25}}]
+write("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
+trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", legacy)
+trade["given_item_modifiers"] = [{"function": "minecraft:set_item", "item": "bluestone:bluestone",
+                                  "conditions": [{"condition": "minecraft:random_chance", "chance": 0.25}]}]
+write("mc26.1/data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
 
 write("pack.mcmeta", {
     "pack": {"description": "Bluestone", "min_format": 84, "max_format": 121},
