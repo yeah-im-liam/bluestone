@@ -3,8 +3,9 @@
 python dev/gen_resources.py <26.3 client jar> common/src/main/resources <art folder> <26.1 client jar> <unzipped 26.3 Programmer Art pack>
 
 The client jars are in the Loom cache (fabric-loom/<version>/minecraft-client.jar); the Programmer Art pack is
-minecraft/resourcepacks/programmer_art.zip in the 26.3 asset index. The art folder holds default/ and programmer_art/
-with the same layout as the game's textures folder.
+minecraft/resourcepacks/programmer_art.zip in the 26.3 asset index. The art folder holds default/ and programmer art/,
+with one folder per thing (bluestone torch, converter, ...). Each of those has block/, item/ or palettes/ folders that
+say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
 """
 import json
 import re
@@ -167,21 +168,18 @@ for name in ["bluestone_block", "purplestone_block", "bluestone_ore", "deepslate
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
-for src_dir, dst_dir in [(ART / "default", OUT / "assets/bluestone/textures"), (ART / "programmer_art", OUT / "programmer_art/assets/bluestone/textures")]:
-    for png in sorted(src_dir.rglob("*.png")):
-        rel = png.relative_to(src_dir)
-        if rel.parts[0] == "palettes":
-            if dst_dir.parts[-4] == "programmer_art":
-                continue
-            # 26.3 reads trim palettes from palettes/, 26.1 and 26.2 from trims/color_palettes/.
-            for palette_dir in ["palettes/trim", "trims/color_palettes"]:
-                dst = dst_dir / palette_dir / png.name
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(png, dst)
+# The redstone originals kept beside them for comparison are skipped.
+OURS = re.compile(r"bluestone|purplestone|converter")
+for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("programmer art", OUT / "programmer_art/assets/bluestone/textures")]:
+    for png in sorted((ART / style).glob("*/*/*.png")):
+        if not OURS.search(png.name):
             continue
-        dst = dst_dir / rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(png, dst)
+        kind = png.parent.name
+        # 26.3 reads trim palettes from palettes/trim/, 26.1 and 26.2 from trims/color_palettes/.
+        for folder in ["palettes/trim", "trims/color_palettes"] if kind == "palettes" else [kind]:
+            dst = dst_dir / folder / png.name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(png, dst)
 # Programmer Art puts the redstone torch on the old plain torch shape; the bluestone and purplestone torches follow it.
 for stone in ["bluestone", "purplestone"]:
     for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
