@@ -15,6 +15,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -56,7 +58,8 @@ import yeah.im.liam.bluestone.signal.Signals;
  * where two faces both border a direction, {@link #SHARED} says which of them draws it. Paste joins only along its own
  * surface: the paste next to it on the same flat surface, paste round the edge of the block it lies on, the other
  * faces of its own space, and parts sitting on the same surface. It loses one level per space, hears only greenstone
- * and plain switches, and meets purplestone through the wall converter. Breaking it takes off the face looked at.
+ * and plain switches, and meets purplestone through the wall converter. Breaking it takes off the face looked at, and
+ * right-clicking a lone piece switches it between a cross and a dot, like dust.
  */
 public class GreenstonePasteBlock extends Block implements SignalBlock {
     public static final EnumProperty<Side> NORTH = EnumProperty.create("north", Side.class);
@@ -300,7 +303,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
         BlockState state = existing.is(this) ? existing : defaultBlockState();
         Direction face = placingFace(state, context);
-        return face == null ? null : withConnections(context.getLevel(), context.getClickedPos(), state.setValue(SIDES.get(face), Side.FACE));
+        return face == null ? null : withConnections(context.getLevel(), context.getClickedPos(), state.setValue(SIDES.get(face), Side.FACE), false);
     }
 
     // A face that loses the block under it drops off on the next tick; with no faces left the paste is gone.
@@ -315,7 +318,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             }
             ticks.scheduleTick(pos, this, 1);
         }
-        return withConnections(level, pos, state);
+        return withConnections(level, pos, state, true);
     }
 
     @Override
@@ -328,7 +331,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             }
         }
         if (updated != state) {
-            level.setBlock(pos, faces(updated).isEmpty() ? Blocks.AIR.defaultBlockState() : withConnections(level, pos, updated), Block.UPDATE_ALL);
+            level.setBlock(pos, faces(updated).isEmpty() ? Blocks.AIR.defaultBlockState() : withConnections(level, pos, updated, true), Block.UPDATE_ALL);
         }
     }
 
@@ -338,7 +341,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         for (BlockPos other : diagonals(pos)) {
             BlockState otherState = level.getBlockState(other);
             if (otherState.is(this)) {
-                Block.updateOrDestroy(otherState, withConnections(level, other, otherState), level, other, flags & ~Block.UPDATE_NEIGHBORS, updateLimit);
+                Block.updateOrDestroy(otherState, withConnections(level, other, otherState, true), level, other, flags & ~Block.UPDATE_NEIGHBORS, updateLimit);
             }
         }
     }
@@ -355,7 +358,22 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return positions;
     }
 
-    private BlockState withConnections(BlockGetter level, BlockPos pos, BlockState state) {
+    // A lone piece of paste with no lines: a dot, which stays a dot (unless placed new) while nothing joins it.
+    private static boolean isDot(BlockState state) {
+        List<Direction> faces = faces(state);
+        if (faces.size() != 1) {
+            return false;
+        }
+        for (Direction way : Direction.values()) {
+            if (way.getAxis() != faces.getFirst().getAxis() && state.getValue(SIDES.get(way)) != Side.NONE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private BlockState withConnections(BlockGetter level, BlockPos pos, BlockState state, boolean keepDot) {
+        boolean dot = keepDot && isDot(state);
         List<Direction> faces = faces(state);
         // The ways each face draws a line, besides the other faces of this space.
         Map<Direction, Set<Direction>> draws = new EnumMap<>(Direction.class);
@@ -373,10 +391,10 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
                     edges.add(way);
                 }
             }
-            // Like dust: a face with no lines is a cross, and a face with a line one way runs straight on through.
+            // Like dust: a face with no lines is a cross (or a dot), and a face with a line one way runs straight on through.
             for (Direction way : Direction.values()) {
                 if (way.getAxis() != face.getAxis() && !faces.contains(way)
-                    && (edges.isEmpty() || edges.size() == 1 && edges.getFirst() == way.getOpposite())) {
+                    && (edges.isEmpty() && !dot || edges.size() == 1 && edges.getFirst() == way.getOpposite())) {
                     ways.add(way);
                 }
             }
@@ -523,6 +541,37 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
+    // Paste in hand adds faces to paste rather than switching it.
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return stack.is(asItem()) ? InteractionResult.PASS : super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+    }
+
+    // Like dust: right-clicking a lone piece of paste that joins nothing switches it between a cross, which powers the
+    // blocks round it, and a dot, which powers only the block it lies on.
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        List<Direction> faces = faces(state);
+        if (!player.getAbilities().mayBuild || faces.size() != 1) {
+            return InteractionResult.PASS;
+        }
+        Direction face = faces.getFirst();
+        BlockState switched = state.setValue(SHARED, Shared.ALL);
+        for (Direction way : Direction.values()) {
+            if (way.getAxis() != face.getAxis()) {
+                if (links(level, pos, face, way)) {
+                    return InteractionResult.PASS;
+                }
+                switched = switched.setValue(SIDES.get(way), isDot(state) ? Side.LINE : Side.NONE);
+            }
+        }
+        level.setBlock(pos, switched, Block.UPDATE_ALL);
+        if (!level.isClientSide()) {
+            updateAround(level, pos);
+        }
+        return InteractionResult.SUCCESS;
+    }
+
     // With paste on more than one face, breaking takes off the face looked at: drops and break particles are for that
     // face alone, and destroy() puts the rest back once the game has removed the block.
     @Override
@@ -544,7 +593,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         Remaining remaining = REMAINING.get();
         if (remaining != null && remaining.level() == level && remaining.pos().equals(pos)) {
             REMAINING.remove();
-            level.setBlock(pos, withConnections(level, pos, remaining.state()), Block.UPDATE_ALL);
+            level.setBlock(pos, withConnections(level, pos, remaining.state(), true), Block.UPDATE_ALL);
         }
     }
 
