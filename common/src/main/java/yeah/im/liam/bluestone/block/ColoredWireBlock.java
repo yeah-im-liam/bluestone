@@ -397,11 +397,11 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
      * Turns one of redstone dust's colours into this dust's colour.
      */
     @FunctionalInterface
-    protected interface ColorMix {
+    interface ColorMix {
         int mix(float red, float green, float blue);
     }
 
-    private static int[] colorsFor(ColorMix mix) {
+    static int[] colorsFor(ColorMix mix) {
         int[] colors = new int[16];
         for (int i = 0; i <= 15; i++) {
             float power = i / 15.0F;

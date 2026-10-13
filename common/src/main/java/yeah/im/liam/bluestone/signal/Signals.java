@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
+import yeah.im.liam.bluestone.block.GreenstonePasteBlock;
 
 /**
  * Tracks who is reading signals on the current thread. While a listener reads, sources it can't hear report no
@@ -71,6 +72,6 @@ public final class Signals {
     }
 
     public static boolean isDust(BlockState state) {
-        return state.getBlock() == Blocks.REDSTONE_WIRE || state.getBlock() instanceof ColoredWireBlock;
+        return state.getBlock() == Blocks.REDSTONE_WIRE || state.getBlock() instanceof ColoredWireBlock || state.getBlock() instanceof GreenstonePasteBlock;
     }
 }

@@ -10,5 +10,6 @@ public final class BluestoneFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         BluestoneBlocks.wires().forEach(wire -> BlockColorRegistry.register(List.of(BluestoneTint.wire(wire)), wire));
+        BlockColorRegistry.register(List.of(BluestoneTint.paste(BluestoneBlocks.paste())), BluestoneBlocks.paste());
     }
 }

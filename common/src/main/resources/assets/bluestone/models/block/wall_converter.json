@@ -1,0 +1,78 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "bluestone:block/wall_converter",
+    "plate": "bluestone:block/wall_converter"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        14
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#plate",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#plate",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#plate",
+          "uv": [
+            0,
+            0,
+            2,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#plate",
+          "uv": [
+            14,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#plate",
+          "uv": [
+            0,
+            14,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#plate",
+          "uv": [
+            0,
+            0,
+            16,
+            2
+          ]
+        }
+      }
+    }
+  ]
+}

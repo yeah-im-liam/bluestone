@@ -68,7 +68,7 @@ public final class BluestoneNeoForge {
         } else if (tab.equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
             insertAfter(event, Items.REDSTONE_TORCH, BluestoneBlocks.torches());
         } else if (tab.equals(CreativeModeTabs.INGREDIENTS)) {
-            insertAfter(event, Items.REDSTONE, List.of(BluestoneBlocks.dust(), BluestoneBlocks.purplestone()));
+            insertAfter(event, Items.REDSTONE, List.of(BluestoneBlocks.dust(), BluestoneBlocks.purplestone(), BluestoneBlocks.pasteItem()));
         }
     }
 

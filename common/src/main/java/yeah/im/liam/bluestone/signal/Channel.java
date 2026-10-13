@@ -10,17 +10,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Redstone and bluestone parts hear their own kind and purplestone, but not each other; purplestone hears everything.
- * Levers, buttons, observers and other plain sources belong to no channel, so everything hears them.
+ * Redstone and bluestone parts hear their own kind and purplestone, but not each other; purplestone hears both.
+ * Greenstone hears only greenstone, and meets purplestone through the wall converter. Levers, buttons, observers and
+ * other plain sources belong to no channel, so everything hears them.
  */
 public enum Channel implements Listener {
     REDSTONE,
     BLUESTONE,
-    PURPLESTONE;
+    PURPLESTONE,
+    GREENSTONE;
 
     @Override
     public boolean hears(Channel source) {
-        return this == source || this == PURPLESTONE || source == PURPLESTONE;
+        if (this == source) {
+            return true;
+        }
+        if (this == GREENSTONE || source == GREENSTONE) {
+            return false;
+        }
+        return this == PURPLESTONE || source == PURPLESTONE;
     }
 
     /**

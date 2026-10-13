@@ -12,7 +12,9 @@ import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 @Mod(value = Bluestone.MOD_ID, dist = Dist.CLIENT)
 public final class BluestoneNeoForgeClient {
     public BluestoneNeoForgeClient(IEventBus modEventBus) {
-        modEventBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) ->
-            BluestoneBlocks.wires().forEach(wire -> event.register(List.of(BluestoneTint.wire(wire)), wire)));
+        modEventBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> {
+            BluestoneBlocks.wires().forEach(wire -> event.register(List.of(BluestoneTint.wire(wire)), wire));
+            event.register(List.of(BluestoneTint.paste(BluestoneBlocks.paste())), BluestoneBlocks.paste());
+        });
     }
 }

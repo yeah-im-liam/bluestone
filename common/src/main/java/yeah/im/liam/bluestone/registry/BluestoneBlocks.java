@@ -28,10 +28,17 @@ import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.ConverterBlock;
+import yeah.im.liam.bluestone.block.GreenstoneBlock;
+import yeah.im.liam.bluestone.block.GreenstoneComparatorBlock;
+import yeah.im.liam.bluestone.block.GreenstonePasteBlock;
+import yeah.im.liam.bluestone.block.GreenstoneRepeaterBlock;
+import yeah.im.liam.bluestone.block.GreenstoneTorchBlock;
+import yeah.im.liam.bluestone.block.GreenstoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneBlock;
 import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
+import yeah.im.liam.bluestone.block.WallConverterBlock;
 
 /**
  * Block and item settings copy the redstone versions.
@@ -56,6 +63,13 @@ public final class BluestoneBlocks {
     private static PurplestoneTorchBlock purplestoneTorch;
     private static PurplestoneWallTorchBlock purplestoneWallTorch;
     private static ConverterBlock converter;
+    private static GreenstonePasteBlock paste;
+    private static GreenstoneTorchBlock greenstoneTorch;
+    private static GreenstoneWallTorchBlock greenstoneWallTorch;
+    private static GreenstoneBlock greenstoneBlock;
+    private static GreenstoneRepeaterBlock greenstoneRepeater;
+    private static GreenstoneComparatorBlock greenstoneComparator;
+    private static WallConverterBlock wallConverter;
 
     private static Item dust;
     private static Item blockItem;
@@ -71,6 +85,12 @@ public final class BluestoneBlocks {
     private static Item purplestoneTorchItem;
     private static Item purplestoneBlockItem;
     private static Item converterItem;
+    private static Item pasteItem;
+    private static Item greenstoneTorchItem;
+    private static Item greenstoneBlockItem;
+    private static Item greenstoneRepeaterItem;
+    private static Item greenstoneComparatorItem;
+    private static Item wallConverterItem;
 
     private BluestoneBlocks() {
     }
@@ -112,6 +132,24 @@ public final class BluestoneBlocks {
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
         converter = blocks.register("converter", key -> new ConverterBlock(props(key, diodeProperties())));
+        paste = blocks.register("greenstone_paste", key -> new GreenstonePasteBlock(props(key, BlockBehaviour.Properties.of()
+            .noCollision()
+            .instabreak()
+            .sound(SoundType.SLIME_BLOCK)
+            .pushReaction(POPPED))));
+        greenstoneTorch = blocks.register("greenstone_torch", key -> new GreenstoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
+        greenstoneWallTorch = blocks.register("greenstone_wall_torch", key -> new GreenstoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
+            .overrideLootTable(greenstoneTorch.getLootTable())
+            .overrideDescription(greenstoneTorch.getDescriptionId())))));
+        greenstoneBlock = blocks.register("greenstone_block", key -> new GreenstoneBlock(props(key, BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_GREEN)
+            .requiresCorrectToolForDrops()
+            .strength(5.0F, 6.0F)
+            .sound(SoundType.METAL)
+            .isRedstoneConductor((state, level, pos) -> false))));
+        greenstoneRepeater = blocks.register("greenstone_repeater", key -> new GreenstoneRepeaterBlock(props(key, diodeProperties())));
+        greenstoneComparator = blocks.register("greenstone_comparator", key -> new GreenstoneComparatorBlock(props(key, diodeProperties())));
+        wallConverter = blocks.register("wall_converter", key -> new WallConverterBlock(props(key, diodeProperties())));
         poweredRail = blocks.register("bluestone_powered_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), false));
         detectorRail = blocks.register("bluestone_detector_rail", key -> new BluestoneDetectorRailBlock(props(key, railProperties())));
         activatorRail = blocks.register("bluestone_activator_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), true));
@@ -131,6 +169,12 @@ public final class BluestoneBlocks {
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
         converterItem = blockItem(items, "converter", converter);
+        pasteItem = blockItem(items, "greenstone_paste", paste);
+        greenstoneTorchItem = items.register("greenstone_torch", key -> new StandingAndWallBlockItem(greenstoneTorch, greenstoneWallTorch, Direction.DOWN, itemProps(key)));
+        greenstoneBlockItem = blockItem(items, "greenstone_block", greenstoneBlock);
+        greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);
+        greenstoneComparatorItem = blockItem(items, "greenstone_comparator", greenstoneComparator);
+        wallConverterItem = blockItem(items, "wall_converter", wallConverter);
         poweredRailItem = blockItem(items, "bluestone_powered_rail", poweredRail);
         detectorRailItem = blockItem(items, "bluestone_detector_rail", detectorRail);
         activatorRailItem = blockItem(items, "bluestone_activator_rail", activatorRail);
@@ -142,6 +186,10 @@ public final class BluestoneBlocks {
 
     public static List<ColoredWireBlock> wires() {
         return List.of(wire, purplestoneWire);
+    }
+
+    public static GreenstonePasteBlock paste() {
+        return paste;
     }
 
     public static Block poweredRail() {
@@ -166,11 +214,13 @@ public final class BluestoneBlocks {
      */
     public static List<Item> creativeTabItems() {
         return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem,
-            converterItem, poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
+            converterItem, pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem, wallConverterItem,
+            poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem);
+        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem,
+            pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem, wallConverterItem);
     }
 
     public static List<Item> rails() {
@@ -182,11 +232,15 @@ public final class BluestoneBlocks {
     }
 
     public static List<Item> storageBlocks() {
-        return List.of(blockItem, purplestoneBlockItem);
+        return List.of(blockItem, purplestoneBlockItem, greenstoneBlockItem);
+    }
+
+    public static Item pasteItem() {
+        return pasteItem;
     }
 
     public static List<Item> torches() {
-        return List.of(torchItem, purplestoneTorchItem);
+        return List.of(torchItem, purplestoneTorchItem, greenstoneTorchItem);
     }
 
     private static Item blockItem(Registrar<Item> items, String path, Block block) {

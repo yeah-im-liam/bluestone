@@ -17,12 +17,12 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
     private static final Listener LISTENER = new Listener() {
         @Override
         public boolean hears(Channel source) {
-            return true;
+            return Channel.PURPLESTONE.hears(source);
         }
 
         @Override
         public int heard(Channel source, int signal) {
-            return source == Channel.PURPLESTONE ? signal : signal / 2;
+            return !hears(source) ? 0 : source == Channel.PURPLESTONE ? signal : signal / 2;
         }
     };
 
@@ -38,7 +38,10 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
     // Redstone or bluestone dust at 10 gives purplestone dust 5, instead of the 9 it would give its own kind.
     @Override
     protected int powerFromOtherDust(BlockState state) {
-        return Signals.isDust(state) ? state.getValue(POWER) / 2 : 0;
+        if (state.getBlock() instanceof WallConverterBlock) {
+            return Math.max(0, state.getValue(WallConverterBlock.POWER) - 1);
+        }
+        return Signals.isDust(state) && LISTENER.hears(Channel.ofSource(state)) ? state.getValue(POWER) / 2 : 0;
     }
 
     // Every kind of dust bends towards purplestone dust, since all of them can feed it.
