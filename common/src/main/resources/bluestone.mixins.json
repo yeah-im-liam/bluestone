@@ -20,8 +20,10 @@
     "wire.ModernWireMixin"
   ],
   "client": [
+    "AbstractMinecartRendererMixin",
     "ClientItemInfoLoaderMixin",
-    "ClientLevelMixin"
+    "ClientLevelMixin",
+    "MinecartRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1
