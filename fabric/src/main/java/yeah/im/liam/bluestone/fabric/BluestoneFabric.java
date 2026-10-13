@@ -60,7 +60,8 @@ public final class BluestoneFabric implements ModInitializer {
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(output -> {
             output.insertAfter(Items.COMPARATOR, stacks(BluestoneBlocks.components()));
             output.insertAfter(Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
-            output.insertAfter(Items.REDSTONE_ORE, stacks(List.of(BluestoneBlocks.ores().getFirst())));
+            output.insertAfter(Items.REDSTONE_ORE, new ItemStack(Items.DEEPSLATE_REDSTONE_ORE));
+            output.insertAfter(Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
         });
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> output.insertAfter(Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails())));
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(output -> output.insertAfter(Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores())));

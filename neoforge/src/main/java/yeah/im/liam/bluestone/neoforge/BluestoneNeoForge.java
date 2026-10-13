@@ -58,7 +58,8 @@ public final class BluestoneNeoForge {
         if (tab.equals(CreativeModeTabs.REDSTONE_BLOCKS)) {
             insertAfter(event, Items.COMPARATOR, BluestoneBlocks.components());
             insertAfter(event, Items.ACTIVATOR_RAIL, BluestoneBlocks.rails());
-            insertAfter(event, Items.REDSTONE_ORE, List.of(BluestoneBlocks.ores().getFirst()));
+            insertAfter(event, Items.REDSTONE_ORE, List.of(Items.DEEPSLATE_REDSTONE_ORE));
+            insertAfter(event, Items.DEEPSLATE_REDSTONE_ORE, BluestoneBlocks.ores());
         } else if (tab.equals(CreativeModeTabs.TOOLS_AND_UTILITIES)) {
             insertAfter(event, Items.ACTIVATOR_RAIL, BluestoneBlocks.rails());
         } else if (tab.equals(CreativeModeTabs.NATURAL_BLOCKS)) {

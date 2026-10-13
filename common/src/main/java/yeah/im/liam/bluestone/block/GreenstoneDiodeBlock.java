@@ -202,10 +202,14 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return getSignal(state, level, pos, direction);
     }
 
-    // Changing state tells the block in front and everything around it, like the game's repeater.
+    // Changing state tells the block in front and everything around it, like the game's repeater. A new one checks its
+    // input straight away, so it turns on when placed next to something already powered.
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         updateNeighborsInFront(level, pos, state);
+        if (!level.isClientSide() && !oldState.is(this)) {
+            checkTickOnNeighbor(level, pos, state);
+        }
     }
 
     @Override

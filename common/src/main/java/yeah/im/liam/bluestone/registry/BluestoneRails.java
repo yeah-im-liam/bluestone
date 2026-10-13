@@ -56,13 +56,13 @@ public final class BluestoneRails {
     }
 
     private static void floorOnly(Registrar<Block> blocks, String name, Function<BlockBehaviour.Properties, Block> factory) {
-        Block floor = blocks.register(name, key -> factory.apply(properties(key, false)));
+        Block floor = blocks.register(name, key -> factory.apply(properties(key)));
         ITEM_REGISTRATIONS.add(() -> ITEMS.add(itemRegistrar.register(name, key -> new BlockItem(floor, itemProperties(key)))));
     }
 
     private static void sticky(Registrar<Block> blocks, String name, Function<BlockBehaviour.Properties, Block> factory, Kind kind, @Nullable Channel channel) {
-        Block floor = blocks.register(name, key -> factory.apply(properties(key, true)));
-        Block attached = blocks.register("attached_" + name, key -> new AttachedRailBlock(properties(key, true)
+        Block floor = blocks.register(name, key -> factory.apply(properties(key)));
+        Block attached = blocks.register("attached_" + name, key -> new AttachedRailBlock(properties(key)
             .overrideLootTable(floor.getLootTable())
             .overrideDescription(floor.getDescriptionId()), kind, channel));
         if (kind == Kind.POWERED) {
@@ -73,11 +73,11 @@ public final class BluestoneRails {
         ITEM_REGISTRATIONS.add(() -> ITEMS.add(itemRegistrar.register(name, key -> new SurfaceRailItem(floor, attached, itemProperties(key)))));
     }
 
-    private static BlockBehaviour.Properties properties(ResourceKey<Block> key, boolean sticky) {
+    private static BlockBehaviour.Properties properties(ResourceKey<Block> key) {
         return BlockBehaviour.Properties.of()
             .noCollision()
             .strength(0.7F)
-            .sound(sticky ? SoundType.SLIME_BLOCK : SoundType.METAL)
+            .sound(SoundType.METAL)
             .setId(key);
     }
 
