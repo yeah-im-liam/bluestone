@@ -267,9 +267,11 @@ for rail, (off, on) in ATTACHED_MODELS.items():
         for (attached, travel) in ALL_PAIRS if attached != "down" for powered in ["false", "true"]}})
 FLOOR_RAILS = CHAIN_RAILS[:2] + list(STICKY) + CHAIN_RAILS[2:]
 
-# Greenstone paste is redstone dust on any face: the game's dust models with their own textures, and the game's dust
-# blockstate once for each face, turned onto it. On a face, north/east/south/west are as on the floor, turned with
-# the face (GreenstonePasteBlock.toWorld): on the ceiling north stays north, on a wall north is up.
+# Greenstone paste is redstone dust on any face, placed one face at a time: the game's dust models with their own
+# textures, and the game's dust blockstate once for each face, turned onto it. On a face, north/east/south/west are as
+# on the floor, turned with the face (GreenstonePasteBlock.toWorld): on the ceiling north stays north, on a wall north
+# is up. Paste has a property per direction in the world: "face" where it lies on that face, "line" where it runs off
+# that way. A dust line shows towards each edge whose direction isn't "none"; paste never draws dust's lines up walls.
 def paste_sprite(value):
     if isinstance(value, dict):
         return dict(value, sprite=paste_sprite(value["sprite"]))
@@ -277,7 +279,7 @@ def paste_sprite(value):
     return "bluestone:block/" + name.replace("redstone_dust", "greenstone_paste") if name.startswith("redstone_dust") else value
 
 
-for name in ["dot", "side0", "side1", "side_alt0", "side_alt1", "up"]:
+for name in ["dot", "side0", "side1", "side_alt0", "side_alt1"]:
     model = vanilla(f"assets/minecraft/models/block/redstone_dust_{name}.json")
     textures = {k: paste_sprite(v) for k, v in model.get("textures", {}).items()}
     if "parent" in model:
@@ -297,16 +299,25 @@ def paste_frame(attached):
     return {"north": north, "east": east, "south": NAMES[tuple(-c for c in VECTORS[north])], "west": NAMES[tuple(-c for c in VECTORS[east])]}
 
 
+def paste_condition(condition, face):
+    frame = paste_frame(face)
+    out = {frame[side]: "none" if value == "none" else "line|face" for side, value in condition.items()}
+    out[face] = "face"
+    return out
+
+
 paste_parts = []
-for attached in VECTORS:
-    frame = paste_frame(attached)
+for face in VECTORS:
+    frame = paste_frame(face)
     for part in vanilla("assets/minecraft/blockstates/redstone_wire.json")["multipart"]:
         apply = part["apply"]
+        if apply["model"].endswith("_up"):
+            continue
         # A part turned on the floor first (its own y), then onto the face.
         turned = ["north", "east", "south", "west"][apply.get("y", 0) // 90]
-        variant = rotated(apply["model"].replace("minecraft:block/redstone_dust_", "bluestone:block/greenstone_paste_"), attached, frame[turned])
+        variant = rotated(apply["model"].replace("minecraft:block/redstone_dust_", "bluestone:block/greenstone_paste_"), face, frame[turned])
         when = part["when"]
-        when = {"OR": [dict(c, attached=attached) for c in when["OR"]]} if "OR" in when else dict(when, attached=attached)
+        when = {"OR": [paste_condition(c, face) for c in when["OR"]]} if "OR" in when else paste_condition(when, face)
         paste_parts.append({"when": when, "apply": variant})
 write(A + "blockstates/greenstone_paste.json", {"multipart": paste_parts})
 
@@ -420,8 +431,14 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
         write(prefix + D + f"loot_table/blocks/{new}.json", swap_ids(data, ID_PAIRS))
     write(prefix + D + "loot_table/blocks/purplestone_wire.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
-    write(prefix + D + "loot_table/blocks/greenstone_paste.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "greenstone_paste"), ("redstone", "greenstone_paste")]))
+    # One paste for each face, as glow lichen drops one for each face, but without needing shears.
+    paste_loot = vanilla("data/minecraft/loot_table/blocks/glow_lichen.json", jar)
+    for entry in paste_loot["pools"][0]["entries"]:
+        entry.pop("condition", None)
+        entry.pop("conditions", None)
+    paste_loot = json.loads(json.dumps(paste_loot).replace('"true"', '"face"').replace("minecraft:glow_lichen", "bluestone:greenstone_paste")
+                            .replace("minecraft:blocks/glow_lichen", "bluestone:blocks/greenstone_paste"))
+    write(prefix + D + "loot_table/blocks/greenstone_paste.json", paste_loot)
     for ours, theirs in [("greenstone_torch", "redstone_torch"), ("greenstone_block", "redstone_block"), ("greenstone_repeater", "repeater"),
                          ("greenstone_comparator", "comparator"), ("wall_converter", "repeater")] + [(rail, "rail") for rail in FLOOR_RAILS]:
         write(prefix + D + f"loot_table/blocks/{ours}.json", swap_ids(vanilla(f"data/minecraft/loot_table/blocks/{theirs}.json", jar), [(theirs, ours)]))

@@ -8,27 +8,27 @@
             "north": "none",
             "south": "none",
             "west": "none",
-            "attached": "down"
+            "down": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "down"
+            "east": "line|face",
+            "north": "line|face",
+            "down": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "down"
+            "east": "line|face",
+            "south": "line|face",
+            "down": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "down"
+            "south": "line|face",
+            "west": "line|face",
+            "down": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "down"
+            "north": "line|face",
+            "west": "line|face",
+            "down": "face"
           }
         ]
       },
@@ -38,8 +38,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "down"
+        "north": "line|face",
+        "down": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0"
@@ -47,8 +47,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "down"
+        "south": "line|face",
+        "down": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0"
@@ -56,8 +56,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "down"
+        "east": "line|face",
+        "down": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -66,8 +66,8 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "down"
+        "west": "line|face",
+        "down": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
@@ -76,72 +76,33 @@
     },
     {
       "when": {
-        "north": "up",
-        "attached": "down"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up"
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "down"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "down"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "down"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "y": 270
-      }
-    },
-    {
-      "when": {
         "OR": [
           {
-            "east": "none",
+            "west": "none",
             "north": "none",
             "south": "none",
-            "west": "none",
-            "attached": "up"
+            "east": "none",
+            "up": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "up"
+            "west": "line|face",
+            "north": "line|face",
+            "up": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "up"
+            "west": "line|face",
+            "south": "line|face",
+            "up": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "up"
+            "south": "line|face",
+            "east": "line|face",
+            "up": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "up"
+            "north": "line|face",
+            "east": "line|face",
+            "up": "face"
           }
         ]
       },
@@ -153,8 +114,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "up"
+        "north": "line|face",
+        "up": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0",
@@ -164,8 +125,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "up"
+        "south": "line|face",
+        "up": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0",
@@ -175,8 +136,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "up"
+        "west": "line|face",
+        "up": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -186,8 +147,8 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "up"
+        "east": "line|face",
+        "up": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
@@ -197,76 +158,33 @@
     },
     {
       "when": {
-        "north": "up",
-        "attached": "up"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 180,
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "up"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 180,
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "up"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 180
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "up"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 180,
-        "y": 270
-      }
-    },
-    {
-      "when": {
         "OR": [
           {
             "east": "none",
-            "north": "none",
-            "south": "none",
+            "up": "none",
+            "down": "none",
             "west": "none",
-            "attached": "north"
+            "north": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "north"
+            "east": "line|face",
+            "up": "line|face",
+            "north": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "north"
+            "east": "line|face",
+            "down": "line|face",
+            "north": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "north"
+            "down": "line|face",
+            "west": "line|face",
+            "north": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "north"
+            "up": "line|face",
+            "west": "line|face",
+            "north": "face"
           }
         ]
       },
@@ -277,8 +195,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "north"
+        "up": "line|face",
+        "north": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0",
@@ -287,8 +205,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "north"
+        "down": "line|face",
+        "north": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0",
@@ -297,8 +215,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "north"
+        "east": "line|face",
+        "north": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -308,8 +226,8 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "north"
+        "west": "line|face",
+        "north": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
@@ -319,76 +237,33 @@
     },
     {
       "when": {
-        "north": "up",
-        "attached": "north"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "north"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270,
-        "z": 90
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "north"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90,
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "north"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270,
-        "z": 270
-      }
-    },
-    {
-      "when": {
         "OR": [
           {
-            "east": "none",
-            "north": "none",
-            "south": "none",
             "west": "none",
-            "attached": "south"
+            "up": "none",
+            "down": "none",
+            "east": "none",
+            "south": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "south"
+            "west": "line|face",
+            "up": "line|face",
+            "south": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "south"
+            "west": "line|face",
+            "down": "line|face",
+            "south": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "south"
+            "down": "line|face",
+            "east": "line|face",
+            "south": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "south"
+            "up": "line|face",
+            "east": "line|face",
+            "south": "face"
           }
         ]
       },
@@ -400,8 +275,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "south"
+        "up": "line|face",
+        "south": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0",
@@ -411,8 +286,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "south"
+        "down": "line|face",
+        "south": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0",
@@ -422,8 +297,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "south"
+        "west": "line|face",
+        "south": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -433,8 +308,8 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "south"
+        "east": "line|face",
+        "south": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
@@ -444,76 +319,33 @@
     },
     {
       "when": {
-        "north": "up",
-        "attached": "south"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270,
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "south"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90,
-        "z": 90
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "south"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "south"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90,
-        "z": 270
-      }
-    },
-    {
-      "when": {
         "OR": [
           {
-            "east": "none",
             "north": "none",
+            "up": "none",
+            "down": "none",
             "south": "none",
-            "west": "none",
-            "attached": "west"
+            "west": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "west"
+            "north": "line|face",
+            "up": "line|face",
+            "west": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "west"
+            "north": "line|face",
+            "down": "line|face",
+            "west": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "west"
+            "down": "line|face",
+            "south": "line|face",
+            "west": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "west"
+            "up": "line|face",
+            "south": "line|face",
+            "west": "face"
           }
         ]
       },
@@ -525,8 +357,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "west"
+        "up": "line|face",
+        "west": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0",
@@ -536,8 +368,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "west"
+        "down": "line|face",
+        "west": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0",
@@ -547,8 +379,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "west"
+        "north": "line|face",
+        "west": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -558,8 +390,8 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "west"
+        "south": "line|face",
+        "west": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
@@ -569,76 +401,33 @@
     },
     {
       "when": {
-        "north": "up",
-        "attached": "west"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270,
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "west"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "z": 90
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "west"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90,
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "west"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "y": 180,
-        "z": 90
-      }
-    },
-    {
-      "when": {
         "OR": [
           {
-            "east": "none",
-            "north": "none",
             "south": "none",
-            "west": "none",
-            "attached": "east"
+            "up": "none",
+            "down": "none",
+            "north": "none",
+            "east": "face"
           },
           {
-            "east": "side|up",
-            "north": "side|up",
-            "attached": "east"
+            "south": "line|face",
+            "up": "line|face",
+            "east": "face"
           },
           {
-            "east": "side|up",
-            "south": "side|up",
-            "attached": "east"
+            "south": "line|face",
+            "down": "line|face",
+            "east": "face"
           },
           {
-            "south": "side|up",
-            "west": "side|up",
-            "attached": "east"
+            "down": "line|face",
+            "north": "line|face",
+            "east": "face"
           },
           {
-            "north": "side|up",
-            "west": "side|up",
-            "attached": "east"
+            "up": "line|face",
+            "north": "line|face",
+            "east": "face"
           }
         ]
       },
@@ -650,8 +439,8 @@
     },
     {
       "when": {
-        "north": "side|up",
-        "attached": "east"
+        "up": "line|face",
+        "east": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side0",
@@ -661,8 +450,8 @@
     },
     {
       "when": {
-        "south": "side|up",
-        "attached": "east"
+        "down": "line|face",
+        "east": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt0",
@@ -672,8 +461,8 @@
     },
     {
       "when": {
-        "east": "side|up",
-        "attached": "east"
+        "south": "line|face",
+        "east": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side_alt1",
@@ -682,54 +471,11 @@
     },
     {
       "when": {
-        "west": "side|up",
-        "attached": "east"
+        "north": "line|face",
+        "east": "face"
       },
       "apply": {
         "model": "bluestone:block/greenstone_paste_side1",
-        "z": 270
-      }
-    },
-    {
-      "when": {
-        "north": "up",
-        "attached": "east"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 270,
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "east": "up",
-        "attached": "east"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "y": 180,
-        "z": 270
-      }
-    },
-    {
-      "when": {
-        "south": "up",
-        "attached": "east"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
-        "x": 90,
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "west": "up",
-        "attached": "east"
-      },
-      "apply": {
-        "model": "bluestone:block/greenstone_paste_up",
         "z": 270
       }
     }
