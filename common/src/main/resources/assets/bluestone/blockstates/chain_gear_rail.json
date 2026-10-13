@@ -41,6 +41,30 @@
     },
     "reversed=true,shape=north_south": {
       "model": "bluestone:block/chain_gear_rail_flat_reversed"
+    },
+    "reversed=false,shape=south_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=true,shape=south_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=false,shape=south_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=true,shape=south_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=false,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=true,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=false,shape=north_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "reversed=true,shape=north_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
     }
   }
 }

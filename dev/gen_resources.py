@@ -173,7 +173,13 @@ ROTATIONS = {
 }
 
 
+AXES = {"down": "y", "up": "y", "north": "z", "south": "z", "east": "x", "west": "x"}
+
+
 def rotated(model, attached, output):
+    # States that point into their own face can't be placed; they get a model anyway so the game doesn't warn.
+    if (attached, output) not in ROTATIONS:
+        output = next(d for d in ["north", "south", "east", "west", "up", "down"] if AXES[d] != AXES[attached])
     variant = {"model": model}
     for axis, angle in zip("xyz", ROTATIONS[(attached, output)]):
         if angle:
@@ -181,13 +187,14 @@ def rotated(model, attached, output):
     return variant
 
 
+ALL_PAIRS = [(a, b) for a in AXES for b in AXES]
 GREEN_TORCHES = {"unlit": "bluestone:block/greenstone_torch_off", "lit": "bluestone:block/greenstone_torch"}
 variants = {}
 for delay in range(1, 5):
     for on in ["", "_on"]:
         for locked in ["", "_locked"]:
             diode_model(f"repeater_{delay}tick{on}{locked}", f"greenstone_repeater_{delay}tick{on}{locked}", f"bluestone:block/greenstone_repeater{on}", GREEN_TORCHES)
-            for attached, output in ROTATIONS:
+            for attached, output in ALL_PAIRS:
                 key = f"attached={attached},delay={delay},locked={str(bool(locked)).lower()},output={output},powered={str(bool(on)).lower()}"
                 variants[key] = rotated(f"bluestone:block/greenstone_repeater_{delay}tick{on}{locked}", attached, output)
 write(A + "blockstates/greenstone_repeater.json", {"variants": variants})
@@ -195,7 +202,7 @@ variants = {}
 for variant in ["", "_on", "_subtract", "_on_subtract"]:
     on = "_on" if variant.startswith("_on") else ""
     diode_model(f"comparator{variant}", f"greenstone_comparator{variant}", f"bluestone:block/greenstone_comparator{on}", GREEN_TORCHES)
-    for attached, output in ROTATIONS:
+    for attached, output in ALL_PAIRS:
         key = f"attached={attached},mode={'subtract' if 'subtract' in variant else 'compare'},output={output},powered={str(bool(on)).lower()}"
         variants[key] = rotated(f"bluestone:block/greenstone_comparator{variant}", attached, output)
 write(A + "blockstates/greenstone_comparator.json", {"variants": variants})
@@ -252,13 +259,17 @@ for rail in ["chain_gear_rail", "slime_chain_gear_rail"]:
             if y:
                 out["y"] = y
             variants[f"reversed={str(reversed_).lower()},shape={shape}"] = out
+    # Chain gear rails are straight, so they never curve; the curved shapes get the flat model to keep the game quiet.
+    for shape in ["south_east", "south_west", "north_west", "north_east"]:
+        for reversed_ in ["false", "true"]:
+            variants[f"reversed={reversed_},shape={shape}"] = {"model": f"bluestone:block/{rail}_flat"}
     write(A + f"blockstates/{rail}.json", {"variants": variants})
 
 # On walls and ceilings: the floor model turned onto the face it sits on, its arrow along the way it travels.
 for attached_rail, model in [("attached_slime_rail", "bluestone:block/slime_rail"), ("attached_slime_chain_gear_rail", "bluestone:block/slime_chain_gear_rail_flat")]:
     write(A + f"blockstates/{attached_rail}.json", {"variants": {
         f"attached={attached},travel={travel}": rotated(model, attached, {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}[travel])
-        for (down, travel) in ROTATIONS if (attached := down) != "down"}})
+        for (attached, travel) in ALL_PAIRS if attached != "down"}})
 
 # Item models and item definitions
 GENERATED = {

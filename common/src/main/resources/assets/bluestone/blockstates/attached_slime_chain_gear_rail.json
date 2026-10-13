@@ -1,37 +1,57 @@
 {
   "variants": {
-    "attached=east,travel=down": {
+    "attached=up,travel=down": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 270,
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,travel=up": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,travel=north": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 180
+    },
+    "attached=up,travel=south": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,travel=east": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 180,
       "y": 90
     },
-    "attached=east,travel=north": {
+    "attached=up,travel=west": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "y": 180,
-      "z": 270
-    },
-    "attached=east,travel=south": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "z": 270
-    },
-    "attached=east,travel=up": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 90,
+      "x": 180,
       "y": 270
     },
     "attached=north,travel=down": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "x": 270
     },
-    "attached=north,travel=east": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 270,
-      "z": 270
-    },
     "attached=north,travel=up": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "x": 90,
       "y": 180
+    },
+    "attached=north,travel=north": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,travel=south": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,travel=east": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 270,
+      "z": 270
     },
     "attached=north,travel=west": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
@@ -43,43 +63,66 @@
       "x": 270,
       "y": 180
     },
+    "attached=south,travel=up": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 90
+    },
+    "attached=south,travel=north": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,travel=south": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 90,
+      "z": 270
+    },
     "attached=south,travel=east": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "x": 90,
       "z": 90
-    },
-    "attached=south,travel=up": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 90
     },
     "attached=south,travel=west": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "x": 90,
       "z": 270
     },
-    "attached=up,travel=east": {
+    "attached=east,travel=down": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 180,
+      "x": 270,
       "y": 90
     },
-    "attached=up,travel=north": {
+    "attached=east,travel=up": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 180
-    },
-    "attached=up,travel=south": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 180,
-      "y": 180
-    },
-    "attached=up,travel=west": {
-      "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 180,
+      "x": 90,
       "y": 270
+    },
+    "attached=east,travel=north": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,travel=south": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "z": 270
+    },
+    "attached=east,travel=east": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "z": 270
+    },
+    "attached=east,travel=west": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "z": 270
     },
     "attached=west,travel=down": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "x": 270,
       "y": 270
+    },
+    "attached=west,travel=up": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "x": 90,
+      "y": 90
     },
     "attached=west,travel=north": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
@@ -90,10 +133,13 @@
       "model": "bluestone:block/slime_chain_gear_rail_flat",
       "z": 90
     },
-    "attached=west,travel=up": {
+    "attached=west,travel=east": {
       "model": "bluestone:block/slime_chain_gear_rail_flat",
-      "x": 90,
-      "y": 90
+      "z": 90
+    },
+    "attached=west,travel=west": {
+      "model": "bluestone:block/slime_chain_gear_rail_flat",
+      "z": 90
     }
   }
 }

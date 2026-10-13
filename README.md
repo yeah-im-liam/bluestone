@@ -14,6 +14,10 @@ Inspired by [ajjxf's bluestone mod](https://modrinth.com/mod/bluestone_ajjxf).
 - Bluestone and purplestone dust are armor trim materials, with their own blue and purple trim colours.
 - Purplestone dust, purplestone torches and the Block of Purplestone work with both: redstone and bluestone power them, and redstone and bluestone dust, torches, repeaters, comparators and rails all pick up their signal at full strength. Mixing costs strength the other way: purplestone dust takes a redstone or bluestone signal at half strength, rounded down, so redstone dust at 10 gives it 5. Levers, buttons and other plain switches still give it full power. The converter changes colour without losing any strength.
 - The converter is a repeater that turns a redstone signal into a bluestone one, or the other way round. Right-click it to swap the direction. Purplestone powers it in either direction. Like a repeater, a repeater or comparator (of either kind) pointing into its side locks it.
+- Greenstone paste is wiring that sticks to floors, walls and ceilings. It loses one level of strength per block, around corners and up walls too. Greenstone torches, the Block of Greenstone, and greenstone repeaters and comparators go with it; the repeaters and comparators work on walls and ceilings as well, pointing any way along them. Only a greenstone repeater restores the signal. Redstone and bluestone ignore greenstone, and greenstone meets purplestone only through the wall converter.
+- The wall converter hangs on a wall and joins purplestone dust and greenstone paste, both ways, without losing any strength. It is not a repeater.
+- Slime rails stick to floors, walls and ceilings, and carts can go from floor to wall to ceiling. They don't move carts themselves. A cart climbs a wall on its own momentum, slowing as it goes, and rolls back down if it runs out; on a ceiling it needs some speed to stay on.
+- Chain gear rails move carts at a fixed speed the way they were placed, whatever speed they come in with, so carts can't roll back. Slime chain gear rails do the same on walls and ceilings, so they carry carts straight up a wall or along a ceiling at any speed.
 - Novice clerics sell 2 bluestone dust instead of 2 redstone dust a quarter of the time.
 - Programmer Art textures are included.
 
@@ -25,6 +29,10 @@ Same recipes as the redstone versions, with bluestone dust and bluestone torches
 - Purplestone torch: purplestone dust on a stick.
 - Block of Purplestone: 9 purplestone dust, and back into 9 dust.
 - Converter: a redstone torch, purplestone dust and a bluestone torch on top of three stone.
+- Greenstone paste: 1 purplestone dust and 1 slimeball make 2, or 1 redstone dust, 1 bluestone dust and 2 slimeballs make 4.
+- Greenstone torches, blocks, repeaters and comparators: the redstone recipes with greenstone paste and greenstone torches.
+- Wall converter: purplestone dust, greenstone paste and stone.
+- Slime rails: 8 rails around a slimeball. Chain gear rails: 8 rails around an iron chain. Slime chain gear rails: 8 chain gear rails around a slimeball.
 
 ## Compatibility
 
