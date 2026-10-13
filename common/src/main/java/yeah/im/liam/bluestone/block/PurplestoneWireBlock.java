@@ -5,14 +5,40 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
+import yeah.im.liam.bluestone.signal.Listener;
+import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * Purplestone dust takes power from both redstone and bluestone, and both pick up its signal, so it links the two.
- * Like redstone dust, it can't sit in water.
+ * Purplestone dust takes power from both redstone and bluestone, but only at half strength, rounded down; both pick up
+ * its own signal at full strength. Like redstone dust, it can't sit in water.
  */
 public class PurplestoneWireBlock extends ColoredWireBlock {
+    // Redstone and bluestone signals come in at half strength; purplestone and plain sources such as levers at full.
+    private static final Listener LISTENER = new Listener() {
+        @Override
+        public boolean hears(Channel source) {
+            return true;
+        }
+
+        @Override
+        public int heard(Channel source, int signal) {
+            return source == Channel.PURPLESTONE ? signal : signal / 2;
+        }
+    };
+
     public PurplestoneWireBlock(Properties properties) {
         super(properties, Channel.PURPLESTONE, (red, green, blue) -> ARGB.colorFromFloat(1.0F, red * 0.6F, green, red));
+    }
+
+    @Override
+    protected Listener listener() {
+        return LISTENER;
+    }
+
+    // Redstone or bluestone dust at 10 gives purplestone dust 5, instead of the 9 it would give its own kind.
+    @Override
+    protected int powerFromOtherDust(BlockState state) {
+        return Signals.isDust(state) ? state.getValue(POWER) / 2 : 0;
     }
 
     // Every kind of dust bends towards purplestone dust, since all of them can feed it.

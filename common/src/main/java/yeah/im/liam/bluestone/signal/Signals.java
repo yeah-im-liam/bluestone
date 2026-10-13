@@ -55,19 +55,19 @@ public final class Signals {
         return read(listener, () -> reader.getAsBoolean() ? 1 : 0) != 0;
     }
 
-    public static boolean hidden(BlockState source) {
+    /**
+     * The strength at which the current reader gets a signal from the given source: none if it can't hear it.
+     */
+    public static int heard(BlockState source, int signal) {
         if (READERS.get() == 0) {
-            return false;
+            return signal;
         }
         if (DUST_READING.get() && isDust(source)) {
-            return true;
+            return 0;
         }
         Listener listener = LISTENER.get();
-        if (listener == null) {
-            return false;
-        }
         Channel channel = Channel.ofSource(source);
-        return channel != null && !listener.hears(channel);
+        return listener == null || channel == null ? signal : listener.heard(channel, signal);
     }
 
     public static boolean isDust(BlockState state) {

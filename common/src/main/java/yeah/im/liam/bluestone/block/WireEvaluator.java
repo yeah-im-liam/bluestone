@@ -21,7 +21,7 @@ abstract class WireEvaluator {
     }
 
     protected int getWireSignal(BlockPos pos, BlockState state) {
-        return wireBlock.takesPowerFrom(state) ? state.getValue(ColoredWireBlock.POWER) : 0;
+        return state.is(wireBlock) ? state.getValue(ColoredWireBlock.POWER) : 0;
     }
 
     protected int getIncomingWireSignal(Level level, BlockPos pos) {
@@ -29,16 +29,22 @@ abstract class WireEvaluator {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockPos neighborPos = pos.relative(direction);
             BlockState neighborState = level.getBlockState(neighborPos);
-            wireSignal = Math.max(wireSignal, getWireSignal(neighborPos, neighborState));
+            wireSignal = Math.max(wireSignal, getReceivedSignal(neighborPos, neighborState));
             BlockPos abovePos = pos.above();
             if (neighborState.isRedstoneConductor(level, neighborPos) && !level.getBlockState(abovePos).isRedstoneConductor(level, abovePos)) {
                 BlockPos aboveNeighborPos = neighborPos.above();
-                wireSignal = Math.max(wireSignal, getWireSignal(aboveNeighborPos, level.getBlockState(aboveNeighborPos)));
+                wireSignal = Math.max(wireSignal, getReceivedSignal(aboveNeighborPos, level.getBlockState(aboveNeighborPos)));
             } else if (!neighborState.isRedstoneConductor(level, neighborPos)) {
                 BlockPos belowNeighborPos = neighborPos.below();
-                wireSignal = Math.max(wireSignal, getWireSignal(belowNeighborPos, level.getBlockState(belowNeighborPos)));
+                wireSignal = Math.max(wireSignal, getReceivedSignal(belowNeighborPos, level.getBlockState(belowNeighborPos)));
             }
         }
-        return Math.max(0, wireSignal - 1);
+        return wireSignal;
+    }
+
+    // What this dust gets from a piece of dust next to it: one level less than its own kind has, and whatever the dust
+    // makes of other colours.
+    private int getReceivedSignal(BlockPos pos, BlockState state) {
+        return state.is(wireBlock) ? Math.max(0, getWireSignal(pos, state) - 1) : wireBlock.powerFromOtherDust(state);
     }
 }

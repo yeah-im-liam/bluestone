@@ -7,4 +7,11 @@ package yeah.im.liam.bluestone.signal;
 @FunctionalInterface
 public interface Listener {
     boolean hears(Channel source);
+
+    /**
+     * How strong a signal of the given strength from the given channel is to this listener.
+     */
+    default int heard(Channel source, int signal) {
+        return hears(source) ? signal : 0;
+    }
 }

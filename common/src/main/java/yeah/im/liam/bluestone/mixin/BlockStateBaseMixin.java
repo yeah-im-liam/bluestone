@@ -11,6 +11,6 @@ import yeah.im.liam.bluestone.signal.Signals;
 abstract class BlockStateBaseMixin {
     @ModifyReturnValue(method = {"getSignal", "getDirectSignal"}, at = @At("RETURN"))
     private int bluestone$hideOtherChannel(int signal) {
-        return signal != 0 && Signals.hidden((BlockState) (Object) this) ? 0 : signal;
+        return signal == 0 ? 0 : Signals.heard((BlockState) (Object) this, signal);
     }
 }

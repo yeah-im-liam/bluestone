@@ -41,6 +41,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
+import yeah.im.liam.bluestone.signal.Listener;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
@@ -248,7 +249,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     public int getBlockSignal(Level level, BlockPos pos) {
-        return Signals.readForDust(channel, () -> {
+        return Signals.readForDust(listener(), () -> {
             shouldSignal = false;
             try {
                 return level.getBestNeighborSignal(pos);
@@ -259,11 +260,18 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     /**
-     * Whether power runs into this dust along the wire from the given block: from dust of its own kind, and between
-     * purplestone and the other colours.
+     * How this dust hears the blocks around it.
      */
-    boolean takesPowerFrom(BlockState state) {
-        return Signals.isDust(state) && channel.hears(Channel.ofSource(state));
+    protected Listener listener() {
+        return channel;
+    }
+
+    /**
+     * The power this dust takes along the wire from a piece of dust of another colour: one level less, as from its own
+     * kind, if it hears that colour, and none otherwise.
+     */
+    protected int powerFromOtherDust(BlockState state) {
+        return Signals.isDust(state) && channel.hears(Channel.ofSource(state)) ? Math.max(0, state.getValue(POWER) - 1) : 0;
     }
 
     private void checkCornerChangeAt(Level level, BlockPos pos) {
