@@ -20,7 +20,8 @@
     "wire.ModernWireMixin"
   ],
   "client": [
-    "ClientItemInfoLoaderMixin"
+    "ClientItemInfoLoaderMixin",
+    "ClientLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

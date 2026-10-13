@@ -2,8 +2,6 @@ package yeah.im.liam.bluestone.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -86,7 +84,6 @@ public class GreenstoneRepeaterBlock extends GreenstoneDiodeBlock {
             return InteractionResult.PASS;
         }
         level.setBlock(pos, state.cycle(DELAY), Block.UPDATE_ALL);
-        level.playSound(player, pos, SoundEvents.COMPARATOR_CLICK, SoundSource.BLOCKS, 0.3F, 0.5F);
         return InteractionResult.SUCCESS;
     }
 }
