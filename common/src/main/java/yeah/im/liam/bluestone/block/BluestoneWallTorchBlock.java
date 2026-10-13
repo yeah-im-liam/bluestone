@@ -53,7 +53,7 @@ public class BluestoneWallTorchBlock extends RedstoneWallTorchBlock implements S
             double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2 + 0.27 * opposite.getStepX();
             double y = pos.getY() + 0.7 + (random.nextDouble() - 0.5) * 0.2 + 0.22;
             double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2 + 0.27 * opposite.getStepZ();
-            level.addParticle(BluestoneDiodes.PARTICLE, x, y, z, 0.0, 0.0, 0.0);
+            BluestoneDiodes.particle(level, x, y, z);
         }
     }
 

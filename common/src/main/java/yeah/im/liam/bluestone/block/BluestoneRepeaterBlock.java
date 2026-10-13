@@ -71,7 +71,7 @@ public class BluestoneRepeaterBlock extends RepeaterBlock implements SimpleWater
             offset = state.getValue(DELAY) * 2 - 1;
         }
         offset /= 16.0F;
-        level.addParticle(BluestoneDiodes.PARTICLE, x + offset * direction.getStepX(), y, z + offset * direction.getStepZ(), 0.0, 0.0, 0.0);
+        BluestoneDiodes.particle(level, x + offset * direction.getStepX(), y, z + offset * direction.getStepZ());
     }
 
     @Override

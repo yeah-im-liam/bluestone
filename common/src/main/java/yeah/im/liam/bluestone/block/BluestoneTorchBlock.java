@@ -52,7 +52,7 @@ public class BluestoneTorchBlock extends RedstoneTorchBlock implements SimpleWat
             double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
             double y = pos.getY() + 0.7 + (random.nextDouble() - 0.5) * 0.2;
             double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
-            level.addParticle(BluestoneDiodes.PARTICLE, x, y, z, 0.0, 0.0, 0.0);
+            BluestoneDiodes.particle(level, x, y, z);
         }
     }
 

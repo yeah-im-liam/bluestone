@@ -421,6 +421,8 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
             double y = 0.5 + 0.4375F * side.getStepY() + positionOnLine * along.getStepY();
             double z = 0.5 + 0.4375F * side.getStepZ() + positionOnLine * along.getStepZ();
             level.addParticle(new DustParticleOptions(color, 1.0F), pos.getX() + x, pos.getY() + y, pos.getZ() + z, 0.0, 0.0, 0.0);
+            // Only bluestone dust is ever underwater.
+            BluestoneDiodes.bubble(level, pos.getX() + x, pos.getY() + y, pos.getZ() + z);
         }
     }
 

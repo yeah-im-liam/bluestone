@@ -3,6 +3,8 @@ package yeah.im.liam.bluestone.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.DiodeBlock;
@@ -18,6 +20,18 @@ final class BluestoneDiodes {
     static final DustParticleOptions PARTICLE = new DustParticleOptions(0x0000FF, 1.0F);
 
     private BluestoneDiodes() {
+    }
+
+    // A powered bluestone particle, with a bubble when it is underwater.
+    static void particle(Level level, double x, double y, double z) {
+        level.addParticle(PARTICLE, x, y, z, 0.0, 0.0, 0.0);
+        bubble(level, x, y, z);
+    }
+
+    static void bubble(Level level, double x, double y, double z) {
+        if (level.getFluidState(BlockPos.containing(x, y, z)).is(FluidTags.WATER)) {
+            level.addParticle(ParticleTypes.BUBBLE, x, y, z, 0.0, 0.02, 0.0);
+        }
     }
 
     static int input(Level level, BlockPos pos, BlockState state) {

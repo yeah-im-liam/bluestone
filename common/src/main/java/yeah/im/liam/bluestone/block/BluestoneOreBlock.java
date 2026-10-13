@@ -70,7 +70,7 @@ public class BluestoneOreBlock extends RedStoneOreBlock {
                 double dx = axis == Direction.Axis.X ? 0.5 + 0.5625 * direction.getStepX() : random.nextFloat();
                 double dy = axis == Direction.Axis.Y ? 0.5 + 0.5625 * direction.getStepY() : random.nextFloat();
                 double dz = axis == Direction.Axis.Z ? 0.5 + 0.5625 * direction.getStepZ() : random.nextFloat();
-                level.addParticle(BluestoneDiodes.PARTICLE, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz, 0.0, 0.0, 0.0);
+                BluestoneDiodes.particle(level, pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
             }
         }
     }
