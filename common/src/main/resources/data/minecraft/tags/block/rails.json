@@ -2,6 +2,9 @@
   "values": [
     "bluestone:bluestone_powered_rail",
     "bluestone:bluestone_detector_rail",
-    "bluestone:bluestone_activator_rail"
+    "bluestone:bluestone_activator_rail",
+    "bluestone:slime_rail",
+    "bluestone:chain_gear_rail",
+    "bluestone:slime_chain_gear_rail"
   ]
 }

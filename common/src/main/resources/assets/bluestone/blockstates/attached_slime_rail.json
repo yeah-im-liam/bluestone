@@ -1,0 +1,99 @@
+{
+  "variants": {
+    "attached=east,travel=down": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,travel=north": {
+      "model": "bluestone:block/slime_rail",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,travel=south": {
+      "model": "bluestone:block/slime_rail",
+      "z": 270
+    },
+    "attached=east,travel=up": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90,
+      "y": 270
+    },
+    "attached=north,travel=down": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270
+    },
+    "attached=north,travel=east": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270,
+      "z": 270
+    },
+    "attached=north,travel=up": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,travel=west": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=south,travel=down": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,travel=east": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90,
+      "z": 90
+    },
+    "attached=south,travel=up": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90
+    },
+    "attached=south,travel=west": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=up,travel=east": {
+      "model": "bluestone:block/slime_rail",
+      "x": 180,
+      "y": 90
+    },
+    "attached=up,travel=north": {
+      "model": "bluestone:block/slime_rail",
+      "x": 180
+    },
+    "attached=up,travel=south": {
+      "model": "bluestone:block/slime_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,travel=west": {
+      "model": "bluestone:block/slime_rail",
+      "x": 180,
+      "y": 270
+    },
+    "attached=west,travel=down": {
+      "model": "bluestone:block/slime_rail",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,travel=north": {
+      "model": "bluestone:block/slime_rail",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,travel=south": {
+      "model": "bluestone:block/slime_rail",
+      "z": 90
+    },
+    "attached=west,travel=up": {
+      "model": "bluestone:block/slime_rail",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

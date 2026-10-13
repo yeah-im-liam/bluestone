@@ -211,6 +211,55 @@ write(A + "blockstates/wall_converter.json", {"variants": {
     f"facing={facing}": ({"model": "bluestone:block/wall_converter", "y": y} if y else {"model": "bluestone:block/wall_converter"})
     for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]}})
 
+# Slime rails and chain gear rails. The slime rail on a floor is an ordinary rail with its own texture.
+for name in ["rail", "rail_corner", "rail_raised_ne", "rail_raised_sw"]:
+    model = vanilla(f"assets/minecraft/models/block/{name}.json")
+    model["textures"] = {k: v.replace("minecraft:block/rail", "bluestone:block/slime_rail") for k, v in model["textures"].items()}
+    write(A + f"models/block/slime_{name}.json", model)
+write(A + "blockstates/slime_rail.json", swap_models(vanilla("assets/minecraft/blockstates/rail.json"), [("minecraft:block/rail", "bluestone:block/slime_rail")]))
+
+# Chain gear rails have an arrow on their texture pointing the way they drive carts. On the game's rail models the
+# texture's bottom edge is south; a "_reversed" model turns the texture round where the rotation can't (on slopes).
+def flipped(model_name, textures, reversed_texture):
+    model = vanilla(f"assets/minecraft/models/block/{model_name}.json")
+    if reversed_texture:
+        for element in model["elements"]:
+            for face in element["faces"].values():
+                face["rotation"] = (face.get("rotation", 0) + 180) % 360
+    model["textures"] = dict(model.get("textures", {}), **textures)
+    return model
+
+
+TURN = {0: "south", 90: "west", 180: "north", 270: "east"}
+for rail in ["chain_gear_rail", "slime_chain_gear_rail"]:
+    texture = {"rail": f"bluestone:block/{rail}", "particle": f"bluestone:block/{rail}"}
+    for kind, template in [("flat", "rail_flat"), ("raised_ne", "template_rail_raised_ne"), ("raised_sw", "template_rail_raised_sw")]:
+        write(A + f"models/block/{rail}_{kind}.json", flipped(template, texture, False))
+        write(A + f"models/block/{rail}_{kind}_reversed.json", flipped(template, texture, True))
+    variants = {}
+    for key, variant in vanilla("assets/minecraft/blockstates/powered_rail.json")["variants"].items():
+        props = dict(part.split("=") for part in key.split(","))
+        if props["powered"] != "false":
+            continue
+        shape = props["shape"]
+        kind = "raised_ne" if variant["model"].endswith("raised_ne") else "raised_sw" if variant["model"].endswith("raised_sw") else "flat"
+        y = variant.get("y", 0)
+        for reversed_ in [False, True]:
+            axis_z = shape in ("north_south", "ascending_north", "ascending_south")
+            drive = ("north" if reversed_ else "south") if axis_z else ("west" if reversed_ else "east")
+            name = f"bluestone:block/{rail}_{kind}" + ("" if TURN[y] == drive else "_reversed")
+            out = {"model": name}
+            if y:
+                out["y"] = y
+            variants[f"reversed={str(reversed_).lower()},shape={shape}"] = out
+    write(A + f"blockstates/{rail}.json", {"variants": variants})
+
+# On walls and ceilings: the floor model turned onto the face it sits on, its arrow along the way it travels.
+for attached_rail, model in [("attached_slime_rail", "bluestone:block/slime_rail"), ("attached_slime_chain_gear_rail", "bluestone:block/slime_chain_gear_rail_flat")]:
+    write(A + f"blockstates/{attached_rail}.json", {"variants": {
+        f"attached={attached},travel={travel}": rotated(model, attached, {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}[travel])
+        for (down, travel) in ROTATIONS if (attached := down) != "down"}})
+
 # Item models and item definitions
 GENERATED = {
     "bluestone": "bluestone:item/bluestone",
@@ -223,6 +272,9 @@ GENERATED = {
     "greenstone_repeater": "bluestone:item/greenstone_repeater",
     "greenstone_comparator": "bluestone:item/greenstone_comparator",
     "wall_converter": "bluestone:block/wall_converter",
+    "slime_rail": "bluestone:block/slime_rail",
+    "chain_gear_rail": "bluestone:block/chain_gear_rail",
+    "slime_chain_gear_rail": "bluestone:block/slime_chain_gear_rail",
     "bluestone_repeater": "bluestone:item/bluestone_repeater",
     "bluestone_comparator": "bluestone:item/bluestone_comparator",
     "bluestone_powered_rail": "bluestone:block/bluestone_powered_rail",
@@ -280,6 +332,9 @@ write(A + "lang/en_us.json", {
     "block.bluestone.greenstone_repeater": "Greenstone Repeater",
     "block.bluestone.greenstone_comparator": "Greenstone Comparator",
     "block.bluestone.wall_converter": "Wall Converter",
+    "block.bluestone.slime_rail": "Slime Rail",
+    "block.bluestone.chain_gear_rail": "Chain Gear Rail",
+    "block.bluestone.slime_chain_gear_rail": "Slime Chain Gear Rail",
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
@@ -312,7 +367,8 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     write(prefix + D + "loot_table/blocks/greenstone_paste.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/resin_clump.json", jar), [("resin_clump", "greenstone_paste")]))
     for ours, theirs in [("greenstone_torch", "redstone_torch"), ("greenstone_block", "redstone_block"), ("greenstone_repeater", "repeater"),
-                         ("greenstone_comparator", "comparator"), ("wall_converter", "repeater")]:
+                         ("greenstone_comparator", "comparator"), ("wall_converter", "repeater"), ("slime_rail", "rail"),
+                         ("chain_gear_rail", "rail"), ("slime_chain_gear_rail", "rail")]:
         write(prefix + D + f"loot_table/blocks/{ours}.json", swap_ids(vanilla(f"data/minecraft/loot_table/blocks/{theirs}.json", jar), [(theirs, ours)]))
     write(prefix + D + "loot_table/blocks/purplestone_block.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_block.json", jar), [("redstone_block", "purplestone_block")]))
@@ -375,6 +431,12 @@ write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
 write(D + "recipe/wall_converter.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
                                         "ingredients": ["bluestone:purplestone", "bluestone:greenstone_paste", "minecraft:stone"],
                                         "result": {"id": "bluestone:wall_converter"}})
+for rail, middle in [("slime_rail", "minecraft:slime_ball"), ("chain_gear_rail", "minecraft:iron_chain")]:
+    write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc", "key": {"R": "minecraft:rail", "#": middle},
+                                     "pattern": ["RRR", "R#R", "RRR"], "result": {"count": 8, "id": f"bluestone:{rail}"}})
+write(D + "recipe/slime_chain_gear_rail.json", {"type": "minecraft:crafting_shaped", "category": "misc",
+                                               "key": {"R": "bluestone:chain_gear_rail", "#": "minecraft:slime_ball"},
+                                               "pattern": ["RRR", "R#R", "RRR"], "result": {"count": 8, "id": "bluestone:slime_chain_gear_rail"}})
 write(D + "recipe/converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
                                    "key": {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
                                    "pattern": ["R#B", "III"], "result": {"id": "bluestone:converter"}})
@@ -382,14 +444,17 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     template = vanilla("data/minecraft/advancement/recipes/redstone/repeater.json", jar)
     recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
     for recipe, unlocked_by in [("purplestone", "bluestone"), ("converter", "purplestone"), ("greenstone_paste", "purplestone"),
-                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("wall_converter", "greenstone_paste")]:
+                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("wall_converter", "greenstone_paste"),
+                                ("slime_rail", "minecraft:rail"), ("chain_gear_rail", "minecraft:rail"), ("slime_chain_gear_rail", "chain_gear_rail")]:
+        item = unlocked_by if ":" in unlocked_by else "bluestone:" + unlocked_by
+        has = "has_" + item.split(":")[1]
         write(prefix + D + "advancement/recipes/redstone/" + recipe + ".json", {
             "parent": "minecraft:recipes/root",
             "criteria": {
-                "has_" + unlocked_by: {"conditions": {"items": [{"items": "bluestone:" + unlocked_by}]}, "trigger": "minecraft:inventory_changed"},
+                has: {"conditions": {"items": [{"items": item}]}, "trigger": "minecraft:inventory_changed"},
                 "has_the_recipe": {"conditions": {recipe_key: "bluestone:" + recipe}, "trigger": "minecraft:recipe_unlocked"},
             },
-            "requirements": [["has_the_recipe", "has_" + unlocked_by]],
+            "requirements": [["has_the_recipe", has]],
             "rewards": {"recipes": ["bluestone:" + recipe]},
         })
 
@@ -463,7 +528,8 @@ write(D + "tags/worldgen/biome/has_more_bluestone.json",
 # Tags
 write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
-RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail"]}
+RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail",
+                   "bluestone:slime_rail", "bluestone:chain_gear_rail", "bluestone:slime_chain_gear_rail"]}
 write("data/minecraft/tags/block/rails.json", RAILS)
 write("data/minecraft/tags/item/rails.json", RAILS)
 # Since 26.3 flowing water only breaks blocks in this tag; 26.1 and 26.2 break anything that doesn't block movement.

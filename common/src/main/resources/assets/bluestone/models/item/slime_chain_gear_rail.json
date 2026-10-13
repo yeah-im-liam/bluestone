@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "bluestone:block/slime_chain_gear_rail"
+  }
+}

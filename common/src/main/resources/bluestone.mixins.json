@@ -5,14 +5,15 @@
   "compatibilityLevel": "JAVA_25",
   "minVersion": "0.8",
   "mixins": [
+    "AbstractMinecartMixin",
     "BlockStateBaseMixin",
     "DiodeBlockMixin",
     "LevelMixin",
     "OreFeatureMixin",
     "PoweredRailBlockMixin",
     "RedstoneTorchBlockMixin",
-    "RedstoneWireEvaluatorMixin",
     "RedstoneWallTorchBlockMixin",
+    "RedstoneWireEvaluatorMixin",
     "wire.LegacyWireMixin",
     "wire.ModernWireMixin"
   ],

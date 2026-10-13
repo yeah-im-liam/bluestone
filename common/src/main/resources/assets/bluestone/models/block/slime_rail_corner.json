@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_curved",
+  "textures": {
+    "rail": "bluestone:block/slime_rail_corner"
+  }
+}
