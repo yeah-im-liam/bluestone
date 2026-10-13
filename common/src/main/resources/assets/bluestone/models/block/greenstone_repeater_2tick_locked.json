@@ -3,6 +3,7 @@
   "textures": {
     "particle": "bluestone:block/greenstone_repeater",
     "top": "bluestone:block/greenstone_repeater",
-    "unlit": "bluestone:block/greenstone_torch_off"
+    "unlit": "bluestone:block/greenstone_torch_off",
+    "slab": "bluestone:block/greenstone_back"
   }
 }

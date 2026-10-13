@@ -179,7 +179,8 @@ def rotated(model, attached, output):
 
 
 ALL_PAIRS = [(a, b) for a in AXES for b in AXES]
-GREEN_TORCHES = {"unlit": "bluestone:block/greenstone_torch_off", "lit": "bluestone:block/greenstone_torch"}
+# Greenstone repeaters and comparators have their own sides and back, greenstone_back, in place of smooth stone.
+GREEN_TORCHES = {"unlit": "bluestone:block/greenstone_torch_off", "lit": "bluestone:block/greenstone_torch", "slab": "bluestone:block/greenstone_back"}
 variants = {}
 for delay in range(1, 5):
     for on in ["", "_on"]:

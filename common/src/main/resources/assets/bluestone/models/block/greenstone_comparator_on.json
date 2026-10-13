@@ -4,6 +4,7 @@
     "particle": "bluestone:block/greenstone_comparator_on",
     "top": "bluestone:block/greenstone_comparator_on",
     "unlit": "bluestone:block/greenstone_torch_off",
-    "lit": "bluestone:block/greenstone_torch"
+    "lit": "bluestone:block/greenstone_torch",
+    "slab": "bluestone:block/greenstone_back"
   }
 }
