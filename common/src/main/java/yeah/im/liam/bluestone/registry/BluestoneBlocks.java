@@ -133,11 +133,7 @@ public final class BluestoneBlocks {
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
         converter = blocks.register("converter", key -> new ConverterBlock(props(key, diodeProperties())));
-        paste = blocks.register("greenstone_paste", key -> new GreenstonePasteBlock(props(key, BlockBehaviour.Properties.of()
-            .noCollision()
-            .instabreak()
-            .sound(SoundType.SLIME_BLOCK)
-            .pushReaction(POPPED))));
+        paste = blocks.register("greenstone_paste", key -> new GreenstonePasteBlock(props(key, wireProperties())));
         greenstoneTorch = blocks.register("greenstone_torch", key -> new GreenstoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
         greenstoneWallTorch = blocks.register("greenstone_wall_torch", key -> new GreenstoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
             .overrideLootTable(greenstoneTorch.getLootTable())
