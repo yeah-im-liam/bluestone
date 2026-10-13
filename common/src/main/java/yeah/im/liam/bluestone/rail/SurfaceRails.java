@@ -1,5 +1,6 @@
 package yeah.im.liam.bluestone.rail;
 
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +22,8 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
  * down the other side). Climbing slows a cart and coming down speeds it up; a cart that stops climbing rolls back. On
  * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain gear rails move carts at
  * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still; powered rails speed carts up and
- * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again.
+ * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again. Floor rails meeting a wall can
+ * be straight or curved.
  */
 public final class SurfaceRails {
     public static final double CHAIN_SPEED = 0.3;
@@ -99,27 +101,77 @@ public final class SurfaceRails {
     }
 
     static @Nullable Step next(Level level, Track from, Direction exit) {
+        return next(level, from, exit, true);
+    }
+
+    /**
+     * Whether track carries on from {@code from} going {@code exit}. Unless {@code strict}, track there that runs the
+     * wrong way counts too: it could turn to join.
+     */
+    public static boolean joins(Level level, Track from, Direction exit, boolean strict) {
+        return next(level, from, exit, strict) != null;
+    }
+
+    private static @Nullable Step next(Level level, Track from, Direction exit, boolean strict) {
         Direction attached = from.attached();
         BlockPos ahead = from.pos().relative(exit);
         if (level.getBlockState(ahead).isFaceSturdy(level, ahead, exit.getOpposite())) {
             // Inside corner: the track carries on up the block in the way.
-            Track up = track(level, from.pos().relative(attached.getOpposite()));
-            return up != null && up.attached() == exit && up.axis() == attached.getAxis() ? new Step(up, attached.getOpposite()) : null;
+            BlockPos upPos = from.pos().relative(attached.getOpposite());
+            if (exit == Direction.DOWN) {
+                return onFloor(level, upPos, attached, strict);
+            }
+            Track up = track(level, upPos);
+            return up != null && up.attached() == exit && (!strict || up.axis() == attached.getAxis()) ? new Step(up, attached.getOpposite()) : null;
+        }
+        // Down a wall onto the floor rail below it.
+        if (exit == Direction.DOWN) {
+            Step floor = onFloor(level, ahead, attached, strict);
+            if (floor != null) {
+                return floor;
+            }
         }
         Track next = track(level, ahead);
-        if (next != null && next.attached() == attached && next.axis() == exit.getAxis()) {
+        if (next != null && next.attached() == attached && (!strict || next.axis() == exit.getAxis())) {
             return new Step(next, exit);
         }
         // Inside corner from the other side: the track ahead is on the block it runs into.
-        if (next != null && next.attached() == exit && next.axis() == attached.getAxis()) {
+        if (next != null && next.attached() == exit && (!strict || next.axis() == attached.getAxis())) {
             return new Step(next, attached.getOpposite());
         }
-        // Outside corner: around the edge of the block the track sits on.
+        // Outside corner: around the edge of the block the track sits on, onto its top going up a wall.
+        if (exit == Direction.UP) {
+            return onFloor(level, ahead.relative(attached), attached.getOpposite(), strict);
+        }
         Track around = track(level, ahead.relative(attached));
-        if (around != null && around.attached() == exit.getOpposite() && around.axis() == attached.getAxis()) {
+        if (around != null && around.attached() == exit.getOpposite() && (!strict || around.axis() == attached.getAxis())) {
             return new Step(around, attached);
         }
         return null;
+    }
+
+    // A floor rail with an end pointing back the way the cart comes, straight or curved, and the end the cart leaves by.
+    // Unless strict, any level floor rail will do: it could turn to join.
+    private static @Nullable Step onFloor(Level level, BlockPos pos, Direction back, boolean strict) {
+        List<Direction> ends = levelEnds(level.getBlockState(pos));
+        if (ends.isEmpty() || strict && !ends.contains(back)) {
+            return null;
+        }
+        Direction out = !ends.contains(back) ? back.getOpposite() : ends.get(0) == back ? ends.get(1) : ends.get(0);
+        Track track = track(level, pos);
+        if (track == null || track.axis() != out.getAxis()) {
+            track = new Track(pos, Direction.DOWN, out.getAxis(), Kind.PLAIN, false, null);
+        }
+        return new Step(track, out);
+    }
+
+    // The two ends of a level floor rail, straight or curved; none for a slope or anything else.
+    private static List<Direction> levelEnds(BlockState state) {
+        if (!(state.getBlock() instanceof BaseRailBlock rail) || !BaseRailBlock.isRail(state)) {
+            return List.of();
+        }
+        RailShape shape = state.getValue(rail.getShapeProperty());
+        return shape.isSlope() ? List.of() : WallRails.level(shape);
     }
 
     private static Vec3 unit(Direction direction) {
@@ -316,8 +368,12 @@ public final class SurfaceRails {
             Step step = next(level, here, exit);
             return step == null ? new Ride(here, exit, here, exit, speed) : new Ride(here, exit, step.track(), step.exit(), speed);
         }
-        Track floor = track(level, cart.getCurrentBlockPosOrRailBelow());
-        if (floor == null || !floor.floor() || floor.kind() == Kind.CHAIN && !floor.powered()) {
+        BlockPos railPos = cart.getCurrentBlockPosOrRailBelow();
+        Track floor = track(level, railPos);
+        if (floor == null) {
+            return startOnCurve(level, cart, railPos, center, velocity);
+        }
+        if (!floor.floor() || floor.kind() == Kind.CHAIN && !floor.powered()) {
             return null;
         }
         Vec3 axis = unit(Direction.fromAxisAndDirection(floor.axis(), Direction.AxisDirection.POSITIVE));
@@ -339,6 +395,30 @@ public final class SurfaceRails {
         }
         cart.setPos(point.x, point.y - height / 2.0, point.z);
         return new Ride(floor, exit, step.track(), step.exit(), speed);
+    }
+
+    // A cart on a curved floor rail leaves by the end it didn't come in by. A curve into a wall is too tight for a cart
+    // to follow, so it turns up the wall rail as soon as it is on the curve; over an edge, it goes round the curve until
+    // past halfway. Rolling back, it leaves the curve by the end it came in by.
+    private static @Nullable Ride startOnCurve(Level level, AbstractMinecart cart, BlockPos railPos, Vec3 center, Vec3 velocity) {
+        List<Direction> ends = levelEnds(level.getBlockState(railPos));
+        if (ends.isEmpty()) {
+            return null;
+        }
+        Direction entry = velocity.dot(unit(ends.get(0))) < velocity.dot(unit(ends.get(1))) ? ends.get(0) : ends.get(1);
+        if (velocity.dot(unit(entry)) > -1.0E-4) {
+            return null;
+        }
+        Direction exit = entry == ends.get(0) ? ends.get(1) : ends.get(0);
+        Track floor = new Track(railPos, Direction.DOWN, exit.getAxis(), Kind.PLAIN, false, null);
+        double speed = velocity.horizontalDistance();
+        BlockPos ahead = railPos.relative(exit);
+        if (!level.getBlockState(ahead).isFaceSturdy(level, ahead, exit.getOpposite())
+            && center.subtract(floor.point(cart.getBbHeight())).dot(unit(exit)) < 0.25 - speed - 0.01) {
+            return null;
+        }
+        Step step = next(level, floor, exit);
+        return step == null || step.track().floor() ? null : new Ride(floor, entry.getOpposite(), step.track(), step.exit(), speed);
     }
 
     // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at

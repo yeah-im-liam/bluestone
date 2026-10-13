@@ -11,6 +11,8 @@
     "LevelMixin",
     "OreFeatureMixin",
     "PoweredRailBlockMixin",
+    "RailStateAccessor",
+    "RailStateMixin",
     "RedstoneTorchBlockMixin",
     "RedstoneWallTorchBlockMixin",
     "RedstoneWireEvaluatorMixin",
