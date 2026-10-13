@@ -161,15 +161,16 @@ public final class BluestoneBlocks {
     }
 
     /**
-     * Everything for the mod's own creative tab, in the order the redstone versions appear.
+     * Everything for the mod's own creative tab: the bluestone parts in the order the redstone versions appear, then
+     * the purplestone ones and the converter.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, purplestoneBlockItem, repeaterItem, comparatorItem,
+        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem,
             converterItem, poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, purplestoneBlockItem, repeaterItem, comparatorItem, converterItem);
+        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem);
     }
 
     public static List<Item> rails() {
