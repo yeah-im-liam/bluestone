@@ -2,6 +2,8 @@
 
 Blue redstone that keeps to itself.
 
+Inspired by [ajjxf's bluestone mod](https://modrinth.com/mod/bluestone_ajjxf).
+
 ## Features
 
 - Bluestone dust, torches, repeaters, comparators, the Block of Bluestone, bluestone ores and bluestone powered, detector and activator rails. They work exactly like their redstone versions.
