@@ -3,6 +3,7 @@
     "bluestone:bluestone_block",
     "bluestone:purplestone_block",
     "bluestone:greenstone_block",
+    "bluestone:wall_converter",
     "bluestone:bluestone_ore",
     "bluestone:deepslate_bluestone_ore"
   ]

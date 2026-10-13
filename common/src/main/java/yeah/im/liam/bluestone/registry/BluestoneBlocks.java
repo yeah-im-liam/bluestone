@@ -160,7 +160,11 @@ public final class BluestoneBlocks {
             .isRedstoneConductor((state, level, pos) -> false))));
         greenstoneRepeater = blocks.register("greenstone_repeater", key -> new GreenstoneRepeaterBlock(props(key, diodeProperties())));
         greenstoneComparator = blocks.register("greenstone_comparator", key -> new GreenstoneComparatorBlock(props(key, diodeProperties())));
-        wallConverter = blocks.register("wall_converter", key -> new WallConverterBlock(props(key, diodeProperties())));
+        wallConverter = blocks.register("wall_converter", key -> new WallConverterBlock(props(key, BlockBehaviour.Properties.of()
+            .mapColor(MapColor.STONE)
+            .requiresCorrectToolForDrops()
+            .strength(1.5F, 6.0F)
+            .isRedstoneConductor((state, level, pos) -> false))));
         slimeRail = blocks.register("slime_rail", key -> new SlimeRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK))));
         attachedSlimeRail = blocks.register("attached_slime_rail", key -> new AttachedRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK)
             .overrideLootTable(slimeRail.getLootTable())

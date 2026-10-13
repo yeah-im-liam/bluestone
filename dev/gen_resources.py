@@ -46,7 +46,7 @@ D = "data/bluestone/"
 # Blockstates
 write(A + "blockstates/bluestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
 write(A + "blockstates/purplestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"blockstates/{name}.json", {"variants": {"": {"model": f"bluestone:block/{name}"}}})
 for name, src, prefix in [
     ("bluestone_torch", "redstone_torch", "redstone_torch"),
@@ -65,7 +65,7 @@ for name, src, prefix in [
     write(A + f"blockstates/{name}.json", swap_models(data, [("minecraft:block/" + prefix, "bluestone:block/" + name)]))
 
 # Block models
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
 for stone in ["bluestone", "purplestone", "greenstone"]:
@@ -207,16 +207,6 @@ for variant in ["", "_on", "_subtract", "_on_subtract"]:
         variants[key] = rotated(f"bluestone:block/greenstone_comparator{variant}", attached, output)
 write(A + "blockstates/greenstone_comparator.json", {"variants": variants})
 
-# The wall converter: a plate on the wall behind it, which is south of it when it faces north.
-plate = {face: {"texture": "#plate", "uv": uv} for face, uv in [
-    ("north", [0, 0, 16, 16]), ("south", [0, 0, 16, 16]), ("east", [0, 0, 2, 16]), ("west", [14, 0, 16, 16]), ("up", [0, 14, 16, 16]), ("down", [0, 0, 16, 2])]}
-plate["south"]["cullface"] = "south"
-write(A + "models/block/wall_converter.json", {"parent": "minecraft:block/block",
-                                               "textures": {"particle": "bluestone:block/wall_converter", "plate": "bluestone:block/wall_converter"},
-                                               "elements": [{"from": [0, 0, 14], "to": [16, 16, 16], "faces": plate}]})
-write(A + "blockstates/wall_converter.json", {"variants": {
-    f"facing={facing}": ({"model": "bluestone:block/wall_converter", "y": y} if y else {"model": "bluestone:block/wall_converter"})
-    for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]}})
 
 # Slime rails and chain gear rails. The slime rail on a floor is an ordinary rail with its own texture.
 for name in ["rail", "rail_corner", "rail_raised_ne", "rail_raised_sw"]:
@@ -282,7 +272,6 @@ GENERATED = {
     "greenstone_torch": "bluestone:block/greenstone_torch",
     "greenstone_repeater": "bluestone:item/greenstone_repeater",
     "greenstone_comparator": "bluestone:item/greenstone_comparator",
-    "wall_converter": "bluestone:block/wall_converter",
     "slime_rail": "bluestone:block/slime_rail",
     "chain_gear_rail": "bluestone:block/chain_gear_rail",
     "slime_chain_gear_rail": "bluestone:block/slime_chain_gear_rail",
@@ -295,7 +284,7 @@ GENERATED = {
 for name, texture in GENERATED.items():
     write(A + f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": texture}})
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:item/{name}"}})
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
@@ -537,7 +526,7 @@ write(D + "tags/worldgen/biome/has_more_bluestone.json",
       {"values": ["#minecraft:is_ocean", "#minecraft:is_river", "minecraft:swamp", "minecraft:mangrove_swamp"]})
 
 # Tags
-write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
+write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:wall_converter", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail",
                    "bluestone:slime_rail", "bluestone:chain_gear_rail", "bluestone:slime_chain_gear_rail"]}
@@ -547,8 +536,7 @@ write("data/minecraft/tags/item/rails.json", RAILS)
 # Purplestone and the converter, like redstone and the repeater, can't sit in water.
 write("data/minecraft/tags/block/washed_away_by_fluids.json",
       {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:converter",
-                  "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater", "bluestone:greenstone_comparator",
-                  "bluestone:wall_converter"]})
+                  "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater", "bluestone:greenstone_comparator"]})
 write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch", "bluestone:greenstone_torch"]})
 ORES = {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]}
 write(D + "tags/block/bluestone_ores.json", ORES)

@@ -7,7 +7,6 @@
     "bluestone:greenstone_torch",
     "bluestone:greenstone_wall_torch",
     "bluestone:greenstone_repeater",
-    "bluestone:greenstone_comparator",
-    "bluestone:wall_converter"
+    "bluestone:greenstone_comparator"
   ]
 }

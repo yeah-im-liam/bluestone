@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=north": {
+    "": {
       "model": "bluestone:block/wall_converter"
-    },
-    "facing=east": {
-      "model": "bluestone:block/wall_converter",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "bluestone:block/wall_converter",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "bluestone:block/wall_converter",
-      "y": 270
     }
   }
 }
