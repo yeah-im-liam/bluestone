@@ -2,16 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "R": "minecraft:rail",
-    "#": "minecraft:iron_chain"
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:iron_chain",
+    "R": "minecraft:redstone"
   },
   "pattern": [
-    "RRR",
-    "R#R",
-    "RRR"
+    "I I",
+    "ICI",
+    "IRI"
   ],
   "result": {
-    "count": 8,
+    "count": 6,
     "id": "bluestone:chain_gear_rail"
   }
 }

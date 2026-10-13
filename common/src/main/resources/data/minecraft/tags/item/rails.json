@@ -3,8 +3,16 @@
     "bluestone:bluestone_powered_rail",
     "bluestone:bluestone_detector_rail",
     "bluestone:bluestone_activator_rail",
-    "bluestone:slime_rail",
     "bluestone:chain_gear_rail",
-    "bluestone:slime_chain_gear_rail"
+    "bluestone:bluestone_chain_gear_rail",
+    "bluestone:sticky_rail",
+    "bluestone:sticky_powered_rail",
+    "bluestone:sticky_bluestone_powered_rail",
+    "bluestone:sticky_detector_rail",
+    "bluestone:sticky_bluestone_detector_rail",
+    "bluestone:sticky_activator_rail",
+    "bluestone:sticky_bluestone_activator_rail",
+    "bluestone:sticky_chain_gear_rail",
+    "bluestone:sticky_bluestone_chain_gear_rail"
   ]
 }

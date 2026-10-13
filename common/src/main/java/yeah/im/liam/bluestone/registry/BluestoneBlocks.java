@@ -1,5 +1,6 @@
 package yeah.im.liam.bluestone.registry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
 import net.minecraft.core.Direction;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import yeah.im.liam.bluestone.Bluestone;
-import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.block.BluestoneBlock;
 import yeah.im.liam.bluestone.block.BluestoneComparatorBlock;
 import yeah.im.liam.bluestone.block.BluestoneDetectorRailBlock;
@@ -27,7 +27,6 @@ import yeah.im.liam.bluestone.block.BluestoneRepeaterBlock;
 import yeah.im.liam.bluestone.block.BluestoneTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
-import yeah.im.liam.bluestone.block.ChainGearRailBlock;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.ConverterBlock;
 import yeah.im.liam.bluestone.block.GreenstoneBlock;
@@ -40,7 +39,6 @@ import yeah.im.liam.bluestone.block.PurplestoneBlock;
 import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
-import yeah.im.liam.bluestone.block.SlimeRailBlock;
 import yeah.im.liam.bluestone.block.WallConverterBlock;
 
 /**
@@ -73,11 +71,6 @@ public final class BluestoneBlocks {
     private static GreenstoneRepeaterBlock greenstoneRepeater;
     private static GreenstoneComparatorBlock greenstoneComparator;
     private static WallConverterBlock wallConverter;
-    private static SlimeRailBlock slimeRail;
-    private static AttachedRailBlock attachedSlimeRail;
-    private static ChainGearRailBlock chainGearRail;
-    private static ChainGearRailBlock slimeChainGearRail;
-    private static AttachedRailBlock attachedSlimeChainGearRail;
 
     private static Item dust;
     private static Item blockItem;
@@ -99,9 +92,6 @@ public final class BluestoneBlocks {
     private static Item greenstoneRepeaterItem;
     private static Item greenstoneComparatorItem;
     private static Item wallConverterItem;
-    private static Item slimeRailItem;
-    private static Item chainGearRailItem;
-    private static Item slimeChainGearRailItem;
 
     private BluestoneBlocks() {
     }
@@ -165,18 +155,10 @@ public final class BluestoneBlocks {
             .requiresCorrectToolForDrops()
             .strength(1.5F, 6.0F)
             .isRedstoneConductor((state, level, pos) -> false))));
-        slimeRail = blocks.register("slime_rail", key -> new SlimeRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK))));
-        attachedSlimeRail = blocks.register("attached_slime_rail", key -> new AttachedRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK)
-            .overrideLootTable(slimeRail.getLootTable())
-            .overrideDescription(slimeRail.getDescriptionId())), false));
-        chainGearRail = blocks.register("chain_gear_rail", key -> new ChainGearRailBlock(props(key, railProperties())));
-        slimeChainGearRail = blocks.register("slime_chain_gear_rail", key -> new ChainGearRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK))));
-        attachedSlimeChainGearRail = blocks.register("attached_slime_chain_gear_rail", key -> new AttachedRailBlock(props(key, railProperties().sound(SoundType.SLIME_BLOCK)
-            .overrideLootTable(slimeChainGearRail.getLootTable())
-            .overrideDescription(slimeChainGearRail.getDescriptionId())), true));
         poweredRail = blocks.register("bluestone_powered_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), false));
         detectorRail = blocks.register("bluestone_detector_rail", key -> new BluestoneDetectorRailBlock(props(key, railProperties())));
         activatorRail = blocks.register("bluestone_activator_rail", key -> new BluestonePoweredRailBlock(props(key, railProperties()), true));
+        BluestoneRails.registerBlocks(blocks);
     }
 
     public static void registerItems(Registrar<Item> items) {
@@ -199,12 +181,10 @@ public final class BluestoneBlocks {
         greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);
         greenstoneComparatorItem = blockItem(items, "greenstone_comparator", greenstoneComparator);
         wallConverterItem = blockItem(items, "wall_converter", wallConverter);
-        slimeRailItem = items.register("slime_rail", key -> new SurfaceRailItem(slimeRail, attachedSlimeRail, itemProps(key)));
-        chainGearRailItem = blockItem(items, "chain_gear_rail", chainGearRail);
-        slimeChainGearRailItem = items.register("slime_chain_gear_rail", key -> new SurfaceRailItem(slimeChainGearRail, attachedSlimeChainGearRail, itemProps(key)));
         poweredRailItem = blockItem(items, "bluestone_powered_rail", poweredRail);
         detectorRailItem = blockItem(items, "bluestone_detector_rail", detectorRail);
         activatorRailItem = blockItem(items, "bluestone_activator_rail", activatorRail);
+        BluestoneRails.registerItems(items);
     }
 
     public static Block comparator() {
@@ -240,10 +220,13 @@ public final class BluestoneBlocks {
      * redstone versions appear, then the converters.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
+        List<Item> items = new ArrayList<>(List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
             pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
             purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem, wallConverterItem,
-            poweredRailItem, detectorRailItem, activatorRailItem, slimeRailItem, chainGearRailItem, slimeChainGearRailItem, oreItem, deepslateOreItem);
+            poweredRailItem, detectorRailItem, activatorRailItem));
+        items.addAll(BluestoneRails.items());
+        items.addAll(List.of(oreItem, deepslateOreItem));
+        return items;
     }
 
     public static List<Item> components() {
@@ -253,7 +236,9 @@ public final class BluestoneBlocks {
     }
 
     public static List<Item> rails() {
-        return List.of(poweredRailItem, detectorRailItem, activatorRailItem, slimeRailItem, chainGearRailItem, slimeChainGearRailItem);
+        List<Item> rails = new ArrayList<>(List.of(poweredRailItem, detectorRailItem, activatorRailItem));
+        rails.addAll(BluestoneRails.items());
+        return rails;
     }
 
     public static List<Item> ores() {

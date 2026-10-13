@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_flat",
+  "textures": {
+    "rail": "bluestone:block/sticky_bluestone_detector_rail"
+  }
+}

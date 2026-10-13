@@ -1,69 +1,135 @@
 {
   "variants": {
-    "reversed=false,shape=ascending_east": {
+    "powered=false,reversed=false,shape=ascending_east": {
       "model": "bluestone:block/chain_gear_rail_raised_ne_reversed",
       "y": 90
     },
-    "reversed=true,shape=ascending_east": {
+    "powered=false,reversed=true,shape=ascending_east": {
       "model": "bluestone:block/chain_gear_rail_raised_ne",
       "y": 90
     },
-    "reversed=false,shape=ascending_north": {
+    "powered=false,reversed=false,shape=ascending_north": {
       "model": "bluestone:block/chain_gear_rail_raised_ne"
     },
-    "reversed=true,shape=ascending_north": {
+    "powered=false,reversed=true,shape=ascending_north": {
       "model": "bluestone:block/chain_gear_rail_raised_ne_reversed"
     },
-    "reversed=false,shape=ascending_south": {
+    "powered=false,reversed=false,shape=ascending_south": {
       "model": "bluestone:block/chain_gear_rail_raised_sw"
     },
-    "reversed=true,shape=ascending_south": {
+    "powered=false,reversed=true,shape=ascending_south": {
       "model": "bluestone:block/chain_gear_rail_raised_sw_reversed"
     },
-    "reversed=false,shape=ascending_west": {
+    "powered=false,reversed=false,shape=ascending_west": {
       "model": "bluestone:block/chain_gear_rail_raised_sw_reversed",
       "y": 90
     },
-    "reversed=true,shape=ascending_west": {
+    "powered=false,reversed=true,shape=ascending_west": {
       "model": "bluestone:block/chain_gear_rail_raised_sw",
       "y": 90
     },
-    "reversed=false,shape=east_west": {
+    "powered=false,reversed=false,shape=east_west": {
       "model": "bluestone:block/chain_gear_rail_flat_reversed",
       "y": 90
     },
-    "reversed=true,shape=east_west": {
+    "powered=false,reversed=true,shape=east_west": {
       "model": "bluestone:block/chain_gear_rail_flat",
       "y": 90
     },
-    "reversed=false,shape=north_south": {
+    "powered=false,reversed=false,shape=north_south": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=true,shape=north_south": {
+    "powered=false,reversed=true,shape=north_south": {
       "model": "bluestone:block/chain_gear_rail_flat_reversed"
     },
-    "reversed=false,shape=south_east": {
+    "powered=true,reversed=false,shape=ascending_east": {
+      "model": "bluestone:block/chain_gear_rail_raised_ne_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=ascending_east": {
+      "model": "bluestone:block/chain_gear_rail_raised_ne_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=ascending_north": {
+      "model": "bluestone:block/chain_gear_rail_raised_ne_on"
+    },
+    "powered=true,reversed=true,shape=ascending_north": {
+      "model": "bluestone:block/chain_gear_rail_raised_ne_reversed_on"
+    },
+    "powered=true,reversed=false,shape=ascending_south": {
+      "model": "bluestone:block/chain_gear_rail_raised_sw_on"
+    },
+    "powered=true,reversed=true,shape=ascending_south": {
+      "model": "bluestone:block/chain_gear_rail_raised_sw_reversed_on"
+    },
+    "powered=true,reversed=false,shape=ascending_west": {
+      "model": "bluestone:block/chain_gear_rail_raised_sw_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=ascending_west": {
+      "model": "bluestone:block/chain_gear_rail_raised_sw_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=east_west": {
+      "model": "bluestone:block/chain_gear_rail_flat_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=east_west": {
+      "model": "bluestone:block/chain_gear_rail_flat_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=north_south": {
+      "model": "bluestone:block/chain_gear_rail_flat_on"
+    },
+    "powered=true,reversed=true,shape=north_south": {
+      "model": "bluestone:block/chain_gear_rail_flat_reversed_on"
+    },
+    "powered=false,reversed=false,shape=south_east": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=true,shape=south_east": {
+    "powered=true,reversed=false,shape=south_east": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=false,shape=south_west": {
+    "powered=false,reversed=true,shape=south_east": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=true,shape=south_west": {
+    "powered=true,reversed=true,shape=south_east": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=false,shape=north_west": {
+    "powered=false,reversed=false,shape=south_west": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=true,shape=north_west": {
+    "powered=true,reversed=false,shape=south_west": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=false,shape=north_east": {
+    "powered=false,reversed=true,shape=south_west": {
       "model": "bluestone:block/chain_gear_rail_flat"
     },
-    "reversed=true,shape=north_east": {
+    "powered=true,reversed=true,shape=south_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=false,reversed=false,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=true,reversed=false,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=false,reversed=true,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=true,reversed=true,shape=north_west": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=false,reversed=false,shape=north_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=true,reversed=false,shape=north_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=false,reversed=true,shape=north_east": {
+      "model": "bluestone:block/chain_gear_rail_flat"
+    },
+    "powered=true,reversed=true,shape=north_east": {
       "model": "bluestone:block/chain_gear_rail_flat"
     }
   }

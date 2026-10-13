@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.block.AttachedRailBlock;
+import yeah.im.liam.bluestone.block.AttachedRailBlock.Kind;
 import yeah.im.liam.bluestone.block.ChainGearRailBlock;
 
 /**
@@ -18,15 +19,17 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
  * reaches a wall or ceiling rail, this takes over. The cart runs along each rail's middle line and turns at inside
  * corners (track running into a wall carries on up it) and outside corners (track running over an edge carries on
  * down the other side). Climbing slows a cart and coming down speeds it up; a cart that stops climbing rolls back. On
- * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Chain gear rails move carts at {@link #CHAIN_SPEED}
- * the way they were placed, whatever speed they come in with. Back on a floor rail, the game takes over again.
+ * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain gear rails move carts at
+ * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still; powered rails speed carts up and
+ * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again.
  */
 public final class SurfaceRails {
     public static final double CHAIN_SPEED = 0.3;
     public static final double MIN_CEILING_SPEED = 0.2;
-    // The minecart's own gravity, and a little less drag than on the floor.
+    // The minecart's own gravity, a little less drag than on the floor, and the game's powered rail boost.
     private static final double GRAVITY = 0.04;
     private static final double DRAG = 0.995;
+    private static final double BOOST = 0.06;
     private static final double MAX_SPEED = 1.0;
     // Ticks after falling off before a cart can be picked up by a wall or ceiling rail again.
     private static final int COOLDOWN = 10;
@@ -35,12 +38,17 @@ public final class SurfaceRails {
     }
 
     /**
-     * A piece of track: where it is, the face it sits on, the axis carts run along and, for chain gear, the way it
-     * drives them.
+     * A piece of track: where it is, the face it sits on, the axis carts run along, what kind of rail it is, whether
+     * it is powered, and the way it was placed (the way chain gear drives).
      */
-    public record Track(BlockPos pos, Direction attached, Direction.Axis axis, @Nullable Direction drive) {
+    public record Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel) {
         boolean floor() {
             return attached == Direction.DOWN;
+        }
+
+        // The way a powered chain gear rail drives carts, or null.
+        @Nullable Direction drive() {
+            return kind == Kind.CHAIN && powered ? travel : null;
         }
 
         // Where the middle of a cart of the given height is when it sits on this piece of track.
@@ -66,7 +74,7 @@ public final class SurfaceRails {
      */
     public record Ride(Track from, Direction fromExit, Track to, Direction exit, double speed) {
         Ride reversed() {
-            return new Ride(to, exit.getOpposite(), from, fromExit.getOpposite(), -speed);
+            return new Ride(to, exit.getOpposite(), from, fromExit.getOpposite(), speed);
         }
     }
 
@@ -74,7 +82,7 @@ public final class SurfaceRails {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof AttachedRailBlock rail) {
             Direction travel = state.getValue(AttachedRailBlock.TRAVEL);
-            return new Track(pos, state.getValue(AttachedRailBlock.ATTACHED), travel.getAxis(), rail.drives() ? travel : null);
+            return new Track(pos, state.getValue(AttachedRailBlock.ATTACHED), travel.getAxis(), rail.kind(), state.getValue(AttachedRailBlock.POWERED), travel);
         }
         if (state.getBlock() instanceof BaseRailBlock rail && BaseRailBlock.isRail(state)) {
             RailShape shape = state.getValue(rail.getShapeProperty());
@@ -82,7 +90,10 @@ public final class SurfaceRails {
             if (axis == null) {
                 return null;
             }
-            return new Track(pos, Direction.DOWN, axis, state.getBlock() instanceof ChainGearRailBlock ? ChainGearRailBlock.drive(state) : null);
+            if (state.getBlock() instanceof ChainGearRailBlock) {
+                return new Track(pos, Direction.DOWN, axis, Kind.CHAIN, state.getValue(ChainGearRailBlock.POWERED), ChainGearRailBlock.drive(state));
+            }
+            return new Track(pos, Direction.DOWN, axis, Kind.PLAIN, false, null);
         }
         return null;
     }
@@ -137,16 +148,51 @@ public final class SurfaceRails {
         }
         double height = cart.getBbHeight();
         Vec3 pos = cart.position().add(0.0, height / 2.0, 0.0);
+        // The track the cart is on now, fresh from the world so power changes count straight away. Turning from a floor
+        // rail up onto a wall or ceiling rail counts as being on the new rail.
+        BlockPos onPos = ride.from().floor() && !ride.to().floor() || ride.to().pos().equals(BlockPos.containing(pos)) ? ride.to().pos() : ride.from().pos();
+        Track on = track(level, onPos);
+        if (on == null) {
+            rider.bluestone$setRide(null);
+            return false;
+        }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
-        Track on = ride.to().pos().equals(BlockPos.containing(pos)) ? ride.to() : ride.from();
-        if (on.drive() != null) {
-            speed = CHAIN_SPEED;
-        } else {
-            speed = (speed - GRAVITY * heading.y) * DRAG;
-            if (ride.from().attached() == Direction.UP && ride.to().attached() == Direction.UP && speed < MIN_CEILING_SPEED) {
-                return fallOff(cart, rider, heading.scale(Math.max(speed, 0.0)));
+        boolean hold = false;
+        switch (on.kind()) {
+            case CHAIN -> {
+                if (on.powered()) {
+                    if (heading.dot(unit(on.travel())) < 0.0) {
+                        ride = ride.reversed();
+                        heading = heading(pos, ride, height);
+                    }
+                    speed = CHAIN_SPEED;
+                } else {
+                    hold = true;
+                }
             }
+            case POWERED -> {
+                if (on.powered()) {
+                    if (speed < 0.01 && heading.dot(unit(on.travel())) < 0.0) {
+                        ride = ride.reversed();
+                        heading = heading(pos, ride, height);
+                    }
+                    speed = (speed + BOOST - GRAVITY * heading.y) * DRAG;
+                } else {
+                    speed *= 0.5;
+                    hold = speed < 0.03;
+                }
+            }
+            default -> speed = (speed - GRAVITY * heading.y) * DRAG;
+        }
+        if (hold) {
+            rider.bluestone$setRide(new Ride(ride.from(), ride.fromExit(), ride.to(), ride.exit(), 0.0));
+            place(cart, pos, height, Vec3.ZERO);
+            affect(level, cart, pos);
+            return true;
+        }
+        if (on.kind() != Kind.CHAIN && ride.from().attached() == Direction.UP && ride.to().attached() == Direction.UP && speed < MIN_CEILING_SPEED) {
+            return fallOff(cart, rider, heading.scale(Math.max(speed, 0.0)));
         }
         if (speed < 0.0) {
             ride = ride.reversed();
@@ -192,7 +238,21 @@ public final class SurfaceRails {
         }
         rider.bluestone$setRide(new Ride(ride.from(), ride.fromExit(), ride.to(), ride.exit(), speed));
         place(cart, pos, height, heading.scale(speed));
+        affect(level, cart, pos);
         return true;
+    }
+
+    // Detector rails notice the cart, and activator rails activate it.
+    private static void affect(ServerLevel level, AbstractMinecart cart, Vec3 center) {
+        BlockPos pos = BlockPos.containing(center);
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof AttachedRailBlock rail) {
+            if (rail.kind() == Kind.DETECTOR) {
+                rail.detect(level, pos, state);
+            } else if (rail.kind() == Kind.ACTIVATOR) {
+                cart.activateMinecart(level, pos.getX(), pos.getY(), pos.getZ(), state.getValue(AttachedRailBlock.POWERED));
+            }
+        }
     }
 
     // Which way the cart is going: towards the next point, or on along the track once there.
@@ -231,17 +291,20 @@ public final class SurfaceRails {
             Vec3 axis = unit(Direction.fromAxisAndDirection(here.axis(), Direction.AxisDirection.POSITIVE));
             double along = velocity.dot(axis);
             Direction exit;
-            if (here.drive() != null) {
-                exit = here.drive();
+            if (here.kind() == Kind.CHAIN || here.kind() == Kind.POWERED && here.powered() && Math.abs(along) < 0.01) {
+                exit = here.travel();
             } else if (Math.abs(along) > 1.0E-4) {
                 exit = Direction.fromAxisAndDirection(here.axis(), along > 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
             } else if (here.axis() == Direction.Axis.Y) {
                 exit = Direction.DOWN;
+            } else if (here.attached() != Direction.UP) {
+                // Standing still on a sideways wall rail: it stays where it is.
+                exit = here.travel();
             } else {
                 return null;
             }
             double speed = here.drive() != null ? CHAIN_SPEED : Math.abs(along);
-            if (here.attached() == Direction.UP && here.drive() == null && speed < MIN_CEILING_SPEED) {
+            if (here.attached() == Direction.UP && here.kind() != Kind.CHAIN && speed < MIN_CEILING_SPEED) {
                 return null;
             }
             Vec3 point = here.point(height);
@@ -254,7 +317,7 @@ public final class SurfaceRails {
             return step == null ? new Ride(here, exit, here, exit, speed) : new Ride(here, exit, step.track(), step.exit(), speed);
         }
         Track floor = track(level, cart.getCurrentBlockPosOrRailBelow());
-        if (floor == null || !floor.floor()) {
+        if (floor == null || !floor.floor() || floor.kind() == Kind.CHAIN && !floor.powered()) {
             return null;
         }
         Vec3 axis = unit(Direction.fromAxisAndDirection(floor.axis(), Direction.AxisDirection.POSITIVE));
@@ -278,14 +341,17 @@ public final class SurfaceRails {
         return new Ride(floor, exit, step.track(), step.exit(), speed);
     }
 
-    // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed.
+    // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
+    // all while the rail is unpowered.
     private static void driveOnFloor(Level level, AbstractMinecart cart) {
         BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
         if (state.getBlock() instanceof ChainGearRailBlock) {
             Direction drive = ChainGearRailBlock.drive(state);
-            if (drive != null) {
-                cart.setDeltaMovement(drive.getStepX() * CHAIN_SPEED, cart.getDeltaMovement().y, drive.getStepZ() * CHAIN_SPEED);
+            if (drive == null) {
+                return;
             }
+            double speed = state.getValue(ChainGearRailBlock.POWERED) ? CHAIN_SPEED : 0.0;
+            cart.setDeltaMovement(drive.getStepX() * speed, cart.getDeltaMovement().y, drive.getStepZ() * speed);
         }
     }
 }

@@ -1,0 +1,286 @@
+{
+  "variants": {
+    "attached=up,powered=false,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=true,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=false,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=true,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=false,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180
+    },
+    "attached=up,powered=true,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180
+    },
+    "attached=up,powered=false,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=true,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,powered=false,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 90
+    },
+    "attached=up,powered=true,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 90
+    },
+    "attached=up,powered=false,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 270
+    },
+    "attached=up,powered=true,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 180,
+      "y": 270
+    },
+    "attached=north,powered=false,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270
+    },
+    "attached=north,powered=true,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270
+    },
+    "attached=north,powered=false,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,powered=true,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,powered=false,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,powered=true,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,powered=false,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,powered=true,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,powered=false,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 270
+    },
+    "attached=north,powered=true,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 270
+    },
+    "attached=north,powered=false,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,powered=true,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "z": 90
+    },
+    "attached=south,powered=false,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,powered=true,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,powered=false,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90
+    },
+    "attached=south,powered=true,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90
+    },
+    "attached=south,powered=false,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,powered=true,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,powered=false,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,powered=true,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,powered=false,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 90
+    },
+    "attached=south,powered=true,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 90
+    },
+    "attached=south,powered=false,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,powered=true,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "z": 270
+    },
+    "attached=east,powered=false,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,powered=true,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,powered=false,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,powered=true,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,powered=false,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,powered=true,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,powered=false,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=east,powered=true,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=east,powered=false,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=east,powered=true,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=east,powered=false,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=east,powered=true,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 270
+    },
+    "attached=west,powered=false,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,powered=true,travel=down": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,powered=false,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,powered=true,travel=up": {
+      "model": "bluestone:block/sticky_rail",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,powered=false,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,powered=true,travel=north": {
+      "model": "bluestone:block/sticky_rail",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,powered=false,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    },
+    "attached=west,powered=true,travel=south": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    },
+    "attached=west,powered=false,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    },
+    "attached=west,powered=true,travel=east": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    },
+    "attached=west,powered=false,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    },
+    "attached=west,powered=true,travel=west": {
+      "model": "bluestone:block/sticky_rail",
+      "z": 90
+    }
+  }
+}

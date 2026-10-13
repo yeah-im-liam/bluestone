@@ -16,8 +16,8 @@ Inspired by [ajjxf's bluestone mod](https://modrinth.com/mod/bluestone_ajjxf).
 - The converter is a repeater that turns a redstone signal into a bluestone one, or the other way round. Right-click it to swap the direction. Purplestone powers it in either direction. Like a repeater, a repeater or comparator (of either kind) pointing into its side locks it.
 - Greenstone paste is redstone dust that sticks to floors, walls and ceilings. It looks and connects like dust on whichever face it is on, climbs onto walls the way dust climbs a block, and loses one level of strength per block, around corners and up walls too. Greenstone torches, the Block of Greenstone, and greenstone repeaters and comparators go with it; the repeaters and comparators work on walls and ceilings as well, pointing any way along them. Only a greenstone repeater restores the signal. Redstone and bluestone ignore greenstone, and greenstone meets purplestone only through the wall converter.
 - The wall converter is a full block that joins purplestone dust and greenstone paste on any side, both ways, passing on whatever strength it gets. It is not a repeater.
-- Slime rails stick to floors, walls and ceilings, and carts can go from floor to wall to ceiling. They don't move carts themselves. A cart climbs a wall on its own momentum, slowing as it goes, and rolls back down if it runs out; on a ceiling it needs some speed to stay on.
-- Chain gear rails move carts at a fixed speed the way they were placed, whatever speed they come in with, so carts can't roll back. Slime chain gear rails do the same on walls and ceilings, so they carry carts straight up a wall or along a ceiling at any speed.
+- Sticky rails stick to floors, walls and ceilings, and carts can go from floor to wall to ceiling. A cart climbs a wall on its own momentum, slowing as it goes, and rolls back down if it runs out; on a ceiling it needs some speed to stay on. There are sticky powered, detector and activator rails too, in a redstone and a bluestone kind, powered by their own colour, and they work on walls and ceilings as well: a powered one can push a cart up a wall.
+- Chain gear rails, in a redstone and a bluestone kind, move carts at a fixed speed the way they were placed while powered by their colour, whatever speed the carts come in with, so carts can't roll back. Unpowered, they hold carts still. Sticky chain gear rails do the same on walls and ceilings, so they carry carts straight up a wall or along a ceiling.
 - Novice clerics sell 2 bluestone dust instead of 2 redstone dust a quarter of the time.
 - Programmer Art textures are included.
 
@@ -32,7 +32,8 @@ Same recipes as the redstone versions, with bluestone dust and bluestone torches
 - Greenstone paste: 1 purplestone dust and 1 slimeball make 2, or 1 redstone dust, 1 bluestone dust and 2 slimeballs make 4.
 - Greenstone torches, blocks, repeaters and comparators: the redstone recipes with greenstone paste and greenstone torches.
 - Wall converter: purplestone dust, greenstone paste and stone.
-- Slime rails: 8 rails around a slimeball. Chain gear rails: 8 rails around an iron chain. Slime chain gear rails: 8 chain gear rails around a slimeball.
+- Chain gear rails: like the powered rail, with iron ingots, an iron chain and redstone dust (bluestone dust for the bluestone kind); makes 6.
+- Sticky rails of every kind: 8 of the rail around a slimeball.
 
 ## Compatibility
 
