@@ -153,7 +153,7 @@ public final class SurfaceRails {
     // A floor rail with an end pointing back the way the cart comes, straight or curved, and the end the cart leaves by.
     // Unless strict, any level floor rail will do: it could turn to join.
     private static @Nullable Step onFloor(Level level, BlockPos pos, Direction back, boolean strict) {
-        List<Direction> ends = levelEnds(level.getBlockState(pos));
+        List<Direction> ends = levelEnds(level, pos, level.getBlockState(pos));
         if (ends.isEmpty() || strict && !ends.contains(back)) {
             return null;
         }
@@ -165,13 +165,17 @@ public final class SurfaceRails {
         return new Step(track, out);
     }
 
-    // The two ends of a level floor rail, straight or curved; none for a slope or anything else.
-    private static List<Direction> levelEnds(BlockState state) {
+    // The two ends of a floor rail: straight, curved, or a slope up to a wall rail; none for anything else.
+    private static List<Direction> levelEnds(Level level, BlockPos pos, BlockState state) {
         if (!(state.getBlock() instanceof BaseRailBlock rail) || !BaseRailBlock.isRail(state)) {
             return List.of();
         }
         RailShape shape = state.getValue(rail.getShapeProperty());
-        return shape.isSlope() ? List.of() : WallRails.level(shape);
+        if (shape.isSlope()) {
+            List<Direction> ends = WallRails.ends(shape);
+            return WallRails.slopesUp(level, pos, ends.getLast()) ? ends : List.of();
+        }
+        return WallRails.level(shape);
     }
 
     private static Vec3 unit(Direction direction) {
@@ -397,11 +401,11 @@ public final class SurfaceRails {
         return new Ride(floor, exit, step.track(), step.exit(), speed);
     }
 
-    // A cart on a curved floor rail leaves by the end it didn't come in by. A curve into a wall is too tight for a cart
-    // to follow, so it turns up the wall rail as soon as it is on the curve; over an edge, it goes round the curve until
-    // past halfway. Rolling back, it leaves the curve by the end it came in by.
+    // A cart on a curved floor rail, or a slope up to a wall rail, leaves by the end it didn't come in by. Into a wall it
+    // turns up the wall rail as soon as it is on the rail (a curve is too tight for a cart to follow); over an edge, it
+    // goes round the curve until past halfway. Rolling back, it leaves by the end it came in by.
     private static @Nullable Ride startOnCurve(Level level, AbstractMinecart cart, BlockPos railPos, Vec3 center, Vec3 velocity) {
-        List<Direction> ends = levelEnds(level.getBlockState(railPos));
+        List<Direction> ends = levelEnds(level, railPos, level.getBlockState(railPos));
         if (ends.isEmpty()) {
             return null;
         }

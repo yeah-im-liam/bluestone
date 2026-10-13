@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -36,13 +37,14 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 /**
  * A sticky rail on a wall or ceiling (the floor ones are ordinary rails). {@link #ATTACHED} is the face it sits on and
  * {@link #TRAVEL} the way along it carts run; chain gear rails drive carts that way. Like the game's rails it turns to
- * join the track around it, including floor rails it runs up from or down to. Its {@link Kind} says what it does to
- * carts, and powered, chain gear and activator rails are powered by their colour like the game's powered rails.
- * {@link SurfaceRails} moves the carts.
+ * join the track around it, including floor rails it runs up from or down to, and {@link #BEND}s round an inside corner
+ * to meet the track on the next face. Its {@link Kind} says what it does to carts, and powered, chain gear and
+ * activator rails are powered by their colour like the game's powered rails. {@link SurfaceRails} moves the carts.
  */
 public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, SignalBlock {
     public static final EnumProperty<Direction> ATTACHED = EnumProperty.create("attached", Direction.class, direction -> direction != Direction.DOWN);
     public static final EnumProperty<Direction> TRAVEL = EnumProperty.create("travel", Direction.class);
+    public static final EnumProperty<Bend> BEND = EnumProperty.create("bend", Bend.class);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     private static final Map<Direction, VoxelShape> SHAPES = new EnumMap<>(Map.of(
         Direction.UP, Block.box(0.0, 14.0, 0.0, 16.0, 16.0, 16.0),
@@ -65,6 +67,27 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         ACTIVATOR
     }
 
+    /**
+     * Where the rail bends round an inside corner onto the next face, like a rail sloping up a block: nowhere, at the
+     * end it travels towards, or at the end behind.
+     */
+    public enum Bend implements StringRepresentable {
+        NONE("none"),
+        AHEAD("ahead"),
+        BEHIND("behind");
+
+        private final String name;
+
+        Bend(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
     private final Kind kind;
     private final @Nullable Channel channel;
 
@@ -75,6 +98,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         registerDefaultState(stateDefinition.any()
             .setValue(ATTACHED, Direction.NORTH)
             .setValue(TRAVEL, Direction.UP)
+            .setValue(BEND, Bend.NONE)
             .setValue(POWERED, false)
             .setValue(BlockStateProperties.WATERLOGGED, false));
     }
@@ -89,7 +113,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(ATTACHED, TRAVEL, POWERED, BlockStateProperties.WATERLOGGED);
+        builder.add(ATTACHED, TRAVEL, BEND, POWERED, BlockStateProperties.WATERLOGGED);
     }
 
     @Override
@@ -131,7 +155,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
                 }
             }
         }
-        BlockState state = defaultBlockState().setValue(ATTACHED, attached).setValue(TRAVEL, travel);
+        BlockState state = defaultBlockState().setValue(ATTACHED, attached).setValue(TRAVEL, travel).setValue(BEND, bend(level, pos, attached, travel));
         return state.canSurvive(level, pos) ? Waterlogging.place(state, context) : null;
     }
 
@@ -169,21 +193,38 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return null;
     }
 
-    // Turns to join more track when the track around it changes, like the game's rails when one is laid next to them.
+    // Where the rail meets track on the face of a block in its way, it bends to that face.
+    private Bend bend(Level level, BlockPos pos, Direction attached, Direction travel) {
+        for (Direction end : new Direction[]{travel, travel.getOpposite()}) {
+            BlockPos ahead = pos.relative(end);
+            if (level.getBlockState(ahead).isFaceSturdy(level, ahead, end.getOpposite())
+                && SurfaceRails.joins(level, new SurfaceRails.Track(pos, attached, travel.getAxis(), kind, false, travel), end, true)) {
+                return end == travel ? Bend.AHEAD : Bend.BEHIND;
+            }
+        }
+        return Bend.NONE;
+    }
+
+    // Turns to join more track when the track around it changes, like the game's rails when one is laid next to them,
+    // and bends to meet track round an inside corner.
     private void turn(Level level, BlockPos pos, BlockState state) {
         Direction attached = state.getValue(ATTACHED);
         Direction travel = state.getValue(TRAVEL);
         Direction.Axis axis = bestAxis(level, pos, attached, travel.getAxis());
-        if (axis == travel.getAxis()) {
-            return;
+        boolean turning = axis != travel.getAxis();
+        if (turning) {
+            travel = following(level, pos, attached, axis);
+            if (travel == null) {
+                travel = axis == Direction.Axis.Y ? Direction.UP : Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
+            }
         }
-        Direction turned = following(level, pos, attached, axis);
-        if (turned == null) {
-            turned = axis == Direction.Axis.Y ? Direction.UP : Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
+        BlockState updated = state.setValue(TRAVEL, travel).setValue(BEND, bend(level, pos, attached, travel));
+        if (updated != state) {
+            level.setBlock(pos, updated, Block.UPDATE_ALL);
+            if (turning) {
+                joined(level, pos, updated);
+            }
         }
-        BlockState updated = state.setValue(TRAVEL, turned);
-        level.setBlock(pos, updated, Block.UPDATE_ALL);
-        joined(level, pos, updated);
     }
 
     // Tells the track it may now join: wall and ceiling rails round an outside corner, which aren't next to it, and
