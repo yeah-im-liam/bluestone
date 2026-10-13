@@ -5,7 +5,8 @@
       "palette_key": "minecraft:trims/color_palettes/trim_palette",
       "permutations": {
         "bluestone": "bluestone:trims/color_palettes/bluestone",
-        "purplestone": "bluestone:trims/color_palettes/purplestone"
+        "purplestone": "bluestone:trims/color_palettes/purplestone",
+        "greenstone": "bluestone:trims/color_palettes/greenstone"
       },
       "textures": [
         "minecraft:trims/entity/humanoid/sentry",

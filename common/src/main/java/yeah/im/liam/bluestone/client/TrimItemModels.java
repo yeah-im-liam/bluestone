@@ -12,13 +12,13 @@ import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.Bluestone;
 
 /**
- * Gives trimmed armor its bluestone and purplestone icons. Each vanilla armor item picks its icon by trim material;
- * next to the redstone case goes a case for each of the mod's materials, pointing at the mod's own model. This runs
- * on the item files as the game reads them, after resource packs and other mods have had their say, instead of
- * replacing the files.
+ * Gives trimmed armor its bluestone, purplestone and greenstone icons. Each vanilla armor item picks its icon by trim
+ * material; next to the redstone case goes a case for each of the mod's materials, pointing at the mod's own model.
+ * This runs on the item files as the game reads them, after resource packs and other mods have had their say, instead
+ * of replacing the files.
  */
 public final class TrimItemModels {
-    private static final List<String> MATERIALS = List.of("bluestone", "purplestone");
+    private static final List<String> MATERIALS = List.of("bluestone", "purplestone", "greenstone");
     private static final Identifier SELECT = Identifier.withDefaultNamespace("select");
     private static final Identifier MODEL = Identifier.withDefaultNamespace("model");
     private static final Identifier TRIM_MATERIAL = Identifier.withDefaultNamespace("trim_material");

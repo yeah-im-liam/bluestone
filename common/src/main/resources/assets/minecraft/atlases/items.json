@@ -5,7 +5,8 @@
       "palette_key": "minecraft:trim_base",
       "permutations": {
         "bluestone": "bluestone:trim/bluestone",
-        "purplestone": "bluestone:trim/purplestone"
+        "purplestone": "bluestone:trim/purplestone",
+        "greenstone": "bluestone:trim/greenstone"
       },
       "textures": [
         "minecraft:trims/items/helmet_trim",

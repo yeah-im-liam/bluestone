@@ -393,6 +393,7 @@ write(A + "lang/en_us.json", {
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
+    "trim_material.bluestone.greenstone": "Greenstone Material",
     "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
 })
@@ -539,13 +540,15 @@ write("pack.mcmeta", {
 })
 
 # Armor trims. 26.3 builds trim textures from palette ids; 26.1 and 26.2 from asset names and the armor_trims atlas.
-# Colours are redstone's #971607 run through the same mix as each dust: red and blue swapped, or 60% red plus full blue.
-TRIMS = {"bluestone": "#071697", "purplestone": "#5A1697"}
+# Colours are redstone's #971607 run through the same mix as each dust: red and blue swapped, 60% red plus full blue, or
+# red and green swapped. Each material is given by one item.
+TRIMS = {"bluestone": "#071697", "purplestone": "#5A1697", "greenstone": "#169707"}
+TRIM_ITEMS = {"bluestone": "bluestone:bluestone", "purplestone": "bluestone:purplestone", "greenstone": "bluestone:greenstone_paste"}
 for material, color in TRIMS.items():
     description = {"color": color, "translate": "trim_material.bluestone." + material}
     write(D + "trim_material/" + material + ".json", {"description": description, "palette_id": "bluestone:trim/" + material})
     write("mc26.1/" + D + "trim_material/" + material + ".json", {"asset_name": material, "description": description})
-write("data/minecraft/tags/item/trim_materials.json", {"values": ["bluestone:" + material for material in TRIMS]})
+write("data/minecraft/tags/item/trim_materials.json", {"values": [TRIM_ITEMS[material] for material in TRIMS]})
 
 items_atlas = vanilla("assets/minecraft/atlases/items.json")["sources"][1]
 write("assets/minecraft/atlases/items.json", {"sources": [{

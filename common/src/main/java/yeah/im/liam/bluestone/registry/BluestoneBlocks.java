@@ -171,7 +171,8 @@ public final class BluestoneBlocks {
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
         converterItem = blockItem(items, "converter", converter);
-        pasteItem = blockItem(items, "greenstone_paste", paste);
+        pasteItem = items.register("greenstone_paste", key -> new BlockItem(paste, itemProps(key)
+            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "greenstone"))));
         greenstoneTorchItem = items.register("greenstone_torch", key -> new StandingAndWallBlockItem(greenstoneTorch, greenstoneWallTorch, Direction.DOWN, itemProps(key)));
         greenstoneBlockItem = blockItem(items, "greenstone_block", greenstoneBlock);
         greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);
