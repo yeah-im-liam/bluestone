@@ -45,7 +45,7 @@ D = "data/bluestone/"
 # Blockstates
 write(A + "blockstates/bluestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
 write(A + "blockstates/purplestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
-for name, src in [("bluestone_block", "redstone_block"), ("bluestone_ore", "redstone_ore"), ("deepslate_bluestone_ore", "deepslate_redstone_ore")]:
+for name in ["bluestone_block", "purplestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"blockstates/{name}.json", {"variants": {"": {"model": f"bluestone:block/{name}"}}})
 for name, src, prefix in [
     ("bluestone_torch", "redstone_torch", "redstone_torch"),
@@ -62,7 +62,7 @@ for name, src, prefix in [
     write(A + f"blockstates/{name}.json", swap_models(data, [("minecraft:block/" + prefix, "bluestone:block/" + name)]))
 
 # Block models
-for name in ["bluestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
 for stone in ["bluestone", "purplestone"]:
@@ -163,7 +163,7 @@ GENERATED = {
 for name, texture in GENERATED.items():
     write(A + f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": texture}})
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:item/{name}"}})
-for name in ["bluestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
@@ -207,6 +207,7 @@ write(A + "lang/en_us.json", {
     "item.bluestone.purplestone": "Purplestone Dust",
     "block.bluestone.purplestone_wire": "Purplestone Wire",
     "block.bluestone.purplestone_torch": "Purplestone Torch",
+    "block.bluestone.purplestone_block": "Block of Purplestone",
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
@@ -236,6 +237,8 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
         write(prefix + D + f"loot_table/blocks/{new}.json", swap_ids(data, ID_PAIRS))
     write(prefix + D + "loot_table/blocks/purplestone_wire.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
+    write(prefix + D + "loot_table/blocks/purplestone_block.json",
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_block.json", jar), [("redstone_block", "purplestone_block")]))
     write(prefix + D + "loot_table/blocks/purplestone_torch.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_torch.json", jar), [("redstone_torch", "purplestone_torch")]))
     write(prefix + D + "loot_table/blocks/converter.json",
@@ -247,6 +250,8 @@ RECIPES = {
     "bluestone_block": ("redstone_block", "redstone"),
     "bluestone_torch": ("redstone_torch", "redstone"),
     "purplestone_torch": ("redstone_torch", "redstone"),
+    "purplestone_block": ("redstone_block", "redstone"),
+    "purplestone_from_purplestone_block": ("redstone", "redstone"),
     "bluestone_repeater": ("repeater", "redstone"),
     "bluestone_comparator": ("comparator", "redstone"),
     "bluestone_powered_rail": ("powered_rail", "transportation"),
@@ -257,8 +262,8 @@ RECIPES = {
     "bluestone_from_blasting_bluestone_ore": ("redstone_from_blasting_redstone_ore", "redstone"),
     "bluestone_from_blasting_deepslate_bluestone_ore": ("redstone_from_blasting_deepslate_redstone_ore", "redstone"),
 }
-# The purplestone torch is the redstone torch recipe with purplestone dust.
-PURPLESTONE_PAIRS = [("redstone_torch", "purplestone_torch"), ("redstone", "purplestone")]
+# The purplestone torch and block are the redstone recipes with purplestone dust.
+PURPLESTONE_PAIRS = [("redstone_torch", "purplestone_torch"), ("redstone_block", "purplestone_block"), ("redstone", "purplestone")]
 for ours, (theirs, folder) in RECIPES.items():
     stone, pairs = ("purplestone", PURPLESTONE_PAIRS) if ours.startswith("purplestone") else ("bluestone", ID_PAIRS)
     recipe = swap_ids(vanilla(f"data/minecraft/recipe/{theirs}.json"), pairs)
@@ -267,8 +272,10 @@ for ours, (theirs, folder) in RECIPES.items():
     write(D + f"recipe/{ours}.json", recipe)
     for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
         advancement = swap_ids(vanilla(f"data/minecraft/advancement/recipes/{folder}/{theirs}.json", jar), pairs)
-        text = json.dumps(advancement).replace(f'"minecraft:{theirs}"', f'"bluestone:{ours}"')
-        text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", stone), text)
+        unlock = advancement["criteria"]["has_the_recipe"]["conditions"]
+        unlock[next(iter(unlock))] = f"bluestone:{ours}"
+        advancement["rewards"]["recipes"] = [f"bluestone:{ours}"]
+        text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", stone), json.dumps(advancement))
         write(prefix + D + f"advancement/recipes/{folder}/{ours}.json", json.loads(text))
 
 write(D + "recipe/purplestone.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
@@ -358,7 +365,7 @@ write(D + "tags/worldgen/biome/has_more_bluestone.json",
       {"values": ["#minecraft:is_ocean", "#minecraft:is_river", "minecraft:swamp", "minecraft:mangrove_swamp"]})
 
 # Tags
-write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
+write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail"]}
 write("data/minecraft/tags/block/rails.json", RAILS)

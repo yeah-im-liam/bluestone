@@ -28,6 +28,7 @@ import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.ConverterBlock;
+import yeah.im.liam.bluestone.block.PurplestoneBlock;
 import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
@@ -51,6 +52,7 @@ public final class BluestoneBlocks {
     private static BluestonePoweredRailBlock activatorRail;
     private static BluestoneDetectorRailBlock detectorRail;
     private static PurplestoneWireBlock purplestoneWire;
+    private static PurplestoneBlock purplestoneBlock;
     private static PurplestoneTorchBlock purplestoneTorch;
     private static PurplestoneWallTorchBlock purplestoneWallTorch;
     private static ConverterBlock converter;
@@ -67,6 +69,7 @@ public final class BluestoneBlocks {
     private static Item detectorRailItem;
     private static Item purplestone;
     private static Item purplestoneTorchItem;
+    private static Item purplestoneBlockItem;
     private static Item converterItem;
 
     private BluestoneBlocks() {
@@ -77,6 +80,12 @@ public final class BluestoneBlocks {
         purplestoneWire = blocks.register("purplestone_wire", key -> new PurplestoneWireBlock(props(key, wireProperties())));
         block = blocks.register("bluestone_block", key -> new BluestoneBlock(props(key, BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_BLUE)
+            .requiresCorrectToolForDrops()
+            .strength(5.0F, 6.0F)
+            .sound(SoundType.METAL)
+            .isRedstoneConductor((state, level, pos) -> false))));
+        purplestoneBlock = blocks.register("purplestone_block", key -> new PurplestoneBlock(props(key, BlockBehaviour.Properties.of()
+            .mapColor(MapColor.COLOR_PURPLE)
             .requiresCorrectToolForDrops()
             .strength(5.0F, 6.0F)
             .sound(SoundType.METAL)
@@ -114,6 +123,7 @@ public final class BluestoneBlocks {
         purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, new Item.Properties().setId(key).useItemDescriptionPrefix()
             .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "purplestone"))));
         blockItem = blockItem(items, "bluestone_block", block);
+        purplestoneBlockItem = blockItem(items, "purplestone_block", purplestoneBlock);
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);
         torchItem = items.register("bluestone_torch", key -> new StandingAndWallBlockItem(torch, wallTorch, Direction.DOWN, itemProps(key)));
@@ -154,12 +164,12 @@ public final class BluestoneBlocks {
      * Everything for the mod's own creative tab, in the order the redstone versions appear.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, repeaterItem, comparatorItem, converterItem,
-            poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
+        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, purplestoneBlockItem, repeaterItem, comparatorItem,
+            converterItem, poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, repeaterItem, comparatorItem, converterItem);
+        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, purplestoneBlockItem, repeaterItem, comparatorItem, converterItem);
     }
 
     public static List<Item> rails() {
@@ -170,8 +180,8 @@ public final class BluestoneBlocks {
         return List.of(oreItem, deepslateOreItem);
     }
 
-    public static Item blockItem() {
-        return blockItem;
+    public static List<Item> storageBlocks() {
+        return List.of(blockItem, purplestoneBlockItem);
     }
 
     public static List<Item> torches() {
