@@ -7,8 +7,9 @@ import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
 
 /**
- * Purplestone dust takes power from both redstone and bluestone. Only purplestone dust and plain blocks such as lamps
- * and pistons pick up its own signal, so it never passes power between redstone and bluestone.
+ * Purplestone dust takes power from both redstone and bluestone. Only purplestone parts, the converter and plain
+ * blocks such as lamps and pistons pick up its own signal, so it never passes power straight between redstone and
+ * bluestone. Like redstone dust, it can't sit in water.
  */
 public class PurplestoneWireBlock extends ColoredWireBlock {
     public PurplestoneWireBlock(Properties properties) {

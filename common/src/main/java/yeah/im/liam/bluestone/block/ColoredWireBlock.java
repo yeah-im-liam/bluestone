@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
@@ -44,9 +45,10 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * The game's redstone dust for another signal channel, able to sit in water.
+ * The game's redstone dust for another signal channel. Dust that is also a {@link SimpleWaterloggedBlock} can sit in
+ * water; the rest washes away like redstone dust.
  */
-public abstract class ColoredWireBlock extends Block implements SimpleWaterloggedBlock, SignalBlock {
+public abstract class ColoredWireBlock extends Block implements SignalBlock {
     public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.NORTH_REDSTONE;
     public static final EnumProperty<RedstoneSide> EAST = BlockStateProperties.EAST_REDSTONE;
     public static final EnumProperty<RedstoneSide> SOUTH = BlockStateProperties.SOUTH_REDSTONE;
@@ -70,13 +72,12 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
         super(properties);
         this.channel = channel;
         this.colors = colorsFor(mix);
-        registerDefaultState(stateDefinition.any()
+        registerDefaultState(withWater(stateDefinition.any()
             .setValue(NORTH, RedstoneSide.NONE)
             .setValue(EAST, RedstoneSide.NONE)
             .setValue(SOUTH, RedstoneSide.NONE)
             .setValue(WEST, RedstoneSide.NONE)
-            .setValue(POWER, 0)
-            .setValue(WATERLOGGED, false));
+            .setValue(POWER, 0), false));
         shapes = makeShapes();
         crossState = defaultBlockState()
             .setValue(NORTH, RedstoneSide.SIDE)
@@ -99,7 +100,7 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
                 };
             }
             return shape;
-        }, POWER, WATERLOGGED);
+        }, defaultBlockState().hasProperty(WATERLOGGED) ? new Property<?>[] {POWER, WATERLOGGED} : new Property<?>[] {POWER});
     }
 
     @Override
@@ -115,9 +116,8 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
 
     private BlockState getConnectionState(BlockGetter level, BlockState state, BlockPos pos) {
         boolean wasDot = isDot(state);
-        state = getMissingConnections(level, defaultBlockState()
-            .setValue(POWER, state.getValue(POWER))
-            .setValue(WATERLOGGED, state.getValue(WATERLOGGED)), pos);
+        state = getMissingConnections(level, withWater(defaultBlockState()
+            .setValue(POWER, state.getValue(POWER)), Waterlogging.isWet(state)), pos);
         if (wasDot && isDot(state)) {
             return state;
         }
@@ -167,10 +167,9 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
         if (side.isConnected() == state.getValue(property).isConnected() && !isCross(state)) {
             return state.setValue(property, side);
         }
-        BlockState cross = crossState
+        BlockState cross = withWater(crossState
             .setValue(POWER, state.getValue(POWER))
-            .setValue(WATERLOGGED, state.getValue(WATERLOGGED))
-            .setValue(property, side);
+            .setValue(property, side), Waterlogging.isWet(state));
         return getConnectionState(level, cross, pos);
     }
 
@@ -462,7 +461,15 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, POWER, WATERLOGGED);
+        builder.add(NORTH, EAST, SOUTH, WEST, POWER);
+        if (this instanceof SimpleWaterloggedBlock) {
+            builder.add(WATERLOGGED);
+        }
+    }
+
+    // Only dust that can sit in water has the waterlogged property.
+    private static BlockState withWater(BlockState state, boolean water) {
+        return state.hasProperty(WATERLOGGED) ? state.setValue(WATERLOGGED, water) : state;
     }
 
     @Override
@@ -476,9 +483,8 @@ public abstract class ColoredWireBlock extends Block implements SimpleWaterlogge
             return InteractionResult.PASS;
         }
         if (isCross(state) || isDot(state)) {
-            BlockState newState = (isCross(state) ? defaultBlockState() : crossState)
-                .setValue(POWER, state.getValue(POWER))
-                .setValue(WATERLOGGED, state.getValue(WATERLOGGED));
+            BlockState newState = withWater((isCross(state) ? defaultBlockState() : crossState)
+                .setValue(POWER, state.getValue(POWER)), Waterlogging.isWet(state));
             newState = getConnectionState(level, newState, pos);
             if (newState != state) {
                 level.setBlockAndUpdate(pos, newState);

@@ -17,8 +17,8 @@ final class Waterlogging {
     }
 
     static @Nullable BlockState place(@Nullable BlockState state, BlockPlaceContext context) {
-        if (state == null) {
-            return null;
+        if (state == null || !state.hasProperty(BlockStateProperties.WATERLOGGED)) {
+            return state;
         }
         boolean water = context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER;
         return state.setValue(BlockStateProperties.WATERLOGGED, water);
@@ -31,6 +31,6 @@ final class Waterlogging {
     }
 
     static boolean isWet(BlockState state) {
-        return state.getValue(BlockStateProperties.WATERLOGGED);
+        return state.getValueOrElse(BlockStateProperties.WATERLOGGED, false);
     }
 }
