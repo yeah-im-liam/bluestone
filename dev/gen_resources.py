@@ -50,6 +50,8 @@ for name, src in [("bluestone_block", "redstone_block"), ("bluestone_ore", "reds
 for name, src, prefix in [
     ("bluestone_torch", "redstone_torch", "redstone_torch"),
     ("bluestone_wall_torch", "redstone_wall_torch", "redstone_wall_torch"),
+    ("purplestone_torch", "redstone_torch", "redstone_torch"),
+    ("purplestone_wall_torch", "redstone_wall_torch", "redstone_wall_torch"),
     ("bluestone_repeater", "repeater", "repeater"),
     ("bluestone_comparator", "comparator", "comparator"),
     ("bluestone_powered_rail", "powered_rail", "powered_rail"),
@@ -63,10 +65,11 @@ for name, src, prefix in [
 for name in ["bluestone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
-write(A + "models/block/bluestone_torch.json", {"parent": "minecraft:block/template_redstone_torch", "textures": {"torch": "bluestone:block/bluestone_torch"}})
-write(A + "models/block/bluestone_torch_off.json", {"parent": "minecraft:block/template_torch_unlit", "textures": {"torch": "bluestone:block/bluestone_torch_off"}})
-write(A + "models/block/bluestone_wall_torch.json", {"parent": "minecraft:block/template_redstone_torch_wall", "textures": {"torch": "bluestone:block/bluestone_torch"}})
-write(A + "models/block/bluestone_wall_torch_off.json", {"parent": "minecraft:block/template_torch_wall_unlit", "textures": {"torch": "bluestone:block/bluestone_torch_off"}})
+for stone in ["bluestone", "purplestone"]:
+    write(A + f"models/block/{stone}_torch.json", {"parent": "minecraft:block/template_redstone_torch", "textures": {"torch": f"bluestone:block/{stone}_torch"}})
+    write(A + f"models/block/{stone}_torch_off.json", {"parent": "minecraft:block/template_torch_unlit", "textures": {"torch": f"bluestone:block/{stone}_torch_off"}})
+    write(A + f"models/block/{stone}_wall_torch.json", {"parent": "minecraft:block/template_redstone_torch_wall", "textures": {"torch": f"bluestone:block/{stone}_torch"}})
+    write(A + f"models/block/{stone}_wall_torch_off.json", {"parent": "minecraft:block/template_torch_wall_unlit", "textures": {"torch": f"bluestone:block/{stone}_torch_off"}})
 
 TORCH_TEXTURES = {"unlit": "bluestone:block/bluestone_torch_off", "lit": "bluestone:block/bluestone_torch"}
 
@@ -95,21 +98,17 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
                   {"parent": f"minecraft:block/{parent}", "textures": {"rail": f"bluestone:block/bluestone_{rail}{on}"}})
 
 
-# The converter: a one-tick repeater whose input-end torch shows the input colour and output-end torch the output colour.
-# Its top is the same in both directions; only the torches swap.
+# The converter: shaped like a four-tick repeater, with the input-end torch in the input colour and the output-end torch
+# in the output colour. Its top is the same in both directions; only the torches swap.
 TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
            "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
 MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
 
 
 def torch_end(element):
-    """Which torch an element of the repeater_1tick models belongs to: the output torch sits at z 2-4, the input one at z 6-8."""
-    center = [(a + b) / 2 for a, b in zip(element["from"], element["to"])]
-    for end, z in (("out", 3), ("in", 7)):
-        offset = sorted(abs(c - h) for c, h in zip(center, (8, 6, z)))
-        if offset == [0, 0, 3]:
-            return end  # one of the glow boxes around that torch's head
-    return "out" if abs(center[2] - 3) < abs(center[2] - 7) else "in"
+    """Which torch an element of the repeater_4tick models belongs to: the output torch sits at z 2-4, the input one at z 12-14."""
+    z = (element["from"][2] + element["to"][2]) / 2
+    return "out" if abs(z - 3) < abs(z - 13) else "in"
 
 
 def converter_model(parent):
@@ -125,7 +124,7 @@ def converter_models(source, prefix):
     for mode, (input_color, output_color) in MODES.items():
         for on in ["", "_on"]:
             for locked in ["", "_locked"]:
-                model = converter_model(source("repeater_1tick" + on + locked))
+                model = converter_model(source("repeater_4tick" + on + locked))
                 top = "bluestone:block/converter" + on
                 model["textures"] = {"particle": top, "slab": "minecraft:block/smooth_stone", "top": top, "lock": "minecraft:block/bedrock",
                                      "in_lit": TORCHES[input_color][0], "in_unlit": TORCHES[input_color][1],
@@ -154,6 +153,7 @@ GENERATED = {
     "purplestone": "bluestone:item/purplestone",
     "converter": "bluestone:item/converter",
     "bluestone_torch": "bluestone:block/bluestone_torch",
+    "purplestone_torch": "bluestone:block/purplestone_torch",
     "bluestone_repeater": "bluestone:item/bluestone_repeater",
     "bluestone_comparator": "bluestone:item/bluestone_comparator",
     "bluestone_powered_rail": "bluestone:block/bluestone_powered_rail",
@@ -182,11 +182,12 @@ for src_dir, dst_dir in [(ART / "default", OUT / "assets/bluestone/textures"), (
         dst = dst_dir / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(png, dst)
-# Programmer Art puts the redstone torch on the old plain torch shape; the bluestone torch follows it.
-for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
-    model = json.loads((PROGRAMMER_ART / f"assets/minecraft/models/block/{theirs}.json").read_text())
-    model["textures"] = {k: v.replace("minecraft:block/redstone_torch", "bluestone:block/bluestone_torch") for k, v in model["textures"].items()}
-    write(f"programmer_art/assets/bluestone/models/block/{theirs.replace('redstone', 'bluestone')}.json", model)
+# Programmer Art puts the redstone torch on the old plain torch shape; the bluestone and purplestone torches follow it.
+for stone in ["bluestone", "purplestone"]:
+    for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
+        model = json.loads((PROGRAMMER_ART / f"assets/minecraft/models/block/{theirs}.json").read_text())
+        model["textures"] = {k: v.replace("minecraft:block/redstone_torch", f"bluestone:block/{stone}_torch") for k, v in model["textures"].items()}
+        write(f"programmer_art/assets/bluestone/models/block/{theirs.replace('redstone', stone)}.json", model)
 write("programmer_art/pack.mcmeta", {"pack": {"description": {"translate": "pack.bluestone.programmer_art.description"}, "min_format": 84, "max_format": 97}})
 
 # Language
@@ -205,6 +206,7 @@ write(A + "lang/en_us.json", {
     "itemGroup.bluestone.main": "Bluestone",
     "item.bluestone.purplestone": "Purplestone Dust",
     "block.bluestone.purplestone_wire": "Purplestone Wire",
+    "block.bluestone.purplestone_torch": "Purplestone Torch",
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
@@ -234,6 +236,8 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
         write(prefix + D + f"loot_table/blocks/{new}.json", swap_ids(data, ID_PAIRS))
     write(prefix + D + "loot_table/blocks/purplestone_wire.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
+    write(prefix + D + "loot_table/blocks/purplestone_torch.json",
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_torch.json", jar), [("redstone_torch", "purplestone_torch")]))
     write(prefix + D + "loot_table/blocks/converter.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/repeater.json", jar), [("repeater", "converter")]))
 
@@ -242,6 +246,7 @@ RECIPES = {
     "bluestone": ("redstone", "redstone"),
     "bluestone_block": ("redstone_block", "redstone"),
     "bluestone_torch": ("redstone_torch", "redstone"),
+    "purplestone_torch": ("redstone_torch", "redstone"),
     "bluestone_repeater": ("repeater", "redstone"),
     "bluestone_comparator": ("comparator", "redstone"),
     "bluestone_powered_rail": ("powered_rail", "transportation"),
@@ -252,15 +257,18 @@ RECIPES = {
     "bluestone_from_blasting_bluestone_ore": ("redstone_from_blasting_redstone_ore", "redstone"),
     "bluestone_from_blasting_deepslate_bluestone_ore": ("redstone_from_blasting_deepslate_redstone_ore", "redstone"),
 }
+# The purplestone torch is the redstone torch recipe with purplestone dust.
+PURPLESTONE_PAIRS = [("redstone_torch", "purplestone_torch"), ("redstone", "purplestone")]
 for ours, (theirs, folder) in RECIPES.items():
-    recipe = swap_ids(vanilla(f"data/minecraft/recipe/{theirs}.json"), ID_PAIRS)
+    stone, pairs = ("purplestone", PURPLESTONE_PAIRS) if ours.startswith("purplestone") else ("bluestone", ID_PAIRS)
+    recipe = swap_ids(vanilla(f"data/minecraft/recipe/{theirs}.json"), pairs)
     if recipe.get("group") == "redstone":
         recipe["group"] = "bluestone"
     write(D + f"recipe/{ours}.json", recipe)
     for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
-        advancement = swap_ids(vanilla(f"data/minecraft/advancement/recipes/{folder}/{theirs}.json", jar), ID_PAIRS)
+        advancement = swap_ids(vanilla(f"data/minecraft/advancement/recipes/{folder}/{theirs}.json", jar), pairs)
         text = json.dumps(advancement).replace(f'"minecraft:{theirs}"', f'"bluestone:{ours}"')
-        text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", "bluestone"), text)
+        text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", stone), text)
         write(prefix + D + f"advancement/recipes/{folder}/{ours}.json", json.loads(text))
 
 write(D + "recipe/purplestone.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
@@ -355,7 +363,7 @@ write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:b
 RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail"]}
 write("data/minecraft/tags/block/rails.json", RAILS)
 write("data/minecraft/tags/item/rails.json", RAILS)
-write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch"]})
+write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch"]})
 ORES = {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]}
 write(D + "tags/block/bluestone_ores.json", ORES)
 write(D + "tags/item/bluestone_ores.json", ORES)

@@ -28,12 +28,14 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
+import yeah.im.liam.bluestone.signal.Listener;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * A one-tick repeater that takes one kind of signal and gives out the other. Right-clicking swaps the direction, and
- * like a repeater it is locked by a repeater or comparator (of either kind) pointing into its side.
+ * A one-tick repeater that takes one kind of signal and gives out the other. Purplestone powers it whichever way it
+ * is set. Right-clicking swaps the direction, and like a repeater it is locked by a repeater or comparator (of either
+ * kind) pointing into its side. It looks like a repeater set to four ticks.
  */
 public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock, SignalBlock {
     public static final EnumProperty<Mode> MODE = EnumProperty.create("mode", Mode.class);
@@ -73,7 +75,8 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
     @Override
     protected int getInputSignal(Level level, BlockPos pos, BlockState state) {
         Channel input = state.getValue(MODE).input;
-        return Signals.read(input, () -> {
+        Listener listener = source -> source == input || source == Channel.PURPLESTONE;
+        return Signals.read(listener, () -> {
             Direction direction = state.getValue(FACING);
             BlockPos targetPos = pos.relative(direction);
             int signal = level.getSignal(targetPos, direction);
@@ -81,8 +84,8 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
                 return signal;
             }
             BlockState target = level.getBlockState(targetPos);
-            boolean dust = input == Channel.REDSTONE ? target.is(Blocks.REDSTONE_WIRE) : target.getBlock() instanceof BluestoneWireBlock;
-            return Math.max(signal, dust ? target.getValue(BlockStateProperties.POWER) : 0);
+            boolean dust = target.is(Blocks.REDSTONE_WIRE) || target.getBlock() instanceof ColoredWireBlock;
+            return Math.max(signal, dust && listener.hears(Channel.ofSource(target)) ? target.getValue(BlockStateProperties.POWER) : 0);
         });
     }
 
@@ -148,9 +151,9 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
         double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
         double y = pos.getY() + 0.4 + (random.nextDouble() - 0.5) * 0.2;
         double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
-        // Like a one-tick repeater: the torch at the output end, or the one nearer the input.
+        // Like a four-tick repeater: the torch at the output end, or the one at the input end.
         boolean inputTorch = random.nextBoolean();
-        float offset = (inputTorch ? 1.0F : -5.0F) / 16.0F;
+        float offset = (inputTorch ? 7.0F : -5.0F) / 16.0F;
         Channel channel = inputTorch ? state.getValue(MODE).input : state.getValue(MODE).output;
         DustParticleOptions particle = channel == Channel.REDSTONE ? DustParticleOptions.REDSTONE : BluestoneDiodes.PARTICLE;
         level.addParticle(particle, x + offset * direction.getStepX(), y, z + offset * direction.getStepZ(), 0.0, 0.0, 0.0);

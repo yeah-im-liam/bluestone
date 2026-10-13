@@ -7,21 +7,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Tracks which channel is reading signals on the current thread. While a channel reads, sources it can't hear
- * report no signal.
+ * Tracks who is reading signals on the current thread. While a listener reads, sources it can't hear report no
+ * signal.
  */
 public final class Signals {
-    private static final ThreadLocal<Channel> LISTENER = new ThreadLocal<>();
+    private static final ThreadLocal<Listener> LISTENER = new ThreadLocal<>();
     private static final AtomicInteger READERS = new AtomicInteger();
 
     private Signals() {
     }
 
     /**
-     * Reads signals as the given channel hears them, or everything for {@code null}.
+     * Reads signals as the given listener hears them, or everything for {@code null}.
      */
-    public static int read(@Nullable Channel listener, IntSupplier reader) {
-        Channel previous = LISTENER.get();
+    public static int read(@Nullable Listener listener, IntSupplier reader) {
+        Listener previous = LISTENER.get();
         LISTENER.set(listener);
         READERS.incrementAndGet();
         try {
@@ -32,7 +32,7 @@ public final class Signals {
         }
     }
 
-    public static boolean test(@Nullable Channel listener, BooleanSupplier reader) {
+    public static boolean test(@Nullable Listener listener, BooleanSupplier reader) {
         return read(listener, () -> reader.getAsBoolean() ? 1 : 0) != 0;
     }
 
@@ -40,7 +40,7 @@ public final class Signals {
         if (READERS.get() == 0) {
             return false;
         }
-        Channel listener = LISTENER.get();
+        Listener listener = LISTENER.get();
         if (listener == null) {
             return false;
         }

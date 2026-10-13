@@ -28,6 +28,8 @@ import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.ConverterBlock;
+import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
+import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
 
 /**
@@ -49,6 +51,8 @@ public final class BluestoneBlocks {
     private static BluestonePoweredRailBlock activatorRail;
     private static BluestoneDetectorRailBlock detectorRail;
     private static PurplestoneWireBlock purplestoneWire;
+    private static PurplestoneTorchBlock purplestoneTorch;
+    private static PurplestoneWallTorchBlock purplestoneWallTorch;
     private static ConverterBlock converter;
 
     private static Item dust;
@@ -62,6 +66,7 @@ public final class BluestoneBlocks {
     private static Item activatorRailItem;
     private static Item detectorRailItem;
     private static Item purplestone;
+    private static Item purplestoneTorchItem;
     private static Item converterItem;
 
     private BluestoneBlocks() {
@@ -91,6 +96,10 @@ public final class BluestoneBlocks {
         wallTorch = blocks.register("bluestone_wall_torch", key -> new BluestoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
             .overrideLootTable(torch.getLootTable())
             .overrideDescription(torch.getDescriptionId())))));
+        purplestoneTorch = blocks.register("purplestone_torch", key -> new PurplestoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
+        purplestoneWallTorch = blocks.register("purplestone_wall_torch", key -> new PurplestoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
+            .overrideLootTable(purplestoneTorch.getLootTable())
+            .overrideDescription(purplestoneTorch.getDescriptionId())))));
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
         converter = blocks.register("converter", key -> new ConverterBlock(props(key, diodeProperties())));
@@ -108,6 +117,7 @@ public final class BluestoneBlocks {
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);
         torchItem = items.register("bluestone_torch", key -> new StandingAndWallBlockItem(torch, wallTorch, Direction.DOWN, itemProps(key)));
+        purplestoneTorchItem = items.register("purplestone_torch", key -> new StandingAndWallBlockItem(purplestoneTorch, purplestoneWallTorch, Direction.DOWN, itemProps(key)));
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
         converterItem = blockItem(items, "converter", converter);
@@ -144,12 +154,12 @@ public final class BluestoneBlocks {
      * Everything for the mod's own creative tab, in the order the redstone versions appear.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, purplestone, torchItem, blockItem, repeaterItem, comparatorItem, converterItem,
+        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, repeaterItem, comparatorItem, converterItem,
             poweredRailItem, detectorRailItem, activatorRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, purplestone, torchItem, blockItem, repeaterItem, comparatorItem, converterItem);
+        return List.of(dust, purplestone, torchItem, purplestoneTorchItem, blockItem, repeaterItem, comparatorItem, converterItem);
     }
 
     public static List<Item> rails() {
@@ -164,8 +174,8 @@ public final class BluestoneBlocks {
         return blockItem;
     }
 
-    public static Item torchItem() {
-        return torchItem;
+    public static List<Item> torches() {
+        return List.of(torchItem, purplestoneTorchItem);
     }
 
     private static Item blockItem(Registrar<Item> items, String path, Block block) {

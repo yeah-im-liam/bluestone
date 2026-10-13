@@ -8,26 +8,27 @@ import net.minecraft.world.level.block.PoweredBlock;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
-import yeah.im.liam.bluestone.block.BluestoneComponent;
 
 /**
  * Redstone and bluestone parts only hear their own kind; purplestone hears both. Levers, buttons, observers and other
  * plain sources belong to no channel, so everything hears them.
  */
-public enum Channel {
+public enum Channel implements Listener {
     REDSTONE,
     BLUESTONE,
     PURPLESTONE;
 
+    @Override
     public boolean hears(Channel source) {
         return this == PURPLESTONE || this == source;
     }
 
     /**
-     * The channel a game block listens on when its own code reads signals.
+     * The channel a game block listens on when its own code reads signals: its own channel, or redstone for the
+     * game's blocks.
      */
     public static Channel of(Block block) {
-        return block instanceof BluestoneComponent ? BLUESTONE : REDSTONE;
+        return block instanceof SignalBlock signalBlock ? signalBlock.channel(block.defaultBlockState()) : REDSTONE;
     }
 
     public static @Nullable Channel ofSource(BlockState state) {

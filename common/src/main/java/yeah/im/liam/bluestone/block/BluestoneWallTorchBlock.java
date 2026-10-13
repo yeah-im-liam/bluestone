@@ -2,6 +2,7 @@ package yeah.im.liam.bluestone.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -53,8 +54,12 @@ public class BluestoneWallTorchBlock extends RedstoneWallTorchBlock implements S
             double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2 + 0.27 * opposite.getStepX();
             double y = pos.getY() + 0.7 + (random.nextDouble() - 0.5) * 0.2 + 0.22;
             double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2 + 0.27 * opposite.getStepZ();
-            level.addParticle(BluestoneDiodes.PARTICLE, x, y, z, 0.0, 0.0, 0.0);
+            level.addParticle(particle(), x, y, z, 0.0, 0.0, 0.0);
         }
+    }
+
+    protected ParticleOptions particle() {
+        return BluestoneDiodes.PARTICLE;
     }
 
     @Override
