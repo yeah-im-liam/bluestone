@@ -14,8 +14,8 @@ import zipfile
 from pathlib import Path
 
 JAR = sys.argv[1]
-LEGACY_JAR = sys.argv[4]
-PROGRAMMER_ART = Path(sys.argv[5])  # the game's Programmer Art pack, unzipped  # 26.1, whose loot table and advancement format 26.1 and 26.2 share
+LEGACY_JAR = sys.argv[4]          # 26.1, whose loot table and advancement format 26.1 and 26.2 share
+PROGRAMMER_ART = Path(sys.argv[5])  # the game's Programmer Art pack, unzipped
 OUT = Path(sys.argv[2])          # common/src/main/resources
 ART = Path(sys.argv[3])          # bluestone/textures (the user's art)
 z = zipfile.ZipFile(JAR)
@@ -96,6 +96,7 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
 
 
 # The converter: a one-tick repeater whose input-end torch shows the input colour and output-end torch the output colour.
+# Its top is the same in both directions; only the torches swap.
 TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
            "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
 MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
@@ -125,7 +126,7 @@ def converter_models(source, prefix):
         for on in ["", "_on"]:
             for locked in ["", "_locked"]:
                 model = converter_model(source("repeater_1tick" + on + locked))
-                top = "bluestone:block/converter_" + mode + on
+                top = "bluestone:block/converter" + on
                 model["textures"] = {"particle": top, "slab": "minecraft:block/smooth_stone", "top": top, "lock": "minecraft:block/bedrock",
                                      "in_lit": TORCHES[input_color][0], "in_unlit": TORCHES[input_color][1],
                                      "out_lit": TORCHES[output_color][0], "out_unlit": TORCHES[output_color][1]}

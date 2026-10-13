@@ -1,9 +1,9 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "bluestone:block/converter_blue_to_red_on",
+    "particle": "bluestone:block/converter_on",
     "slab": "minecraft:block/smooth_stone",
-    "top": "bluestone:block/converter_blue_to_red_on",
+    "top": "bluestone:block/converter_on",
     "lock": "minecraft:block/bedrock",
     "in_lit": "bluestone:block/bluestone_torch",
     "in_unlit": "bluestone:block/bluestone_torch_off",
