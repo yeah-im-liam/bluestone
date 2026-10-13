@@ -31,9 +31,9 @@ public final class WallRails {
     public static boolean joins(BlockGetter level, BlockPos pos, Direction way) {
         BlockPos ahead = pos.relative(way);
         if (level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite())) {
-            return upright(level.getBlockState(pos.above()), way);
+            return wallRail(level.getBlockState(pos.above()), way, Direction.DOWN);
         }
-        return upright(level.getBlockState(ahead.below()), way.getOpposite());
+        return wallRail(level.getBlockState(ahead.below()), way.getOpposite(), Direction.UP);
     }
 
     /**
@@ -41,7 +41,7 @@ public final class WallRails {
      */
     public static boolean slopesUp(BlockGetter level, BlockPos pos, Direction way) {
         BlockPos ahead = pos.relative(way);
-        return level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite()) && upright(level.getBlockState(pos.above()), way);
+        return level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite()) && wallRail(level.getBlockState(pos.above()), way, Direction.DOWN);
     }
 
     /**
@@ -63,10 +63,9 @@ public final class WallRails {
         return shape;
     }
 
-    private static boolean upright(BlockState state, Direction attached) {
-        return state.getBlock() instanceof AttachedRailBlock
-            && state.getValue(AttachedRailBlock.ATTACHED) == attached
-            && state.getValue(AttachedRailBlock.TRAVEL).getAxis() == Direction.Axis.Y;
+    // A rail on the wall the given way, with an end pointing down to a rail at its foot or up to one on top.
+    private static boolean wallRail(BlockState state, Direction attached, Direction end) {
+        return state.getBlock() instanceof AttachedRailBlock && state.getValue(AttachedRailBlock.ATTACHED) == attached && AttachedRailBlock.hasEnd(state, end);
     }
 
     /**

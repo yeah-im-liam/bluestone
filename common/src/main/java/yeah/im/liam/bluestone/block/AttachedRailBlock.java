@@ -1,9 +1,12 @@
 package yeah.im.liam.bluestone.block;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
@@ -38,13 +41,14 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
  * A sticky rail on a wall or ceiling (the floor ones are ordinary rails). {@link #ATTACHED} is the face it sits on and
  * {@link #TRAVEL} the way along it carts run; chain gear rails drive carts that way. Like the game's rails it turns to
  * join the track around it, including floor rails it runs up from or down to, and {@link #BEND}s round an inside corner
- * to meet the track on the next face. Its {@link Kind} says what it does to carts, and powered, chain gear and
+ * to meet the track on the next face. Plain sticky rails also {@link #CURVE} like the game's rails. Its {@link Kind} says what it does to carts, and powered, chain gear and
  * activator rails are powered by their colour like the game's powered rails. {@link SurfaceRails} moves the carts.
  */
 public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, SignalBlock {
     public static final EnumProperty<Direction> ATTACHED = EnumProperty.create("attached", Direction.class, direction -> direction != Direction.DOWN);
     public static final EnumProperty<Direction> TRAVEL = EnumProperty.create("travel", Direction.class);
     public static final EnumProperty<Bend> BEND = EnumProperty.create("bend", Bend.class);
+    public static final EnumProperty<Curve> CURVE = EnumProperty.create("curve", Curve.class);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     private static final Map<Direction, VoxelShape> SHAPES = new EnumMap<>(Map.of(
         Direction.UP, Block.box(0.0, 14.0, 0.0, 16.0, 16.0, 16.0),
@@ -88,6 +92,31 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
+    /**
+     * Whether the rail curves: not at all, or round to the left or right of the way it travels, as seen from in front of
+     * the face with that way up.
+     */
+    public enum Curve implements StringRepresentable {
+        NONE("none"),
+        LEFT("left"),
+        RIGHT("right");
+
+        private final String name;
+
+        Curve(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    // A shape the rail can take: the way it travels, and how it curves.
+    private record Shape(Direction travel, Curve curve) {
+    }
+
     private final Kind kind;
     private final @Nullable Channel channel;
 
@@ -99,6 +128,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
             .setValue(ATTACHED, Direction.NORTH)
             .setValue(TRAVEL, Direction.UP)
             .setValue(BEND, Bend.NONE)
+            .setValue(CURVE, Curve.NONE)
             .setValue(POWERED, false)
             .setValue(BlockStateProperties.WATERLOGGED, false));
     }
@@ -113,7 +143,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(ATTACHED, TRAVEL, BEND, POWERED, BlockStateProperties.WATERLOGGED);
+        builder.add(ATTACHED, TRAVEL, BEND, CURVE, POWERED, BlockStateProperties.WATERLOGGED);
     }
 
     @Override
@@ -128,7 +158,41 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return level.getBlockState(support).isFaceSturdy(level, support, attached.getOpposite());
     }
 
-    // On the face clicked, running whichever way joins the most track around it, or else the way the player looks
+    /**
+     * The other end of a curve: to the left or right of the way it travels, seen from in front of the face.
+     */
+    public static Direction otherEnd(Direction attached, Direction travel, Curve curve) {
+        if (curve == Curve.NONE) {
+            return travel.getOpposite();
+        }
+        Vec3i right = travel.getUnitVec3i().cross(attached.getOpposite().getUnitVec3i());
+        Direction toRight = Direction.getApproximateNearest(right.getX(), right.getY(), right.getZ());
+        return curve == Curve.RIGHT ? toRight : toRight.getOpposite();
+    }
+
+    /**
+     * The other end of a curved rail, or null if it runs straight.
+     */
+    public static @Nullable Direction curveEnd(BlockState state) {
+        Curve curve = state.getValue(CURVE);
+        return curve == Curve.NONE ? null : otherEnd(state.getValue(ATTACHED), state.getValue(TRAVEL), curve);
+    }
+
+    /**
+     * Whether a wall or ceiling rail has an end pointing the given way.
+     */
+    public static boolean hasEnd(BlockState state, Direction way) {
+        Direction travel = state.getValue(TRAVEL);
+        Direction other = curveEnd(state);
+        return other == null ? travel.getAxis() == way.getAxis() : travel == way || other == way;
+    }
+
+    private SurfaceRails.Track track(BlockPos pos, Direction attached, Shape shape) {
+        Direction other = shape.curve() == Curve.NONE ? null : otherEnd(attached, shape.travel(), shape.curve());
+        return new SurfaceRails.Track(pos, attached, shape.travel().getAxis(), kind, false, shape.travel(), other);
+    }
+
+    // On the face clicked, in whichever shape joins the most track around it, or else running the way the player looks
     // along that face. Next to a rail running the same way it takes that rail's direction, so chain gear keeps driving
     // the same way.
     @Override
@@ -139,43 +203,68 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        Direction.Axis axis = null;
+        Direction looking = null;
         for (Direction direction : context.getNearestLookingDirections()) {
             if (direction.getAxis() != attached.getAxis()) {
-                axis = bestAxis(level, pos, attached, direction.getAxis());
+                looking = direction;
                 break;
             }
         }
-        Direction travel = following(level, pos, attached, axis);
-        if (travel == null) {
-            for (Direction direction : context.getNearestLookingDirections()) {
-                if (direction.getAxis() == axis) {
-                    travel = direction;
-                    break;
+        Shape shape = bestShape(level, pos, attached, new Shape(looking, Curve.NONE));
+        Direction travel = shape.travel();
+        if (shape.curve() == Curve.NONE) {
+            travel = following(level, pos, attached, travel.getAxis());
+            if (travel == null) {
+                for (Direction direction : context.getNearestLookingDirections()) {
+                    if (direction.getAxis() == shape.travel().getAxis()) {
+                        travel = direction;
+                        break;
+                    }
                 }
             }
         }
-        BlockState state = defaultBlockState().setValue(ATTACHED, attached).setValue(TRAVEL, travel).setValue(BEND, bend(level, pos, attached, travel));
+        BlockState state = defaultBlockState().setValue(ATTACHED, attached).setValue(TRAVEL, travel).setValue(CURVE, shape.curve())
+            .setValue(BEND, shape.curve() == Curve.NONE ? bend(level, pos, attached, travel) : Bend.NONE);
         return state.canSurvive(level, pos) ? Waterlogging.place(state, context) : null;
     }
 
-    // The axis along the face that joins the most track: 2 for each end that meets track running the same way, 1 for
-    // track that could turn to meet it. The preferred axis wins a tie.
-    private Direction.Axis bestAxis(Level level, BlockPos pos, Direction attached, Direction.Axis preferred) {
-        Direction.Axis best = preferred;
+    // The shape that joins the most track: 2 for each end that meets track that runs on from it, 1 for track that could
+    // turn to meet it. The current shape wins a tie, then a straight one. Only plain sticky rails curve, like the
+    // game's rails.
+    private Shape bestShape(Level level, BlockPos pos, Direction attached, Shape current) {
+        List<Shape> shapes = new ArrayList<>();
+        shapes.add(current);
+        List<Direction> along = new ArrayList<>(4);
+        for (Direction direction : Direction.values()) {
+            if (direction.getAxis() != attached.getAxis()) {
+                along.add(direction);
+                if (direction.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+                    shapes.add(new Shape(direction, Curve.NONE));
+                }
+            }
+        }
+        if (kind == Kind.PLAIN) {
+            for (Direction first : along) {
+                for (Direction second : along) {
+                    if (first.getAxis() != second.getAxis() && first.ordinal() < second.ordinal()) {
+                        shapes.add(new Shape(first, otherEnd(attached, first, Curve.RIGHT) == second ? Curve.RIGHT : Curve.LEFT));
+                    }
+                }
+            }
+        }
+        Shape best = current;
         int bestScore = -1;
-        for (Direction.Axis axis : new Direction.Axis[]{preferred, Direction.Axis.X, Direction.Axis.Y, Direction.Axis.Z}) {
-            if (axis == attached.getAxis()) {
+        for (Shape shape : shapes) {
+            if (shape.travel().getAxis() == attached.getAxis()) {
                 continue;
             }
+            SurfaceRails.Track track = track(pos, attached, shape);
             int score = 0;
-            for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {
-                Direction exit = Direction.fromAxisAndDirection(axis, sign);
-                SurfaceRails.Track track = new SurfaceRails.Track(pos, attached, axis, kind, false, exit);
-                score += SurfaceRails.joins(level, track, exit, true) ? 2 : SurfaceRails.joins(level, track, exit, false) ? 1 : 0;
+            for (Direction end : track.ends()) {
+                score += SurfaceRails.joins(level, track, end, true) ? 2 : SurfaceRails.joins(level, track, end, false) ? 1 : 0;
             }
             if (score > bestScore) {
-                best = axis;
+                best = shape;
                 bestScore = score;
             }
         }
@@ -186,14 +275,15 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
     private static @Nullable Direction following(Level level, BlockPos pos, Direction attached, Direction.Axis axis) {
         for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {
             BlockState next = level.getBlockState(pos.relative(Direction.fromAxisAndDirection(axis, sign)));
-            if (next.getBlock() instanceof AttachedRailBlock && next.getValue(ATTACHED) == attached && next.getValue(TRAVEL).getAxis() == axis) {
+            if (next.getBlock() instanceof AttachedRailBlock && next.getValue(ATTACHED) == attached && next.getValue(CURVE) == Curve.NONE
+                && next.getValue(TRAVEL).getAxis() == axis) {
                 return next.getValue(TRAVEL);
             }
         }
         return null;
     }
 
-    // Where the rail meets track on the face of a block in its way, it bends to that face.
+    // Where a straight rail meets track on the face of a block in its way, it bends to that face.
     private Bend bend(Level level, BlockPos pos, Direction attached, Direction travel) {
         for (Direction end : new Direction[]{travel, travel.getOpposite()}) {
             BlockPos ahead = pos.relative(end);
@@ -205,20 +295,24 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return Bend.NONE;
     }
 
-    // Turns to join more track when the track around it changes, like the game's rails when one is laid next to them,
-    // and bends to meet track round an inside corner.
+    // Turns or curves to join more track when the track around it changes, like the game's rails when one is laid next
+    // to them, and bends to meet track round an inside corner.
     private void turn(Level level, BlockPos pos, BlockState state) {
         Direction attached = state.getValue(ATTACHED);
-        Direction travel = state.getValue(TRAVEL);
-        Direction.Axis axis = bestAxis(level, pos, attached, travel.getAxis());
-        boolean turning = axis != travel.getAxis();
-        if (turning) {
-            travel = following(level, pos, attached, axis);
-            if (travel == null) {
-                travel = axis == Direction.Axis.Y ? Direction.UP : Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
+        Shape current = new Shape(state.getValue(TRAVEL), state.getValue(CURVE));
+        Shape shape = bestShape(level, pos, attached, current);
+        boolean turning = !shape.equals(current);
+        Direction travel = shape.travel();
+        if (turning && shape.curve() == Curve.NONE) {
+            if (current.curve() == Curve.NONE && current.travel().getAxis() == travel.getAxis()) {
+                travel = current.travel();
+            } else {
+                Direction following = following(level, pos, attached, travel.getAxis());
+                travel = following != null ? following : travel.getAxis() == Direction.Axis.Y ? Direction.UP : travel;
             }
         }
-        BlockState updated = state.setValue(TRAVEL, travel).setValue(BEND, bend(level, pos, attached, travel));
+        BlockState updated = state.setValue(TRAVEL, travel).setValue(CURVE, shape.curve())
+            .setValue(BEND, shape.curve() == Curve.NONE ? bend(level, pos, attached, travel) : Bend.NONE);
         if (updated != state) {
             level.setBlock(pos, updated, Block.UPDATE_ALL);
             if (turning) {
@@ -237,9 +331,13 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
                 level.neighborChanged(around, this, null);
             }
         }
-        if (attached.getAxis().isHorizontal() && state.getValue(TRAVEL).getAxis() == Direction.Axis.Y) {
-            WallRails.join(level, pos.below(), attached);
-            WallRails.join(level, pos.above().relative(attached), attached.getOpposite());
+        if (attached.getAxis().isHorizontal()) {
+            if (hasEnd(state, Direction.DOWN)) {
+                WallRails.join(level, pos.below(), attached);
+            }
+            if (hasEnd(state, Direction.UP)) {
+                WallRails.join(level, pos.above().relative(attached), attached.getOpposite());
+            }
         }
     }
 

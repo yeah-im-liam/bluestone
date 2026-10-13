@@ -279,16 +279,42 @@ for kind in ["powered", "bluestone_powered", "detector", "bluestone_detector", "
     ATTACHED_MODELS[f"sticky_{kind}_rail"] = lit_rail(f"sticky_{kind}_rail")
 for rail in ["sticky_chain_gear_rail", "sticky_bluestone_chain_gear_rail"]:
     ATTACHED_MODELS[rail] = chain_rail(rail)
+
+
+UNIT = {"down": (0, -1, 0), "up": (0, 1, 0), "north": (0, 0, -1), "south": (0, 0, 1), "west": (-1, 0, 0), "east": (1, 0, 0)}
+
+
+def cross(a, b):
+    (ax, ay, az), (bx, by, bz) = UNIT[a], UNIT[b]
+    return {v: k for k, v in UNIT.items()}.get((ay * bz - az * by, az * bx - ax * bz, ax * by - ay * bx))
+
+
+# The plain sticky rail also curves (AttachedRailBlock.Curve): its other end is to the right of the way it travels
+# (travel x the way out of the face) or to the left. The game's corner model joins its south and east edges, and
+# turned with its north to some way, its east lands on attached x that way.
+def curved(attached, travel, curve):
+    right = cross(travel, OPPOSITE[attached])
+    other = right if curve == "right" else OPPOSITE[right]
+    north = OPPOSITE[travel] if cross(attached, OPPOSITE[travel]) == other else OPPOSITE[other]
+    return rotated("bluestone:block/sticky_rail_corner", attached, north)
+
+
 for rail, model in ATTACHED_MODELS.items():
+    curves = rail == "sticky_rail"
     variants = {}
     for (attached, travel) in ALL_PAIRS:
         if attached == "down":
             continue
+        straight = ",curve=none" if curves else ""
         for powered in ["false", "true"]:
             on = powered == "true"
-            variants[f"attached={attached},bend=none,powered={powered},travel={travel}"] = rotated(model(on, False, False), attached, OPPOSITE[travel])
+            variants[f"attached={attached},bend=none{straight},powered={powered},travel={travel}"] = rotated(model(on, False, False), attached, OPPOSITE[travel])
             for bend, toward in [("ahead", travel), ("behind", OPPOSITE[travel])]:
-                variants[f"attached={attached},bend={bend},powered={powered},travel={travel}"] = rotated(model(on, bend == "ahead", True), attached, toward)
+                variants[f"attached={attached},bend={bend}{straight},powered={powered},travel={travel}"] = rotated(model(on, bend == "ahead", True), attached, toward)
+            if curves:
+                for curve in ["left", "right"]:
+                    variants[f"attached={attached},curve={curve},powered={powered},travel={travel}"] = (
+                        curved(attached, travel, curve) if AXES[travel] != AXES[attached] else rotated(model(on, False, False), attached, OPPOSITE[travel]))
     write(A + f"blockstates/attached_{rail}.json", {"variants": variants})
 FLOOR_RAILS = CHAIN_RAILS[:2] + list(STICKY) + CHAIN_RAILS[2:]
 

@@ -17,9 +17,10 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
 
 /**
  * Minecart movement on rails stuck to walls and ceilings. The game moves carts on floor rails as usual; once a cart
- * reaches a wall or ceiling rail, this takes over. The cart runs along each rail's middle line and turns at inside
- * corners (track running into a wall carries on up it) and outside corners (track running over an edge carries on
- * down the other side). Climbing slows a cart and coming down speeds it up; a cart that stops climbing rolls back. On
+ * reaches a wall or ceiling rail, this takes over. The cart runs along each rail's middle line, round curves, and
+ * turns at inside corners (track running into a wall carries on up it) and outside corners (track running over an
+ * edge carries on down the other side). Climbing slows a cart and coming down speeds it up, more gently than falling;
+ * a cart that stops climbing rolls back. On
  * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain gear rails move carts at
  * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still; powered rails speed carts up and
  * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again. Floor rails meeting a wall can
@@ -27,9 +28,10 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
  */
 public final class SurfaceRails {
     public static final double CHAIN_SPEED = 0.3;
-    public static final double MIN_CEILING_SPEED = 0.2;
-    // The minecart's own gravity, a little less drag than on the floor, and the game's powered rail boost.
-    private static final double GRAVITY = 0.04;
+    public static final double MIN_CEILING_SPEED = 0.1;
+    // Gravity along the track (a quarter of a falling cart's, so a cart at full speed climbs about five blocks), a
+    // little less drag than on the floor, and the game's powered rail boost.
+    private static final double GRAVITY = 0.015;
     private static final double DRAG = 0.995;
     private static final double BOOST = 0.06;
     private static final double MAX_SPEED = 1.0;
@@ -41,11 +43,39 @@ public final class SurfaceRails {
 
     /**
      * A piece of track: where it is, the face it sits on, the axis carts run along, what kind of rail it is, whether
-     * it is powered, and the way it was placed (the way chain gear drives).
+     * it is powered, the way it was placed (the way chain gear drives), and for a curve its other end.
      */
-    public record Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel) {
+    public record Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel,
+                        @Nullable Direction other) {
+        public Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel) {
+            this(pos, attached, axis, kind, powered, travel, null);
+        }
+
         boolean floor() {
             return attached == Direction.DOWN;
+        }
+
+        /**
+         * Its two ends: either way along its axis, or for a curve the way it was placed and its other end.
+         */
+        public List<Direction> ends() {
+            return other != null ? List.of(travel, other)
+                : List.of(Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE), Direction.fromAxisAndDirection(axis, Direction.AxisDirection.NEGATIVE));
+        }
+
+        boolean hasEnd(Direction way) {
+            return other != null ? way == travel || way == other : way.getAxis() == axis;
+        }
+
+        // The end a cart leaves by after coming in by the given one.
+        Direction out(Direction in) {
+            if (other != null && in == travel) {
+                return other;
+            }
+            if (other != null && in == other) {
+                return travel;
+            }
+            return in.getOpposite();
         }
 
         // The way a powered chain gear rail drives carts, or null.
@@ -76,7 +106,7 @@ public final class SurfaceRails {
      */
     public record Ride(Track from, Direction fromExit, Track to, Direction exit, double speed) {
         Ride reversed() {
-            return new Ride(to, exit.getOpposite(), from, fromExit.getOpposite(), speed);
+            return new Ride(to, to.out(exit), from, from.out(fromExit), speed);
         }
     }
 
@@ -84,7 +114,8 @@ public final class SurfaceRails {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof AttachedRailBlock rail) {
             Direction travel = state.getValue(AttachedRailBlock.TRAVEL);
-            return new Track(pos, state.getValue(AttachedRailBlock.ATTACHED), travel.getAxis(), rail.kind(), state.getValue(AttachedRailBlock.POWERED), travel);
+            return new Track(pos, state.getValue(AttachedRailBlock.ATTACHED), travel.getAxis(), rail.kind(), state.getValue(AttachedRailBlock.POWERED), travel,
+                AttachedRailBlock.curveEnd(state));
         }
         if (state.getBlock() instanceof BaseRailBlock rail && BaseRailBlock.isRail(state)) {
             RailShape shape = state.getValue(rail.getShapeProperty());
@@ -122,7 +153,7 @@ public final class SurfaceRails {
                 return onFloor(level, upPos, attached, strict);
             }
             Track up = track(level, upPos);
-            return up != null && up.attached() == exit && (!strict || up.axis() == attached.getAxis()) ? new Step(up, attached.getOpposite()) : null;
+            return up != null && up.attached() == exit && (!strict || up.hasEnd(attached)) ? new Step(up, up.out(attached)) : null;
         }
         // Down a wall onto the floor rail below it.
         if (exit == Direction.DOWN) {
@@ -132,20 +163,20 @@ public final class SurfaceRails {
             }
         }
         Track next = track(level, ahead);
-        if (next != null && next.attached() == attached && (!strict || next.axis() == exit.getAxis())) {
-            return new Step(next, exit);
+        if (next != null && next.attached() == attached && (!strict || next.hasEnd(exit.getOpposite()))) {
+            return new Step(next, next.out(exit.getOpposite()));
         }
         // Inside corner from the other side: the track ahead is on the block it runs into.
-        if (next != null && next.attached() == exit && (!strict || next.axis() == attached.getAxis())) {
-            return new Step(next, attached.getOpposite());
+        if (next != null && next.attached() == exit && (!strict || next.hasEnd(attached))) {
+            return new Step(next, next.out(attached));
         }
         // Outside corner: around the edge of the block the track sits on, onto its top going up a wall.
         if (exit == Direction.UP) {
             return onFloor(level, ahead.relative(attached), attached.getOpposite(), strict);
         }
         Track around = track(level, ahead.relative(attached));
-        if (around != null && around.attached() == exit.getOpposite() && (!strict || around.axis() == attached.getAxis())) {
-            return new Step(around, attached);
+        if (around != null && around.attached() == exit.getOpposite() && (!strict || around.hasEnd(attached.getOpposite()))) {
+            return new Step(around, around.out(attached.getOpposite()));
         }
         return null;
     }
@@ -344,14 +375,21 @@ public final class SurfaceRails {
         Vec3 velocity = cart.getDeltaMovement();
         Track here = track(level, BlockPos.containing(center));
         if (here != null && !here.floor()) {
-            Vec3 axis = unit(Direction.fromAxisAndDirection(here.axis(), Direction.AxisDirection.POSITIVE));
-            double along = velocity.dot(axis);
+            // The end it is moving towards, if any.
+            Direction moving = null;
+            double along = 1.0E-4;
+            for (Direction end : here.ends()) {
+                if (velocity.dot(unit(end)) > along) {
+                    moving = end;
+                    along = velocity.dot(unit(end));
+                }
+            }
             Direction exit;
-            if (here.kind() == Kind.CHAIN || here.kind() == Kind.POWERED && here.powered() && Math.abs(along) < 0.01) {
+            if (here.kind() == Kind.CHAIN || here.kind() == Kind.POWERED && here.powered() && along < 0.01) {
                 exit = here.travel();
-            } else if (Math.abs(along) > 1.0E-4) {
-                exit = Direction.fromAxisAndDirection(here.axis(), along > 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
-            } else if (here.axis() == Direction.Axis.Y) {
+            } else if (moving != null) {
+                exit = moving;
+            } else if (here.hasEnd(Direction.DOWN)) {
                 exit = Direction.DOWN;
             } else if (here.attached() != Direction.UP) {
                 // Standing still on a sideways wall rail: it stays where it is.
@@ -359,11 +397,18 @@ public final class SurfaceRails {
             } else {
                 return null;
             }
-            double speed = here.drive() != null ? CHAIN_SPEED : Math.abs(along);
+            double speed = here.drive() != null ? CHAIN_SPEED : moving != null ? along : 0.0;
             if (here.attached() == Direction.UP && here.kind() != Kind.CHAIN && speed < MIN_CEILING_SPEED) {
                 return null;
             }
             Vec3 point = here.point(height);
+            if (here.other() != null) {
+                // On a curve: from its middle.
+                cart.setPos(point.x, point.y - height / 2.0, point.z);
+                Step step = next(level, here, exit);
+                return step == null ? new Ride(here, exit, here, exit, speed) : new Ride(here, exit, step.track(), step.exit(), speed);
+            }
+            Vec3 axis = unit(Direction.fromAxisAndDirection(here.axis(), Direction.AxisDirection.POSITIVE));
             Vec3 onLine = point.add(axis.scale(center.subtract(point).dot(axis)));
             cart.setPos(onLine.x, onLine.y - height / 2.0, onLine.z);
             if (point.subtract(onLine).dot(unit(exit)) > 0.0) {
