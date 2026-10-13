@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "bluestone",
   "version": "${version}",
-  "name": "Bluestone",
+  "name": "Bluestone: Over-Powered",
   "description": "Blue redstone that keeps to itself: bluestone parts and redstone parts ignore each other, and bluestone works underwater.",
   "authors": [
     "yeahimliam"

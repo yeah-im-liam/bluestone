@@ -332,7 +332,7 @@ write(A + "lang/en_us.json", {
     "block.bluestone.bluestone_powered_rail": "Bluestone Powered Rail",
     "block.bluestone.bluestone_activator_rail": "Bluestone Activator Rail",
     "block.bluestone.bluestone_detector_rail": "Bluestone Detector Rail",
-    "itemGroup.bluestone.main": "Bluestone",
+    "itemGroup.bluestone.main": "Bluestone: Over-Powered",
     "item.bluestone.purplestone": "Purplestone Dust",
     "block.bluestone.purplestone_wire": "Purplestone Wire",
     "block.bluestone.purplestone_torch": "Purplestone Torch",
@@ -349,8 +349,8 @@ write(A + "lang/en_us.json", {
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
-    "pack.bluestone.programmer_art": "Bluestone Programmer Art",
-    "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone",
+    "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
+    "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
 })
 
 

@@ -5,7 +5,7 @@ license = "CC-BY-NC-4.0"
 [[mods]]
 modId = "bluestone"
 version = "${version}"
-displayName = "Bluestone"
+displayName = "Bluestone: Over-Powered"
 authors = "yeahimliam"
 description = '''
 Blue redstone that keeps to itself: bluestone parts and redstone parts ignore each other, and bluestone works underwater.

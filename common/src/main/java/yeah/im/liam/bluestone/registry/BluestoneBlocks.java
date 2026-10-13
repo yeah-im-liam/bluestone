@@ -232,18 +232,20 @@ public final class BluestoneBlocks {
     }
 
     /**
-     * Everything for the mod's own creative tab: the bluestone parts in the order the redstone versions appear, then
-     * the purplestone ones and the converter.
+     * Everything for the mod's own creative tab: the bluestone, greenstone and purplestone parts, each in the order the
+     * redstone versions appear, then the converters.
      */
     public static List<Item> creativeTabItems() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem,
-            converterItem, pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem, wallConverterItem,
+        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
+            pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
+            purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem, wallConverterItem,
             poweredRailItem, detectorRailItem, activatorRailItem, slimeRailItem, chainGearRailItem, slimeChainGearRailItem, oreItem, deepslateOreItem);
     }
 
     public static List<Item> components() {
-        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem, purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem,
-            pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem, wallConverterItem);
+        return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
+            pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
+            purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem, wallConverterItem);
     }
 
     public static List<Item> rails() {
@@ -255,7 +257,7 @@ public final class BluestoneBlocks {
     }
 
     public static List<Item> storageBlocks() {
-        return List.of(blockItem, purplestoneBlockItem, greenstoneBlockItem);
+        return List.of(blockItem, greenstoneBlockItem, purplestoneBlockItem);
     }
 
     public static Item pasteItem() {
@@ -263,7 +265,7 @@ public final class BluestoneBlocks {
     }
 
     public static List<Item> torches() {
-        return List.of(torchItem, purplestoneTorchItem, greenstoneTorchItem);
+        return List.of(torchItem, greenstoneTorchItem, purplestoneTorchItem);
     }
 
     private static Item blockItem(Registrar<Item> items, String path, Block block) {

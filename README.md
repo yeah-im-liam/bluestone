@@ -1,4 +1,4 @@
-# Bluestone
+# Bluestone: Over-Powered
 
 Blue redstone that keeps to itself.
 
@@ -40,7 +40,7 @@ Same recipes as the redstone versions, with bluestone dust and bluestone torches
 - Loaders: Fabric (with Fabric API) and NeoForge
 - Environment: client and server
 
-On NeoForge, turn on the "Bluestone Programmer Art" resource pack together with the Programmer Art pack. Fabric switches the textures over by itself.
+On NeoForge, turn on the "Bluestone: Over-Powered Programmer Art" resource pack together with the Programmer Art pack. Fabric switches the textures over by itself.
 
 ## License
 
