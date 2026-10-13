@@ -21,7 +21,7 @@ abstract class WireEvaluator {
     }
 
     protected int getWireSignal(BlockPos pos, BlockState state) {
-        return state.is(wireBlock) ? state.getValue(ColoredWireBlock.POWER) : 0;
+        return wireBlock.takesPowerFrom(state) ? state.getValue(ColoredWireBlock.POWER) : 0;
     }
 
     protected int getIncomingWireSignal(Level level, BlockPos pos) {

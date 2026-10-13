@@ -20,7 +20,7 @@ import yeah.im.liam.bluestone.signal.Signals;
 abstract class LegacyWireMixin {
     @WrapMethod(method = "getBlockSignal")
     private int bluestone$listen(Level level, BlockPos pos, Operation<Integer> original) {
-        return Signals.read(Channel.REDSTONE, () -> original.call(level, pos));
+        return Signals.readForDust(Channel.REDSTONE, () -> original.call(level, pos));
     }
 
     // Fabric's dust asks here whether to bend towards a block; NeoForge asks the block's canConnectRedstone instead.

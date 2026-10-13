@@ -369,9 +369,9 @@ RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_det
 write("data/minecraft/tags/block/rails.json", RAILS)
 write("data/minecraft/tags/item/rails.json", RAILS)
 # Since 26.3 flowing water only breaks blocks in this tag; 26.1 and 26.2 break anything that doesn't block movement.
-# Purplestone, like redstone, can't sit in water.
+# Purplestone and the converter, like redstone and the repeater, can't sit in water.
 write("data/minecraft/tags/block/washed_away_by_fluids.json",
-      {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch"]})
+      {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:converter"]})
 write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch"]})
 ORES = {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]}
 write(D + "tags/block/bluestone_ores.json", ORES)

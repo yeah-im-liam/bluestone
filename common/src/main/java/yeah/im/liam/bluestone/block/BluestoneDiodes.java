@@ -29,7 +29,8 @@ final class BluestoneDiodes {
                 return input;
             }
             BlockState target = level.getBlockState(targetPos);
-            return Math.max(input, target.getBlock() instanceof BluestoneWireBlock ? target.getValue(BluestoneWireBlock.POWER) : 0);
+            // Bluestone and purplestone dust, the dust that bluestone hears.
+            return Math.max(input, target.getBlock() instanceof ColoredWireBlock ? target.getValue(ColoredWireBlock.POWER) : 0);
         });
     }
 
@@ -50,11 +51,11 @@ final class BluestoneDiodes {
         if (diodesOnly) {
             return DiodeBlock.isDiode(state) ? level.getDirectSignal(pos, direction) : 0;
         }
-        if (state.getBlock() instanceof BluestoneBlock) {
+        if (state.getBlock() instanceof BluestoneBlock || state.getBlock() instanceof PurplestoneBlock) {
             return 15;
         }
-        if (state.getBlock() instanceof BluestoneWireBlock) {
-            return state.getValue(BluestoneWireBlock.POWER);
+        if (state.getBlock() instanceof ColoredWireBlock) {
+            return state.getValue(ColoredWireBlock.POWER);
         }
         return state.isSignalSource() ? level.getDirectSignal(pos, direction) : 0;
     }

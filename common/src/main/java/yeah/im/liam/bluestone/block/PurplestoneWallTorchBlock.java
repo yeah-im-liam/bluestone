@@ -37,7 +37,7 @@ public class PurplestoneWallTorchBlock extends RedstoneWallTorchBlock implements
 
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
-        return wire == Channel.PURPLESTONE && direction != null;
+        return direction != null;
     }
 
     @Override

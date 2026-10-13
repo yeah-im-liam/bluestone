@@ -11,6 +11,7 @@
     "OreFeatureMixin",
     "PoweredRailBlockMixin",
     "RedstoneTorchBlockMixin",
+    "RedstoneWireEvaluatorMixin",
     "RedstoneWallTorchBlockMixin",
     "wire.LegacyWireMixin",
     "wire.ModernWireMixin"

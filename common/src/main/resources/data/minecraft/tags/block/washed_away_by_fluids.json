@@ -2,6 +2,7 @@
   "values": [
     "bluestone:purplestone_wire",
     "bluestone:purplestone_torch",
-    "bluestone:purplestone_wall_torch"
+    "bluestone:purplestone_wall_torch",
+    "bluestone:converter"
   ]
 }

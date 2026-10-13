@@ -10,8 +10,8 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 
 /**
- * The Block of Purplestone: always on, like the Block of Redstone, but on the purplestone channel, so only purplestone
- * parts, the converter and plain blocks pick it up.
+ * The Block of Purplestone: always on, like the Block of Redstone, and on the purplestone channel, so redstone and
+ * bluestone parts both pick it up.
  */
 public class PurplestoneBlock extends PoweredBlock implements SignalBlock {
     public PurplestoneBlock(Properties properties) {
@@ -25,7 +25,7 @@ public class PurplestoneBlock extends PoweredBlock implements SignalBlock {
 
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
-        return wire == Channel.PURPLESTONE && direction != null;
+        return direction != null;
     }
 
     @Override

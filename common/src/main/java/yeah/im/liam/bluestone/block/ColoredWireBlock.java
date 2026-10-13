@@ -248,7 +248,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     public int getBlockSignal(Level level, BlockPos pos) {
-        return Signals.read(channel, () -> {
+        return Signals.readForDust(channel, () -> {
             shouldSignal = false;
             try {
                 return level.getBestNeighborSignal(pos);
@@ -256,6 +256,14 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
                 shouldSignal = true;
             }
         });
+    }
+
+    /**
+     * Whether power runs into this dust along the wire from the given block: from dust of its own kind, and between
+     * purplestone and the other colours.
+     */
+    boolean takesPowerFrom(BlockState state) {
+        return Signals.isDust(state) && channel.hears(Channel.ofSource(state));
     }
 
     private void checkCornerChangeAt(Level level, BlockPos pos) {

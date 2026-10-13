@@ -13,8 +13,8 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 
 /**
- * A torch on the purplestone channel: redstone or bluestone can turn it off, but only purplestone dust, the
- * converter and plain blocks pick up its signal. Like a redstone torch, it can't sit in water.
+ * A torch on the purplestone channel: redstone or bluestone can turn it off, and both pick up its signal. Like a
+ * redstone torch, it can't sit in water.
  */
 public class PurplestoneTorchBlock extends RedstoneTorchBlock implements SignalBlock {
     // Redstone's particle colour run through the purplestone dust mix.
@@ -41,7 +41,7 @@ public class PurplestoneTorchBlock extends RedstoneTorchBlock implements SignalB
 
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
-        return wire == Channel.PURPLESTONE && direction != null;
+        return direction != null;
     }
 
     @Override

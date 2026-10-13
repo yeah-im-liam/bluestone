@@ -18,13 +18,11 @@ import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DiodeBlock;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
@@ -35,9 +33,9 @@ import yeah.im.liam.bluestone.signal.Signals;
 /**
  * A one-tick repeater that takes one kind of signal and gives out the other. Purplestone powers it whichever way it
  * is set. Right-clicking swaps the direction, and like a repeater it is locked by a repeater or comparator (of either
- * kind) pointing into its side. It looks like a repeater set to four ticks.
+ * kind) pointing into its side. It looks like a repeater set to four ticks, and like one, water washes it away.
  */
-public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock, SignalBlock {
+public class ConverterBlock extends DiodeBlock implements SignalBlock {
     public static final EnumProperty<Mode> MODE = EnumProperty.create("mode", Mode.class);
     public static final BooleanProperty LOCKED = BlockStateProperties.LOCKED;
 
@@ -47,8 +45,7 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
             .setValue(FACING, Direction.NORTH)
             .setValue(MODE, Mode.RED_TO_BLUE)
             .setValue(LOCKED, false)
-            .setValue(POWERED, false)
-            .setValue(BlockStateProperties.WATERLOGGED, false));
+            .setValue(POWERED, false));
     }
 
     @Override
@@ -116,13 +113,11 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
-        state = state.setValue(LOCKED, isLocked(context.getLevel(), context.getClickedPos(), state));
-        return Waterlogging.place(state, context);
+        return state.setValue(LOCKED, isLocked(context.getLevel(), context.getClickedPos(), state));
     }
 
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
-        Waterlogging.scheduleTick(state, level, ticks, pos);
         if (directionToNeighbour == Direction.DOWN && !canSurviveOn(level, neighbourPos, neighbourState)) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -133,13 +128,8 @@ public class ConverterBlock extends DiodeBlock implements SimpleWaterloggedBlock
     }
 
     @Override
-    protected FluidState getFluidState(BlockState state) {
-        return Waterlogging.isWet(state) ? Waterlogging.WATER : super.getFluidState(state);
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, MODE, LOCKED, POWERED, BlockStateProperties.WATERLOGGED);
+        builder.add(FACING, MODE, LOCKED, POWERED);
     }
 
     @Override
