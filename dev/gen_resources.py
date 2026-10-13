@@ -319,24 +319,18 @@ for atlas in ["items", "armor_trims"]:
         "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],
         "permutations": {material: "bluestone:trims/color_palettes/" + material for material in TRIMS}, "textures": source["textures"]}]})
 
-# Inventory icons of trimmed armor: one model per armor piece and material, and a case for each in the armor item's model selector.
+# Inventory icons of trimmed armor: one model per armor piece and material. client/TrimItemModels adds the cases to the
+# armor item files while the game loads them, so the vanilla item files are not replaced.
 for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/items/") and n.endswith(".json")):
     definition = json.loads(z.read(name))
     cases = definition["model"].get("cases", []) if definition["model"].get("type") == "minecraft:select" else []
-    redstone = [c for c in cases if c.get("when") == "minecraft:redstone"]
-    if not redstone:
+    if not any(c.get("when") == "minecraft:redstone" for c in cases):
         continue
     armor = name.split("/")[-1][:-5]
-    position = cases.index(redstone[0]) + 1
     for material in TRIMS:
         model = vanilla(f"assets/minecraft/models/item/{armor}_redstone_trim.json")
         model["textures"] = {k: v.replace("_trim_redstone", "_trim_" + material) for k, v in model["textures"].items()}
         write(A + f"models/item/{armor}_{material}_trim.json", model)
-        case = json.loads(json.dumps(redstone[0]).replace(f"minecraft:item/{armor}_redstone_trim", f"bluestone:item/{armor}_{material}_trim"))
-        case["when"] = "bluestone:" + material
-        cases.insert(position, case)
-        position += 1
-    write(f"assets/minecraft/items/{armor}.json", definition)
 
 # World generation: the redstone ore vein and heights, plus extra attempts in water biomes.
 WORLDGEN_IDS = ID_PAIRS + [("ore_redstone", "ore_bluestone")]

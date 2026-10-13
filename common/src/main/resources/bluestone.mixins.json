@@ -15,6 +15,9 @@
     "wire.LegacyWireMixin",
     "wire.ModernWireMixin"
   ],
+  "client": [
+    "ClientItemInfoLoaderMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
