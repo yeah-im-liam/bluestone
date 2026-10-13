@@ -255,17 +255,41 @@ for rail in CHAIN_RAILS:
     write(A + f"blockstates/{rail}.json", {"variants": variants})
 
 # On walls and ceilings: the floor model turned onto the face it sits on, running the way it travels (a chain gear
-# rail's arrow points that way), lit while powered.
+# rail's arrow points that way), lit while powered. Bent round an inside corner, it is the slope model instead, turned
+# so it rises off its face towards the bend (the slope rises towards its model's north).
 OPPOSITE = {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}
-ATTACHED_MODELS = {"sticky_rail": ("bluestone:block/sticky_rail", "bluestone:block/sticky_rail")}
+
+
+def plain_rail(flat, sloped):
+    return lambda on, arrow_ahead, bent: sloped if bent else flat
+
+
+def lit_rail(name):
+    return lambda on, arrow_ahead, bent: f"bluestone:block/{name}{'_on' if on else ''}{'_raised_ne' if bent else ''}"
+
+
+# A chain gear rail's arrow points down its slope model, so bent at the end it travels towards it needs the turned one.
+def chain_rail(name):
+    return lambda on, arrow_ahead, bent: (f"bluestone:block/{name}_raised_ne{'_reversed' if arrow_ahead else ''}{'_on' if on else ''}" if bent
+                                          else f"bluestone:block/{name}_flat{'_on' if on else ''}")
+
+
+ATTACHED_MODELS = {"sticky_rail": plain_rail("bluestone:block/sticky_rail", "bluestone:block/sticky_rail_raised_ne")}
 for kind in ["powered", "bluestone_powered", "detector", "bluestone_detector", "activator", "bluestone_activator"]:
-    ATTACHED_MODELS[f"sticky_{kind}_rail"] = (f"bluestone:block/sticky_{kind}_rail", f"bluestone:block/sticky_{kind}_rail_on")
+    ATTACHED_MODELS[f"sticky_{kind}_rail"] = lit_rail(f"sticky_{kind}_rail")
 for rail in ["sticky_chain_gear_rail", "sticky_bluestone_chain_gear_rail"]:
-    ATTACHED_MODELS[rail] = (f"bluestone:block/{rail}_flat", f"bluestone:block/{rail}_flat_on")
-for rail, (off, on) in ATTACHED_MODELS.items():
-    write(A + f"blockstates/attached_{rail}.json", {"variants": {
-        f"attached={attached},powered={powered},travel={travel}": rotated(on if powered == "true" else off, attached, OPPOSITE[travel])
-        for (attached, travel) in ALL_PAIRS if attached != "down" for powered in ["false", "true"]}})
+    ATTACHED_MODELS[rail] = chain_rail(rail)
+for rail, model in ATTACHED_MODELS.items():
+    variants = {}
+    for (attached, travel) in ALL_PAIRS:
+        if attached == "down":
+            continue
+        for powered in ["false", "true"]:
+            on = powered == "true"
+            variants[f"attached={attached},bend=none,powered={powered},travel={travel}"] = rotated(model(on, False, False), attached, OPPOSITE[travel])
+            for bend, toward in [("ahead", travel), ("behind", OPPOSITE[travel])]:
+                variants[f"attached={attached},bend={bend},powered={powered},travel={travel}"] = rotated(model(on, bend == "ahead", True), attached, toward)
+    write(A + f"blockstates/attached_{rail}.json", {"variants": variants})
 FLOOR_RAILS = CHAIN_RAILS[:2] + list(STICKY) + CHAIN_RAILS[2:]
 
 # Greenstone paste is redstone dust on any face, placed one face at a time: the game's dust models with their own
@@ -300,10 +324,32 @@ def paste_frame(attached):
     return {"north": north, "east": east, "south": NAMES[tuple(-c for c in VECTORS[north])], "west": NAMES[tuple(-c for c in VECTORS[east])]}
 
 
-def paste_condition(condition, face):
-    frame = paste_frame(face)
-    out = {frame[side]: "none" if value == "none" else "line|face" for side, value in condition.items()}
-    out[face] = "face"
+# Where two faces both border a direction, "shared" says which draws its line: all, the first or the last of them in
+# the order below (GreenstonePasteBlock.Shared).
+ORDER = ["down", "up", "north", "south", "west", "east"]
+AXIS = {"down": "y", "up": "y", "north": "z", "south": "z", "west": "x", "east": "x"}
+
+
+def draws(face, way):
+    """The conditions, any one of which makes a face draw its line towards way."""
+    others = [g for g in ORDER if AXIS[g] != AXIS[way] and g != face]
+    return [{face: "face", way: "face"},
+            {face: "face", way: "line", "shared": "all"},
+            dict({face: "face", way: "line", "shared": "first"}, **{g: "none|line" for g in others if ORDER.index(g) < ORDER.index(face)}),
+            dict({face: "face", way: "line", "shared": "last"}, **{g: "none|line" for g in others if ORDER.index(g) > ORDER.index(face)})]
+
+
+def merge(a, b):
+    """Both conditions at once, or None if they can't both hold."""
+    out = dict(a)
+    for key, value in b.items():
+        if key in out:
+            both = [v for v in out[key].split("|") if v in value.split("|")]
+            if not both:
+                return None
+            out[key] = "|".join(both)
+        else:
+            out[key] = value
     return out
 
 
@@ -318,7 +364,22 @@ for face in VECTORS:
         turned = ["north", "east", "south", "west"][apply.get("y", 0) // 90]
         variant = rotated(apply["model"].replace("minecraft:block/redstone_dust_", "bluestone:block/greenstone_paste_"), face, frame[turned])
         when = part["when"]
-        when = {"OR": [paste_condition(c, face) for c in when["OR"]]} if "OR" in when else paste_condition(when, face)
+        if "OR" in when:
+            # The dot in the middle, where two lines meet at a corner.
+            groups = []
+            for corner in when["OR"]:
+                sides = [side for side, value in corner.items() if value != "none"]
+                if len(sides) != 2:
+                    continue
+                for first in draws(face, frame[sides[0]]):
+                    for second in draws(face, frame[sides[1]]):
+                        both = merge(first, second)
+                        if both is not None and both not in groups:
+                            groups.append(both)
+            when = {"OR": groups}
+        else:
+            (side, _), = when.items()
+            when = {"OR": draws(face, frame[side])}
         paste_parts.append({"when": when, "apply": variant})
 write(A + "blockstates/greenstone_paste.json", {"multipart": paste_parts})
 

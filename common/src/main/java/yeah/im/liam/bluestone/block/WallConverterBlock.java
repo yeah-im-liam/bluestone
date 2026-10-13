@@ -62,7 +62,9 @@ public class WallConverterBlock extends Block implements SignalBlock {
             BlockState neighbour = level.getBlockState(pos.relative(direction));
             if (neighbour.getBlock() instanceof PurplestoneWireBlock) {
                 power = Math.max(power, neighbour.getValue(ColoredWireBlock.POWER));
-            } else if (neighbour.getBlock() instanceof GreenstonePasteBlock) {
+            } else if (neighbour.getBlock() instanceof GreenstonePasteBlock
+                && neighbour.getValue(GreenstonePasteBlock.side(direction.getOpposite())).reaches()) {
+                // Paste that lies on this block or runs into it.
                 power = Math.max(power, neighbour.getValue(GreenstonePasteBlock.POWER));
             }
         }

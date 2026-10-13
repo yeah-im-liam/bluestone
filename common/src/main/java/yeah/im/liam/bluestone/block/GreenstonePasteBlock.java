@@ -3,8 +3,10 @@ package yeah.im.liam.bluestone.block;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -13,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -22,12 +25,18 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LightningRodBlock;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.world.level.block.TripWireHookBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -41,10 +50,11 @@ import yeah.im.liam.bluestone.signal.Signals;
  * itself; each face is placed on its own, like glow lichen, and one space can have paste on several of its faces.
  * <p>
  * There is one property per direction: {@link Side#FACE} where paste lies on that face, {@link Side#LINE} where the
- * paste runs off that way, and {@link Side#NONE}. Each face draws dust lines towards the edges whose direction isn't
- * none. Paste joins the paste next to it on the same flat surface, paste round the edge of the block it lies on, and
- * the other faces of its own space, and loses one level per space. It hears only greenstone and plain switches, and
- * meets purplestone through the wall converter.
+ * paste runs off that way, and {@link Side#NONE}. A face draws dust lines towards the edges whose direction isn't none;
+ * where two faces both border a direction, {@link #SHARED} says which of them draws it. Paste joins only along its own
+ * surface: the paste next to it on the same flat surface, paste round the edge of the block it lies on, the other
+ * faces of its own space, and parts sitting on the same surface. It loses one level per space, hears only greenstone
+ * and plain switches, and meets purplestone through the wall converter. Breaking it takes off the face looked at.
  */
 public class GreenstonePasteBlock extends Block implements SignalBlock {
     public static final EnumProperty<Side> NORTH = EnumProperty.create("north", Side.class);
@@ -53,6 +63,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
     public static final EnumProperty<Side> WEST = EnumProperty.create("west", Side.class);
     public static final EnumProperty<Side> UP = EnumProperty.create("up", Side.class);
     public static final EnumProperty<Side> DOWN = EnumProperty.create("down", Side.class);
+    public static final EnumProperty<Shared> SHARED = EnumProperty.create("shared", Shared.class);
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     private static final Map<Direction, EnumProperty<Side>> SIDES = new EnumMap<>(Map.of(
         Direction.NORTH, NORTH, Direction.EAST, EAST, Direction.SOUTH, SOUTH, Direction.WEST, WEST, Direction.UP, UP, Direction.DOWN, DOWN));
@@ -103,9 +114,36 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
+    /**
+     * Which faces draw a line towards a direction that more than one face borders: all of them, only the first (in the
+     * order down, up, north, south, west, east) or only the last.
+     */
+    public enum Shared implements StringRepresentable {
+        ALL("all"),
+        FIRST("first"),
+        LAST("last");
+
+        private final String name;
+
+        Shared(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    // Breaking paste takes off the face looked at; the other faces go back once the block has been removed.
+    private record Remaining(LevelAccessor level, BlockPos pos, BlockState state) {
+    }
+
+    private static final ThreadLocal<@Nullable Remaining> REMAINING = new ThreadLocal<>();
+
     public GreenstonePasteBlock(Properties properties) {
         super(properties);
-        BlockState state = stateDefinition.any().setValue(POWER, 0);
+        BlockState state = stateDefinition.any().setValue(SHARED, Shared.ALL).setValue(POWER, 0);
         for (EnumProperty<Side> side : SIDES.values()) {
             state = state.setValue(side, Side.NONE);
         }
@@ -114,7 +152,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, POWER);
+        builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, SHARED, POWER);
     }
 
     public static EnumProperty<Side> side(Direction direction) {
@@ -259,45 +297,64 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
 
     private BlockState withConnections(BlockGetter level, BlockPos pos, BlockState state) {
         List<Direction> faces = faces(state);
-        Map<Direction, Side> sides = new EnumMap<>(Direction.class);
-        for (Direction way : Direction.values()) {
-            sides.put(way, faces.contains(way) ? Side.FACE : links(level, pos, faces, way) ? Side.LINE : Side.NONE);
-        }
-        // Like dust: a face with no lines is a cross, and a face with a line one way runs straight on through.
-        Map<Direction, Side> drawn = new EnumMap<>(sides);
+        // The ways each face draws a line, besides the other faces of this space.
+        Map<Direction, Set<Direction>> draws = new EnumMap<>(Direction.class);
         for (Direction face : faces) {
+            Set<Direction> ways = EnumSet.noneOf(Direction.class);
             List<Direction> edges = new ArrayList<>(4);
             for (Direction way : Direction.values()) {
-                if (way.getAxis() != face.getAxis() && sides.get(way).reaches()) {
+                if (way.getAxis() == face.getAxis()) {
+                    continue;
+                }
+                if (faces.contains(way)) {
+                    edges.add(way);
+                } else if (links(level, pos, face, way)) {
+                    ways.add(way);
                     edges.add(way);
                 }
             }
+            // Like dust: a face with no lines is a cross, and a face with a line one way runs straight on through.
             for (Direction way : Direction.values()) {
-                if (way.getAxis() != face.getAxis() && !drawn.get(way).reaches()
+                if (way.getAxis() != face.getAxis() && !faces.contains(way)
                     && (edges.isEmpty() || edges.size() == 1 && edges.getFirst() == way.getOpposite())) {
-                    drawn.put(way, Side.LINE);
+                    ways.add(way);
                 }
             }
+            draws.put(face, ways);
         }
-        for (Map.Entry<Direction, Side> entry : drawn.entrySet()) {
-            state = state.setValue(SIDES.get(entry.getKey()), entry.getValue());
+        Shared shared = null;
+        boolean clash = false;
+        for (Direction way : Direction.values()) {
+            List<Direction> bordering = new ArrayList<>(4);
+            List<Direction> drawing = new ArrayList<>(4);
+            for (Direction face : faces) {
+                if (face.getAxis() != way.getAxis()) {
+                    bordering.add(face);
+                    if (draws.get(face).contains(way)) {
+                        drawing.add(face);
+                    }
+                }
+            }
+            Side side = faces.contains(way) ? Side.FACE : drawing.isEmpty() ? Side.NONE : Side.LINE;
+            state = state.setValue(SIDES.get(way), side);
+            if (side == Side.LINE && bordering.size() > 1) {
+                Shared needed = drawing.size() == bordering.size() ? Shared.ALL
+                    : drawing.equals(List.of(bordering.getFirst())) ? Shared.FIRST
+                    : drawing.equals(List.of(bordering.getLast())) ? Shared.LAST : Shared.ALL;
+                clash |= shared != null && shared != needed;
+                shared = needed;
+            }
         }
-        return state;
+        // Two ways that need different faces can't both be shown; then every face draws them.
+        return state.setValue(SHARED, shared == null || clash ? Shared.ALL : shared);
     }
 
-    // Whether any face runs off the given way: into paste on the same flat surface, round the edge of the block it lies
-    // on, or into something it bends towards.
-    private boolean links(BlockGetter level, BlockPos pos, List<Direction> faces, Direction way) {
-        boolean across = false;
-        for (Direction face : faces) {
-            if (face.getAxis() != way.getAxis()) {
-                across = true;
-                if (isPaste(level, pos.relative(way), face) || isPaste(level, pos.relative(way).relative(face), way.getOpposite())) {
-                    return true;
-                }
-            }
-        }
-        return across && connectsTo(level.getBlockState(pos.relative(way)), faces, way);
+    // Whether a face runs off the given way along its own surface: into paste next to it on the same flat surface,
+    // round the edge of the block it lies on, or into something it bends towards.
+    private boolean links(BlockGetter level, BlockPos pos, Direction face, Direction way) {
+        BlockPos ahead = pos.relative(way);
+        return isPaste(level, ahead, face) || isPaste(level, ahead.relative(face), way.getOpposite())
+            || connectsTo(level, ahead, level.getBlockState(ahead), face, way);
     }
 
     private boolean isPaste(BlockGetter level, BlockPos pos, Direction face) {
@@ -305,19 +362,49 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return state.is(this) && hasFace(state, face);
     }
 
-    // Greenstone parts and plain switches bend paste towards them, the way dust bends towards a lever or a torch.
-    private static boolean connectsTo(BlockState state, List<Direction> faces, Direction way) {
+    // Greenstone parts and plain switches bend paste towards them, the way dust bends towards a lever or a torch: whole
+    // blocks next to it, and smaller parts only if they sit on the same surface as the paste. A greenstone repeater only
+    // bends it towards its front and back.
+    private static boolean connectsTo(BlockGetter level, BlockPos pos, BlockState state, Direction face, Direction way) {
         if (state.getBlock() instanceof WallConverterBlock) {
             return true;
         }
         if (state.getBlock() instanceof GreenstoneDiodeBlock) {
-            return faces.contains(state.getValue(GreenstoneDiodeBlock.ATTACHED)) && state.getValue(GreenstoneDiodeBlock.OUTPUT).getAxis() == way.getAxis();
+            return state.getValue(GreenstoneDiodeBlock.ATTACHED) == face
+                && (state.getBlock() instanceof GreenstoneComparatorBlock || state.getValue(GreenstoneDiodeBlock.OUTPUT).getAxis() == way.getAxis());
         }
-        if (!state.isSignalSource()) {
+        if (!state.isSignalSource() || state.getBlock() instanceof GreenstonePasteBlock) {
             return false;
         }
         Channel channel = Channel.ofSource(state);
-        return channel == null || channel == Channel.GREENSTONE;
+        if (channel != null && channel != Channel.GREENSTONE) {
+            return false;
+        }
+        Direction support = support(level, pos, state);
+        return support == null || support == face;
+    }
+
+    // The face a small part such as a lever, button or torch is fixed to, or null for a whole block.
+    private static @Nullable Direction support(BlockGetter level, BlockPos pos, BlockState state) {
+        if (Block.isShapeFullBlock(state.getShape(level, pos))) {
+            return null;
+        }
+        if (state.hasProperty(BlockStateProperties.ATTACH_FACE) && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+            return switch (state.getValue(BlockStateProperties.ATTACH_FACE)) {
+                case FLOOR -> Direction.DOWN;
+                case CEILING -> Direction.UP;
+                case WALL -> state.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
+            };
+        }
+        Block block = state.getBlock();
+        if ((block instanceof WallTorchBlock || block instanceof RedstoneWallTorchBlock || block instanceof TripWireHookBlock)
+            && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+            return state.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
+        }
+        if (block instanceof LightningRodBlock && state.hasProperty(BlockStateProperties.FACING)) {
+            return state.getValue(BlockStateProperties.FACING).getOpposite();
+        }
+        return Direction.DOWN;
     }
 
     /**
@@ -376,6 +463,55 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
+    // With paste on more than one face, breaking takes off the face looked at: drops and break particles are for that
+    // face alone, and destroy() puts the rest back once the game has removed the block.
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        REMAINING.remove();
+        if (faces(state).size() > 1) {
+            Direction target = lookedAt(state, pos, player);
+            REMAINING.set(new Remaining(level, pos.immutable(), state.setValue(SIDES.get(target), Side.NONE)));
+            state = defaultBlockState().setValue(SIDES.get(target), Side.FACE).setValue(POWER, state.getValue(POWER));
+        }
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+        Remaining remaining = REMAINING.get();
+        if (remaining != null && remaining.level() == level && remaining.pos().equals(pos)) {
+            REMAINING.remove();
+            level.setBlock(pos, withConnections(level, pos, remaining.state()), Block.UPDATE_ALL);
+        }
+    }
+
+    // The nearest face the player's line of sight crosses, or else the face they look most straight at.
+    private static Direction lookedAt(BlockState state, BlockPos pos, Player player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 look = player.getViewVector(1.0F);
+        Vec3 end = eye.add(look.scale(player.blockInteractionRange() + 1.0));
+        Direction best = null;
+        double nearest = Double.MAX_VALUE;
+        for (Direction face : faces(state)) {
+            BlockHitResult hit = SHAPES.get(face).clip(eye, end, pos);
+            if (hit != null && hit.getLocation().distanceToSqr(eye) < nearest) {
+                best = face;
+                nearest = hit.getLocation().distanceToSqr(eye);
+            }
+        }
+        if (best == null) {
+            double straightest = -Double.MAX_VALUE;
+            for (Direction face : faces(state)) {
+                double toward = look.dot(Vec3.atLowerCornerOf(face.getUnitVec3i()));
+                if (toward > straightest) {
+                    best = face;
+                    straightest = toward;
+                }
+            }
+        }
+        return best;
+    }
+
     @Override
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         if (!movedByPiston) {
@@ -424,9 +560,10 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         for (BlockPos other : connectedPaste(level, pos, state)) {
             signal = Math.max(signal, level.getBlockState(other).getValue(POWER) - 1);
         }
+        // A wall converter it lies on or runs into.
         for (Direction direction : Direction.values()) {
             BlockState neighbour = level.getBlockState(pos.relative(direction));
-            if (neighbour.getBlock() instanceof WallConverterBlock) {
+            if (neighbour.getBlock() instanceof WallConverterBlock && state.getValue(SIDES.get(direction)).reaches()) {
                 signal = Math.max(signal, neighbour.getValue(WallConverterBlock.POWER) - 1);
             }
         }

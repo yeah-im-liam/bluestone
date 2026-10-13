@@ -160,7 +160,7 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return Signals.read(Channel.GREENSTONE, () -> {
             int signal = level.getSignal(inputPos, input);
             BlockState inputState = level.getBlockState(inputPos);
-            return Math.max(signal, inputState.getBlock() instanceof GreenstonePasteBlock ? inputState.getValue(GreenstonePasteBlock.POWER) : 0);
+            return Math.max(signal, onSurface(inputState, state) ? inputState.getValue(GreenstonePasteBlock.POWER) : 0);
         });
     }
 
@@ -177,7 +177,7 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
                     continue;
                 } else if (sideState.getBlock() instanceof GreenstoneBlock) {
                     signal = 15;
-                } else if (sideState.getBlock() instanceof GreenstonePasteBlock) {
+                } else if (onSurface(sideState, state)) {
                     signal = Math.max(signal, sideState.getValue(GreenstonePasteBlock.POWER));
                 } else if (sideState.isSignalSource()) {
                     signal = Math.max(signal, level.getDirectSignal(sidePos, side));
@@ -185,6 +185,11 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
             }
             return signal;
         });
+    }
+
+    // Paste on the same face as this repeater or comparator; paste on other faces of that space doesn't reach it.
+    private static boolean onSurface(BlockState paste, BlockState state) {
+        return paste.getBlock() instanceof GreenstonePasteBlock && GreenstonePasteBlock.hasFace(paste, state.getValue(ATTACHED));
     }
 
     @Override
