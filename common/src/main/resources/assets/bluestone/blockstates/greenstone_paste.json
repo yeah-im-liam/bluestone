@@ -1,149 +1,736 @@
 {
   "multipart": [
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste"
-      },
       "when": {
-        "north": "true"
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "down"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "down"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "down"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "down"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "down"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot"
       }
     },
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste"
-      },
       "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
+        "north": "side|up",
+        "attached": "down"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side0"
       }
     },
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "y": 90
-      },
       "when": {
-        "east": "true"
+        "south": "side|up",
+        "attached": "down"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0"
       }
     },
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "y": 90
-      },
       "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "y": 180
+        "east": "side|up",
+        "attached": "down"
       },
-      "when": {
-        "south": "true"
-      }
-    },
-    {
       "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "y": 180
-      },
-      "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
-      }
-    },
-    {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
+        "model": "bluestone:block/greenstone_paste_side_alt1",
         "y": 270
-      },
-      "when": {
-        "west": "true"
       }
     },
     {
+      "when": {
+        "west": "side|up",
+        "attached": "down"
+      },
       "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
+        "model": "bluestone:block/greenstone_paste_side1",
         "y": 270
-      },
-      "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
       }
     },
     {
+      "when": {
+        "north": "up",
+        "attached": "down"
+      },
       "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
+        "model": "bluestone:block/greenstone_paste_up"
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "down"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "down"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "down"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "up"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "up"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "up"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "up"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "up"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot",
+        "x": 180,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "north": "side|up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side0",
+        "x": 180,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "side|up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0",
+        "x": 180,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "side|up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt1",
+        "x": 180,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "side|up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side1",
+        "x": 180,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": "up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 180,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 180,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "up"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 180,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "north"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "north"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "north"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "north"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "north"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot",
         "x": 270
-      },
-      "when": {
-        "up": "true"
       }
     },
     {
+      "when": {
+        "north": "side|up",
+        "attached": "north"
+      },
       "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
+        "model": "bluestone:block/greenstone_paste_side0",
         "x": 270
-      },
-      "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
       }
     },
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "x": 90
-      },
       "when": {
-        "down": "true"
+        "south": "side|up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0",
+        "x": 270
       }
     },
     {
-      "apply": {
-        "model": "bluestone:block/greenstone_paste",
-        "uvlock": true,
-        "x": 90
-      },
       "when": {
-        "down": "false",
-        "east": "false",
-        "north": "false",
-        "south": "false",
-        "up": "false",
-        "west": "false"
+        "east": "side|up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt1",
+        "x": 270,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "west": "side|up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side1",
+        "x": 270,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "north": "up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270,
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "north"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "south"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "south"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "south"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "south"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "south"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot",
+        "x": 270,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "north": "side|up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side0",
+        "x": 270,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "side|up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0",
+        "x": 270,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "side|up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt1",
+        "x": 90,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "west": "side|up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side1",
+        "x": 90,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "north": "up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90,
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "south"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "west"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "west"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "west"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "west"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "west"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot",
+        "x": 270,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": "side|up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side0",
+        "x": 270,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "south": "side|up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0",
+        "x": 270,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "east": "side|up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt1",
+        "y": 180,
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "west": "side|up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side1",
+        "y": 180,
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "north": "up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "west"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "y": 180,
+        "z": 90
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "none",
+            "north": "none",
+            "south": "none",
+            "west": "none",
+            "attached": "east"
+          },
+          {
+            "east": "side|up",
+            "north": "side|up",
+            "attached": "east"
+          },
+          {
+            "east": "side|up",
+            "south": "side|up",
+            "attached": "east"
+          },
+          {
+            "south": "side|up",
+            "west": "side|up",
+            "attached": "east"
+          },
+          {
+            "north": "side|up",
+            "west": "side|up",
+            "attached": "east"
+          }
+        ]
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_dot",
+        "x": 270,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "side|up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side0",
+        "x": 270,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "side|up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt0",
+        "x": 270,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "side|up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side_alt1",
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "west": "side|up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_side1",
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "north": "up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 270,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "y": 180,
+        "z": 270
+      }
+    },
+    {
+      "when": {
+        "south": "up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "x": 90,
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "up",
+        "attached": "east"
+      },
+      "apply": {
+        "model": "bluestone:block/greenstone_paste_up",
+        "z": 270
       }
     }
   ]

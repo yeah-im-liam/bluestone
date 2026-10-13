@@ -1,0 +1,14 @@
+{
+  "parent": "block/redstone_dust_side",
+  "textures": {
+    "line": {
+      "sprite": "bluestone:block/greenstone_paste_line1",
+      "force_translucent": true
+    },
+    "particle": "bluestone:block/greenstone_paste_dot",
+    "overlay": {
+      "sprite": "bluestone:block/greenstone_paste_overlay",
+      "force_translucent": true
+    }
+  }
+}

@@ -2,91 +2,12 @@
   "type": "minecraft:block",
   "pools": [
     {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
       "entries": [
         {
           "type": "minecraft:item",
-          "modifier": [
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "down": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "up": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "north": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "south": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "west": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "bluestone:greenstone_paste",
-                "state": {
-                  "east": "true"
-                }
-              },
-              "count": 1
-            },
-            {
-              "type": "minecraft:set_count",
-              "add": true,
-              "count": -1
-            },
-            {
-              "type": "minecraft:explosion_decay"
-            }
-          ],
           "name": "bluestone:greenstone_paste"
         }
       ],

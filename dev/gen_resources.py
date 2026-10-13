@@ -150,15 +150,6 @@ for facing, y in ROTATION.items():
                 variants[key] = variant
 write(A + "blockstates/converter.json", {"variants": variants})
 
-# Greenstone. Paste is a flat layer on each face it covers, tinted by power like dust.
-paste_model = vanilla("assets/minecraft/models/block/resin_clump.json")
-paste_model["textures"] = {"particle": "bluestone:block/greenstone_paste", "texture": "bluestone:block/greenstone_paste"}
-for element in paste_model["elements"]:
-    for face in element["faces"].values():
-        face["tintindex"] = 0
-write(A + "models/block/greenstone_paste.json", paste_model)
-write(A + "blockstates/greenstone_paste.json", swap_models(vanilla("assets/minecraft/blockstates/resin_clump.json"),
-                                                           [("minecraft:block/resin_clump", "bluestone:block/greenstone_paste")]))
 
 # The greenstone repeater and comparator sit on any face (attached) and point any way along it (output). The game's
 # models lie on the floor pointing north; these rotations, measured from the game's own block model rotations (the
@@ -260,6 +251,49 @@ for attached_rail, model in [("attached_slime_rail", "bluestone:block/slime_rail
     write(A + f"blockstates/{attached_rail}.json", {"variants": {
         f"attached={attached},travel={travel}": rotated(model, attached, {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}[travel])
         for (attached, travel) in ALL_PAIRS if attached != "down"}})
+
+# Greenstone paste is redstone dust on any face: the game's dust models with their own textures, and the game's dust
+# blockstate once for each face, turned onto it. On a face, north/east/south/west are as on the floor, turned with
+# the face (GreenstonePasteBlock.toWorld): on the ceiling north stays north, on a wall north is up.
+def paste_sprite(value):
+    if isinstance(value, dict):
+        return dict(value, sprite=paste_sprite(value["sprite"]))
+    name = value.split("/")[-1]
+    return "bluestone:block/" + name.replace("redstone_dust", "greenstone_paste") if name.startswith("redstone_dust") else value
+
+
+for name in ["dot", "side0", "side1", "side_alt0", "side_alt1", "up"]:
+    model = vanilla(f"assets/minecraft/models/block/redstone_dust_{name}.json")
+    textures = {k: paste_sprite(v) for k, v in model.get("textures", {}).items()}
+    if "parent" in model:
+        textures.setdefault("particle", "bluestone:block/greenstone_paste_dot")
+        textures.setdefault("overlay", {"sprite": "bluestone:block/greenstone_paste_overlay", "force_translucent": True})
+    model["textures"] = textures
+    write(A + f"models/block/greenstone_paste_{name}.json", model)
+
+VECTORS = {"down": (0, -1, 0), "up": (0, 1, 0), "north": (0, 0, -1), "south": (0, 0, 1), "west": (-1, 0, 0), "east": (1, 0, 0)}
+NAMES = {v: k for k, v in VECTORS.items()}
+
+
+def paste_frame(attached):
+    north = "north" if attached in ("down", "up") else "up"
+    (ax, ay, az), (nx, ny, nz) = VECTORS[attached], VECTORS[north]
+    east = NAMES[(ay * nz - az * ny, az * nx - ax * nz, ax * ny - ay * nx)]
+    return {"north": north, "east": east, "south": NAMES[tuple(-c for c in VECTORS[north])], "west": NAMES[tuple(-c for c in VECTORS[east])]}
+
+
+paste_parts = []
+for attached in VECTORS:
+    frame = paste_frame(attached)
+    for part in vanilla("assets/minecraft/blockstates/redstone_wire.json")["multipart"]:
+        apply = part["apply"]
+        # A part turned on the floor first (its own y), then onto the face.
+        turned = ["north", "east", "south", "west"][apply.get("y", 0) // 90]
+        variant = rotated(apply["model"].replace("minecraft:block/redstone_dust_", "bluestone:block/greenstone_paste_"), attached, frame[turned])
+        when = part["when"]
+        when = {"OR": [dict(c, attached=attached) for c in when["OR"]]} if "OR" in when else dict(when, attached=attached)
+        paste_parts.append({"when": when, "apply": variant})
+write(A + "blockstates/greenstone_paste.json", {"multipart": paste_parts})
 
 # Item models and item definitions
 GENERATED = {
@@ -365,7 +399,7 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     write(prefix + D + "loot_table/blocks/purplestone_wire.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
     write(prefix + D + "loot_table/blocks/greenstone_paste.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/resin_clump.json", jar), [("resin_clump", "greenstone_paste")]))
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "greenstone_paste"), ("redstone", "greenstone_paste")]))
     for ours, theirs in [("greenstone_torch", "redstone_torch"), ("greenstone_block", "redstone_block"), ("greenstone_repeater", "repeater"),
                          ("greenstone_comparator", "comparator"), ("wall_converter", "repeater"), ("slime_rail", "rail"),
                          ("chain_gear_rail", "rail"), ("slime_chain_gear_rail", "rail")]:
@@ -536,7 +570,8 @@ write("data/minecraft/tags/item/rails.json", RAILS)
 # Purplestone and the converter, like redstone and the repeater, can't sit in water.
 write("data/minecraft/tags/block/washed_away_by_fluids.json",
       {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:converter",
-                  "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater", "bluestone:greenstone_comparator"]})
+                  "bluestone:greenstone_paste", "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater",
+                  "bluestone:greenstone_comparator"]})
 write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch", "bluestone:greenstone_torch"]})
 ORES = {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]}
 write(D + "tags/block/bluestone_ores.json", ORES)
