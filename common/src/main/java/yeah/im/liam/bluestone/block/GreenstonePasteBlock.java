@@ -35,9 +35,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
@@ -69,29 +71,30 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         Direction.NORTH, NORTH, Direction.EAST, EAST, Direction.SOUTH, SOUTH, Direction.WEST, WEST, Direction.UP, UP, Direction.DOWN, DOWN));
     // Redstone's colours with the red and green channels swapped.
     private static final int[] COLORS = ColoredWireBlock.colorsFor((red, green, blue) -> ARGB.colorFromFloat(1.0F, green, red, blue));
-    private static final Map<Direction, VoxelShape> SHAPES = new EnumMap<>(Map.of(
-        Direction.DOWN, Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),
-        Direction.UP, Block.box(0.0, 15.0, 0.0, 16.0, 16.0, 16.0),
-        Direction.NORTH, Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 1.0),
-        Direction.SOUTH, Block.box(0.0, 0.0, 15.0, 16.0, 16.0, 16.0),
-        Direction.WEST, Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0),
-        Direction.EAST, Block.box(15.0, 0.0, 0.0, 16.0, 16.0, 16.0)
-    ));
-    // The outline for each set of faces, by the faces' bits (1 << ordinal).
-    private static final VoxelShape[] OUTLINES = new VoxelShape[64];
-    private boolean shouldSignal = true;
+    // Dust's outline turned onto each face: by face, and by which of its lines are drawn (bit 0 north, 1 east, 2 south,
+    // 3 west, on the face as in toWorld).
+    private static final VoxelShape[][] OUTLINES = new VoxelShape[6][16];
+    private static final Direction[] FACE_SIDES = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
     static {
-        for (int faces = 0; faces < OUTLINES.length; faces++) {
-            VoxelShape shape = Shapes.empty();
-            for (Direction face : Direction.values()) {
-                if ((faces & 1 << face.ordinal()) != 0) {
-                    shape = Shapes.or(shape, SHAPES.get(face));
+        // On the floor: a middle 10 pixels across and a line to each edge, a pixel high.
+        AABB middle = new AABB(3.0, 0.0, 3.0, 13.0, 1.0, 13.0);
+        AABB[] lines = {new AABB(3.0, 0.0, 0.0, 13.0, 1.0, 8.0), new AABB(8.0, 0.0, 3.0, 16.0, 1.0, 13.0),
+            new AABB(3.0, 0.0, 8.0, 13.0, 1.0, 16.0), new AABB(0.0, 0.0, 3.0, 8.0, 1.0, 13.0)};
+        for (Direction face : Direction.values()) {
+            for (int drawn = 0; drawn < 16; drawn++) {
+                VoxelShape shape = turn(middle, face);
+                for (int i = 0; i < 4; i++) {
+                    if ((drawn & 1 << i) != 0) {
+                        shape = Shapes.or(shape, turn(lines[i], face));
+                    }
                 }
+                OUTLINES[face.ordinal()][drawn] = shape;
             }
-            OUTLINES[faces] = shape;
         }
     }
+
+    private boolean shouldSignal = true;
 
     public enum Side implements StringRepresentable {
         NONE("none"),
@@ -194,13 +197,70 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return COLORS[power];
     }
 
+    // A box in pixels on the floor, turned onto a face: the floor's north, east and up become the face's (toWorld) and
+    // the way out of it.
+    private static VoxelShape turn(AABB box, Direction face) {
+        Vec3 north = Vec3.atLowerCornerOf(toWorld(face, Direction.NORTH).getUnitVec3i());
+        Vec3 east = Vec3.atLowerCornerOf(toWorld(face, Direction.EAST).getUnitVec3i());
+        Vec3 up = Vec3.atLowerCornerOf(face.getOpposite().getUnitVec3i());
+        Vec3 min = null;
+        Vec3 max = null;
+        for (double x : new double[]{box.minX, box.maxX}) {
+            for (double y : new double[]{box.minY, box.maxY}) {
+                for (double z : new double[]{box.minZ, box.maxZ}) {
+                    Vec3 corner = new Vec3(0.5, 0.5, 0.5).add(east.scale(x / 16.0 - 0.5)).add(up.scale(y / 16.0 - 0.5)).add(north.scale(0.5 - z / 16.0));
+                    min = min == null ? corner : new Vec3(Math.min(min.x, corner.x), Math.min(min.y, corner.y), Math.min(min.z, corner.z));
+                    max = max == null ? corner : new Vec3(Math.max(max.x, corner.x), Math.max(max.y, corner.y), Math.max(max.z, corner.z));
+                }
+            }
+        }
+        return Shapes.box(min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+
+    // Whether a face draws its line towards a way, as the models show it (see SHARED).
+    private static boolean draws(BlockState state, Direction face, Direction way) {
+        Side side = state.getValue(SIDES.get(way));
+        if (side != Side.LINE) {
+            return side == Side.FACE;
+        }
+        Shared shared = state.getValue(SHARED);
+        if (shared == Shared.ALL) {
+            return true;
+        }
+        for (Direction other : Direction.values()) {
+            if (other != face && other.getAxis() != way.getAxis() && hasFace(state, other)
+                && (shared == Shared.FIRST ? other.ordinal() < face.ordinal() : other.ordinal() > face.ordinal())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // The outline of one face: like dust, its middle and the lines it draws.
+    private static VoxelShape outline(BlockState state, Direction face) {
+        int drawn = 0;
+        for (int i = 0; i < 4; i++) {
+            if (draws(state, face, toWorld(face, FACE_SIDES[i]))) {
+                drawn |= 1 << i;
+            }
+        }
+        return OUTLINES[face.ordinal()][drawn];
+    }
+
+    // Each face is outlined and picked on its own: to a player looking at the paste, it is only the face they look at.
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        int faces = 0;
-        for (Direction face : faces(state)) {
-            faces |= 1 << face.ordinal();
+        if (context instanceof EntityCollisionContext entityContext && entityContext.getEntity() instanceof Player player) {
+            Direction face = lookedAt(state, pos, player);
+            if (face != null) {
+                return outline(state, face);
+            }
         }
-        return OUTLINES[faces];
+        VoxelShape shape = Shapes.empty();
+        for (Direction face : faces(state)) {
+            shape = Shapes.or(shape, outline(state, face));
+        }
+        return shape;
     }
 
     private static boolean supported(LevelReader level, BlockPos pos, Direction face) {
@@ -470,6 +530,9 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         REMAINING.remove();
         if (faces(state).size() > 1) {
             Direction target = lookedAt(state, pos, player);
+            if (target == null) {
+                target = facing(state, player);
+            }
             REMAINING.set(new Remaining(level, pos.immutable(), state.setValue(SIDES.get(target), Side.NONE)));
             state = defaultBlockState().setValue(SIDES.get(target), Side.FACE).setValue(POWER, state.getValue(POWER));
         }
@@ -485,28 +548,32 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
-    // The nearest face the player's line of sight crosses, or else the face they look most straight at.
-    private static Direction lookedAt(BlockState state, BlockPos pos, Player player) {
+    // The face whose paste the player's line of sight crosses first, if any.
+    private static @Nullable Direction lookedAt(BlockState state, BlockPos pos, Player player) {
         Vec3 eye = player.getEyePosition();
-        Vec3 look = player.getViewVector(1.0F);
-        Vec3 end = eye.add(look.scale(player.blockInteractionRange() + 1.0));
+        Vec3 end = eye.add(player.getViewVector(1.0F).scale(player.blockInteractionRange() + 1.0));
         Direction best = null;
         double nearest = Double.MAX_VALUE;
         for (Direction face : faces(state)) {
-            BlockHitResult hit = SHAPES.get(face).clip(eye, end, pos);
+            BlockHitResult hit = outline(state, face).clip(eye, end, pos);
             if (hit != null && hit.getLocation().distanceToSqr(eye) < nearest) {
                 best = face;
                 nearest = hit.getLocation().distanceToSqr(eye);
             }
         }
-        if (best == null) {
-            double straightest = -Double.MAX_VALUE;
-            for (Direction face : faces(state)) {
-                double toward = look.dot(Vec3.atLowerCornerOf(face.getUnitVec3i()));
-                if (toward > straightest) {
-                    best = face;
-                    straightest = toward;
-                }
+        return best;
+    }
+
+    // The face the player looks most straight at.
+    private static Direction facing(BlockState state, Player player) {
+        Vec3 look = player.getViewVector(1.0F);
+        Direction best = null;
+        double straightest = -Double.MAX_VALUE;
+        for (Direction face : faces(state)) {
+            double toward = look.dot(Vec3.atLowerCornerOf(face.getUnitVec3i()));
+            if (toward > straightest) {
+                best = face;
+                straightest = toward;
             }
         }
         return best;
