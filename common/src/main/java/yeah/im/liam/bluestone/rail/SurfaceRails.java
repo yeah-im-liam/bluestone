@@ -246,13 +246,14 @@ public final class SurfaceRails {
         }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
-        // Chain gear sets the pace while the cart is on it; off it, the cart goes back to the speed it came on at.
+        // Chain gear sets the pace while the cart is on it; off it, the cart goes back to the speed it came on at, but
+        // never faster than the chain gear moved it.
         if (on.kind() == Kind.CHAIN) {
             if (Double.isNaN(rider.bluestone$chainEntry())) {
                 rider.bluestone$setChainEntry(speed);
             }
         } else if (!Double.isNaN(rider.bluestone$chainEntry())) {
-            speed = rider.bluestone$chainEntry();
+            speed = Math.min(rider.bluestone$chainEntry(), CHAIN_SPEED);
             rider.bluestone$setChainEntry(Double.NaN);
         }
         boolean hold = false;
@@ -482,7 +483,8 @@ public final class SurfaceRails {
     }
 
     // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
-    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain gear at.
+    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain gear at,
+    // but never faster than the chain gear moved it.
     private static void driveOnFloor(Level level, AbstractMinecart cart, RailRider rider) {
         BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
         Vec3 velocity = cart.getDeltaMovement();
@@ -498,7 +500,7 @@ public final class SurfaceRails {
             cart.setDeltaMovement(drive.getStepX() * speed, velocity.y, drive.getStepZ() * speed);
             return;
         }
-        double entry = rider.bluestone$chainEntry();
+        double entry = Math.min(rider.bluestone$chainEntry(), CHAIN_SPEED);
         if (!Double.isNaN(entry)) {
             rider.bluestone$setChainEntry(Double.NaN);
             double horizontal = velocity.horizontalDistance();
