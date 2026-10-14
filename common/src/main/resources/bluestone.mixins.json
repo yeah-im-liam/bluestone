@@ -21,6 +21,7 @@
   ],
   "client": [
     "AbstractMinecartRendererMixin",
+    "CameraMixin",
     "ClientItemInfoLoaderMixin",
     "ClientLevelMixin",
     "EntityRenderDispatcherMixin",

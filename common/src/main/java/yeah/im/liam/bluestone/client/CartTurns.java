@@ -88,19 +88,31 @@ public final class CartTurns {
     }
 
     /**
-     * A rider of a turned cart is tilted with it, about the cart's pivot.
+     * How a rider is tilted with its cart: the tilt, and the cart's pivot in the world.
      */
-    public static void ride(Entity rider, EntityRenderState state, float partialTicks) {
-        SurfaceRider surfaceRider = (SurfaceRider) state;
-        surfaceRider.bluestone$setTilt(null, Vec3.ZERO);
+    public record Tilt(Quaternionf tilt, Vec3 pivot) {
+    }
+
+    /**
+     * The tilt of a rider of a turned cart, or null if it isn't riding one.
+     */
+    public static @Nullable Tilt tilt(Entity rider, float partialTicks) {
         if (!(rider.getVehicle() instanceof AbstractMinecart cart)) {
-            return;
+            return null;
         }
         Turn turn = TURNS.get(cart);
         if (turn == null || !turn.ours) {
-            return;
+            return null;
         }
-        Vec3 pivot = cart.getPosition(partialTicks).add(turn.pivot).subtract(state.x, state.y, state.z);
-        surfaceRider.bluestone$setTilt(new Quaternionf(turn.tilt), pivot);
+        return new Tilt(new Quaternionf(turn.tilt), cart.getPosition(partialTicks).add(turn.pivot));
+    }
+
+    /**
+     * A rider of a turned cart is drawn tilted with it, about the cart's pivot.
+     */
+    public static void ride(Entity rider, EntityRenderState state, float partialTicks) {
+        Tilt tilt = tilt(rider, partialTicks);
+        ((SurfaceRider) state).bluestone$setTilt(tilt != null ? tilt.tilt() : null,
+            tilt != null ? tilt.pivot().subtract(state.x, state.y, state.z) : Vec3.ZERO);
     }
 }
