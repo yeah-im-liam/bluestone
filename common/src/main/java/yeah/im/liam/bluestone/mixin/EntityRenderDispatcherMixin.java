@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import yeah.im.liam.bluestone.client.SurfaceRider;
 
 /**
- * Draws a rider tilted about its cart's pivot (see {@link yeah.im.liam.bluestone.client.CartTurns}).
+ * Draws a rider sitting where the game seats it, tilted about its cart's pivot (see
+ * {@link yeah.im.liam.bluestone.client.CartTurns}).
  */
 @Mixin(EntityRenderDispatcher.class)
 abstract class EntityRenderDispatcherMixin {
@@ -30,10 +31,11 @@ abstract class EntityRenderDispatcherMixin {
             return;
         }
         Vec3 pivot = ((SurfaceRider) state).bluestone$tiltPivot();
+        Vec3 seat = ((SurfaceRider) state).bluestone$tiltSeat();
         poseStack.pushPose();
         poseStack.translate(pivot.x, pivot.y, pivot.z);
         poseStack.mulPose(new Matrix4f().rotation(tilt));
-        poseStack.translate(-pivot.x, -pivot.y, -pivot.z);
+        poseStack.translate(seat.x, seat.y, seat.z);
         original.call(renderer, state, poseStack, collector, camera);
         poseStack.popPose();
     }

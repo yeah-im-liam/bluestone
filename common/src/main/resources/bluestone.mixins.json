@@ -8,6 +8,7 @@
     "AbstractMinecartMixin",
     "BlockStateBaseMixin",
     "DiodeBlockMixin",
+    "EntityMixin",
     "LevelMixin",
     "OreFeatureMixin",
     "PoweredRailBlockMixin",

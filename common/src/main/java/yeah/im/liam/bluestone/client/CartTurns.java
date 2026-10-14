@@ -88,9 +88,11 @@ public final class CartTurns {
     }
 
     /**
-     * How a rider is tilted with its cart: the tilt, and the cart's pivot in the world.
+     * How a rider is tilted with its cart: the tilt, the cart's pivot in the world, and where the game would seat the
+     * rider in an untilted cart (the rider itself is moved to where the turned cart carries it, see
+     * {@link yeah.im.liam.bluestone.rail.SurfaceRails#turnedRider}).
      */
-    public record Tilt(Quaternionf tilt, Vec3 pivot) {
+    public record Tilt(Quaternionf tilt, Vec3 pivot, Vec3 seat) {
     }
 
     /**
@@ -104,15 +106,19 @@ public final class CartTurns {
         if (turn == null || !turn.ours) {
             return null;
         }
-        return new Tilt(new Quaternionf(turn.tilt), cart.getPosition(partialTicks).add(turn.pivot));
+        Vec3 seat = cart.getPassengerRidingPosition(rider).subtract(rider.getVehicleAttachmentPoint(cart)).subtract(cart.position());
+        return new Tilt(new Quaternionf(turn.tilt), cart.getPosition(partialTicks).add(turn.pivot), cart.getPosition(partialTicks).add(seat));
     }
 
     /**
-     * A rider of a turned cart is drawn tilted with it, about the cart's pivot.
+     * A rider of a turned cart is drawn tilted with it: sitting where the game seats it, turned about the cart's pivot.
      */
     public static void ride(Entity rider, EntityRenderState state, float partialTicks) {
         Tilt tilt = tilt(rider, partialTicks);
-        ((SurfaceRider) state).bluestone$setTilt(tilt != null ? tilt.tilt() : null,
-            tilt != null ? tilt.pivot().subtract(state.x, state.y, state.z) : Vec3.ZERO);
+        if (tilt == null) {
+            ((SurfaceRider) state).bluestone$setTilt(null, Vec3.ZERO, Vec3.ZERO);
+        } else {
+            ((SurfaceRider) state).bluestone$setTilt(tilt.tilt(), tilt.pivot().subtract(state.x, state.y, state.z), tilt.seat().subtract(tilt.pivot()));
+        }
     }
 }

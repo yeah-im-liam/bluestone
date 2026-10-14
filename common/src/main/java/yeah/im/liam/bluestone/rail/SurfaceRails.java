@@ -4,12 +4,15 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.block.AttachedRailBlock.Kind;
@@ -208,6 +211,39 @@ public final class SurfaceRails {
             return WallRails.slopesUp(level, pos, ends.getLast()) ? ends : List.of();
         }
         return WallRails.level(shape);
+    }
+
+    // The cart is drawn turned about a point this far off the face its rail is on, as the game turns a cart on a floor
+    // rail (AbstractMinecartRendererMixin).
+    private static final double PIVOT_HEIGHT = 0.375;
+
+    /**
+     * Where a rider of a cart on a wall or ceiling rail goes: turned with the cart about its pivot, so its eyes are
+     * where the turned cart carries them rather than inside the wall or ceiling. Null on any other rail.
+     */
+    public static @Nullable Vec3 turnedRider(AbstractMinecart cart, Entity rider) {
+        Vec3 center = cart.position().add(0.0, cart.getBbHeight() / 2.0, 0.0);
+        BlockPos pos = BlockPos.containing(center);
+        BlockState rail = cart.level().getBlockState(pos);
+        if (!(rail.getBlock() instanceof AttachedRailBlock)) {
+            return null;
+        }
+        Direction attached = rail.getValue(AttachedRailBlock.ATTACHED);
+        Vec3 face = Vec3.atCenterOf(pos).add(unit(attached).scale(0.5 - PIVOT_HEIGHT));
+        Vec3 pivot = switch (attached.getAxis()) {
+            case X -> new Vec3(face.x, center.y, center.z);
+            case Y -> new Vec3(center.x, face.y, center.z);
+            case Z -> new Vec3(center.x, center.y, face.z);
+        };
+        // The cart's floor faces out of the rail's face: on a wall up is turned towards that, on a ceiling turned over
+        // along the rail.
+        Direction out = attached.getOpposite();
+        Quaternionf turn = out == Direction.DOWN
+            ? new Quaternionf().rotationAxis((float) Math.PI, rail.getValue(AttachedRailBlock.TRAVEL).getStepX(), 0.0F, rail.getValue(AttachedRailBlock.TRAVEL).getStepZ())
+            : new Quaternionf().rotationTo(new Vector3f(0.0F, 1.0F, 0.0F), new Vector3f(out.getStepX(), out.getStepY(), out.getStepZ()));
+        Vec3 eye = rider.position().add(0.0, rider.getEyeHeight(), 0.0).subtract(pivot);
+        Vector3f turned = new Vector3f((float) eye.x, (float) eye.y, (float) eye.z).rotate(turn);
+        return pivot.add(turned.x, turned.y - rider.getEyeHeight(), turned.z);
     }
 
     private static Vec3 unit(Direction direction) {
