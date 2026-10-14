@@ -23,6 +23,9 @@
     "AbstractMinecartRendererMixin",
     "ClientItemInfoLoaderMixin",
     "ClientLevelMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "EntityRenderStateMixin",
     "MinecartRenderStateMixin"
   ],
   "injectors": {
