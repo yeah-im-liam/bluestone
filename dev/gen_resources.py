@@ -4,8 +4,8 @@ python dev/gen_resources.py <26.3 client jar> common/src/main/resources <art fol
 
 The client jars are in the Loom cache (fabric-loom/<version>/minecraft-client.jar); the Programmer Art pack is
 minecraft/resourcepacks/programmer_art.zip in the 26.3 asset index. The art folder holds default/ and programmer art/,
-with one folder per thing (bluestone torch, converter, ...). Each of those has block/, item/ or palettes/ folders that
-say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
+with one folder per thing (bluestone torch, purplestone converter, ...). Each of those has block/, item/ or palettes/
+folders that say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
 """
 import json
 import re
@@ -46,7 +46,7 @@ D = "data/bluestone/"
 # Blockstates
 write(A + "blockstates/bluestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
 write(A + "blockstates/purplestone_wire.json", vanilla("assets/minecraft/blockstates/redstone_wire.json"))
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"blockstates/{name}.json", {"variants": {"": {"model": f"bluestone:block/{name}"}}})
 for name, src, prefix in [
     ("bluestone_torch", "redstone_torch", "redstone_torch"),
@@ -68,12 +68,12 @@ for name, src, prefix in [
 for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
-# The wall converter is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
-# 6x6 middle, and the light at the middle of each edge lies in the side piece there. A lit side piece is drawn by
-# WallConverterRenderer in exactly the same place in the purplestone or the greenstone overlay, so it covers the unlit
-# one without standing off the face. Every piece takes its texture from the same place as a whole face would. The
-# states (face, edge, color) of the lit pieces belong to no block; BlockStateDefinitionsMixin loads them, as the game
-# does item frames.
+# The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
+# 6x6 middle, and the light at the middle of each edge lies in the side piece there. Unlit, the world draws it from
+# converter_box.json. While any light is on (lit=true) the world draws nothing and ConverterBoxRenderer draws the
+# whole block glowing: the frame (corners and middles) and every side piece, unlit or in the overlay of its colour.
+# Every piece takes its texture from the same place as a whole face would. The frame's and the side pieces' states
+# belong to no block; BlockStateDefinitionsMixin loads them, as the game does item frames.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
 SPANS = [(0, 5), (5, 11), (11, 16)]
@@ -88,16 +88,24 @@ def face_piece(face, spans):
     return lo, hi
 
 
-pieces = []
+pieces, frame = [], []
 for face in AXES:
     u, v = [axis for axis in range(3) if axis != AXES[face]]
     for su in SPANS:
         for sv in SPANS:
             lo, hi = face_piece(face, {u: su, v: sv})
             pieces.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all", "cullface": face}}})
-write(A + "models/block/wall_converter.json", {"parent": "minecraft:block/block",
-                                                "textures": {"all": "bluestone:block/wall_converter", "particle": "#all"},
-                                                "elements": pieces})
+            if (su == SPANS[1]) == (sv == SPANS[1]):
+                frame.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all"}}})
+BOX_TEXTURES = {"all": "bluestone:block/converter_box", "particle": "#all"}
+write(A + "models/block/converter_box.json", {"parent": "minecraft:block/block", "textures": BOX_TEXTURES, "elements": pieces})
+write(A + "models/block/converter_box_lit.json", {"textures": {"particle": "bluestone:block/converter_box"}})
+write(A + "blockstates/converter_box.json", {"variants": {"lit=false": {"model": "bluestone:block/converter_box"},
+                                                          "lit=true": {"model": "bluestone:block/converter_box_lit"}}})
+write(A + "models/block/converter_box_frame.json", {"textures": BOX_TEXTURES, "elements": frame})
+write(A + "blockstates/converter_box_frame.json", {"variants": {"": {"model": "bluestone:block/converter_box_frame"}}})
+LIGHT_TEXTURES = {"off": "bluestone:block/converter_box"}
+LIGHT_TEXTURES.update({colour: f"bluestone:block/converter_box_{colour}_overlay" for colour in ["redstone", "bluestone", "purplestone", "greenstone"]})
 light_parts = []
 for face in AXES:
     for edge in AXES:
@@ -105,15 +113,14 @@ for face in AXES:
             continue
         third = 3 - AXES[face] - AXES[edge]
         lo, hi = face_piece(face, {AXES[edge]: SPANS[2] if FAR[edge] else SPANS[0], third: SPANS[1]})
-        template = f"template_wall_converter_light_{face}_{edge}"
+        template = f"template_converter_box_light_{face}_{edge}"
         write(A + f"models/block/{template}.json", {"textures": {"particle": "#light"},
                                                     "elements": [{"from": lo, "to": hi, "faces": {face: {"texture": "#light"}}}]})
-        for colour in ["purplestone", "greenstone"]:
-            name = f"wall_converter_light_{face}_{edge}_{colour}"
-            write(A + f"models/block/{name}.json", {"parent": f"bluestone:block/{template}",
-                                                    "textures": {"light": f"bluestone:block/wall_converter_{colour}_overlay"}})
+        for colour, texture in LIGHT_TEXTURES.items():
+            name = f"converter_box_light_{face}_{edge}_{colour}"
+            write(A + f"models/block/{name}.json", {"parent": f"bluestone:block/{template}", "textures": {"light": texture}})
             light_parts.append({"when": {"face": face, "edge": edge, "color": colour}, "apply": {"model": f"bluestone:block/{name}"}})
-write(A + "blockstates/wall_converter_light.json", {"multipart": light_parts})
+write(A + "blockstates/converter_box_light.json", {"multipart": light_parts})
 
 for stone in ["bluestone", "purplestone", "greenstone"]:
     write(A + f"models/block/{stone}_torch.json", {"parent": "minecraft:block/template_redstone_torch", "textures": {"torch": f"bluestone:block/{stone}_torch"}})
@@ -148,8 +155,8 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
                   {"parent": f"minecraft:block/{parent}", "textures": {"rail": f"bluestone:block/bluestone_{rail}{on}"}})
 
 
-# The converter: shaped like a four-tick repeater, with the input-end torch in the input colour and the output-end torch
-# in the output colour. Its top is the same in both directions; only the torches swap.
+# The purplestone converter: shaped like a four-tick repeater, with the input-end torch in the input colour and the
+# output-end torch in the output colour. Its top is the same in both directions; only the torches swap.
 TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
            "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
 MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
@@ -175,11 +182,11 @@ def converter_models(source, prefix):
         for on in ["", "_on"]:
             for locked in ["", "_locked"]:
                 model = converter_model(source("repeater_4tick" + on + locked))
-                top = "bluestone:block/converter" + on
+                top = "bluestone:block/purplestone_converter" + on
                 model["textures"] = {"particle": top, "slab": "minecraft:block/smooth_stone", "top": top, "lock": "minecraft:block/bedrock",
                                      "in_lit": TORCHES[input_color][0], "in_unlit": TORCHES[input_color][1],
                                      "out_lit": TORCHES[output_color][0], "out_unlit": TORCHES[output_color][1]}
-                write(prefix + "models/block/converter_" + mode + on + locked + ".json", model)
+                write(prefix + "models/block/purplestone_converter_" + mode + on + locked + ".json", model)
 
 
 converter_models(lambda name: vanilla("assets/minecraft/models/block/" + name + ".json"), A)
@@ -190,12 +197,12 @@ for facing, y in ROTATION.items():
     for mode in MODES:
         for powered in [False, True]:
             for locked in [False, True]:
-                variant = {"model": "bluestone:block/converter_" + mode + ("_on" if powered else "") + ("_locked" if locked else "")}
+                variant = {"model": "bluestone:block/purplestone_converter_" + mode + ("_on" if powered else "") + ("_locked" if locked else "")}
                 if y:
                     variant["y"] = y
                 key = "facing=%s,locked=%s,mode=%s,powered=%s" % (facing, str(locked).lower(), mode, str(powered).lower())
                 variants[key] = variant
-write(A + "blockstates/converter.json", {"variants": variants})
+write(A + "blockstates/purplestone_converter.json", {"variants": variants})
 
 
 # The greenstone repeater and comparator sit on any face (attached) and point any way along it (output). The game's
@@ -461,7 +468,7 @@ write(A + "blockstates/greenstone_paste.json", {"multipart": paste_parts})
 GENERATED = {
     "bluestone": "bluestone:item/bluestone",
     "purplestone": "bluestone:item/purplestone",
-    "converter": "bluestone:item/converter",
+    "purplestone_converter": "bluestone:item/purplestone_converter",
     "bluestone_torch": "bluestone:block/bluestone_torch",
     "purplestone_torch": "bluestone:block/purplestone_torch",
     "greenstone_paste": "bluestone:item/greenstone_paste",
@@ -478,7 +485,7 @@ GENERATED.update({rail: f"bluestone:block/{rail}" for rail in FLOOR_RAILS})
 for name, texture in GENERATED.items():
     write(A + f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": texture}})
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:item/{name}"}})
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "converter_box", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
@@ -530,19 +537,19 @@ write(A + "lang/en_us.json", {
     "block.bluestone.greenstone_block": "Block of Greenstone",
     "block.bluestone.greenstone_repeater": "Greenstone Repeater",
     "block.bluestone.greenstone_comparator": "Greenstone Comparator",
-    "block.bluestone.wall_converter": "Wall Converter",
+    "block.bluestone.converter_box": "Converter Box",
     "block.bluestone.chain_rail": "Chain Rail",
     "block.bluestone.bluestone_chain_rail": "Bluestone Chain Rail",
     "block.bluestone.sticky_rail": "Sticky Rail",
-    "block.bluestone.sticky_powered_rail": "Sticky Powered Rail",
+    "block.bluestone.sticky_powered_rail": "Sticky Redstone Powered Rail",
     "block.bluestone.sticky_bluestone_powered_rail": "Sticky Bluestone Powered Rail",
-    "block.bluestone.sticky_detector_rail": "Sticky Detector Rail",
+    "block.bluestone.sticky_detector_rail": "Sticky Redstone Detector Rail",
     "block.bluestone.sticky_bluestone_detector_rail": "Sticky Bluestone Detector Rail",
-    "block.bluestone.sticky_activator_rail": "Sticky Activator Rail",
+    "block.bluestone.sticky_activator_rail": "Sticky Redstone Activator Rail",
     "block.bluestone.sticky_bluestone_activator_rail": "Sticky Bluestone Activator Rail",
     "block.bluestone.sticky_chain_rail": "Sticky Chain Rail",
     "block.bluestone.sticky_bluestone_chain_rail": "Sticky Bluestone Chain Rail",
-    "block.bluestone.converter": "Converter",
+    "block.bluestone.purplestone_converter": "Purplestone Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
     "trim_material.bluestone.greenstone": "Greenstone Material",
@@ -581,14 +588,14 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
                             .replace("minecraft:blocks/glow_lichen", "bluestone:blocks/greenstone_paste"))
     write(prefix + D + "loot_table/blocks/greenstone_paste.json", paste_loot)
     for ours, theirs in [("greenstone_torch", "redstone_torch"), ("greenstone_block", "redstone_block"), ("greenstone_repeater", "repeater"),
-                         ("greenstone_comparator", "comparator"), ("wall_converter", "repeater")] + [(rail, "rail") for rail in FLOOR_RAILS]:
+                         ("greenstone_comparator", "comparator"), ("converter_box", "repeater")] + [(rail, "rail") for rail in FLOOR_RAILS]:
         write(prefix + D + f"loot_table/blocks/{ours}.json", swap_ids(vanilla(f"data/minecraft/loot_table/blocks/{theirs}.json", jar), [(theirs, ours)]))
     write(prefix + D + "loot_table/blocks/purplestone_block.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_block.json", jar), [("redstone_block", "purplestone_block")]))
     write(prefix + D + "loot_table/blocks/purplestone_torch.json",
           swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_torch.json", jar), [("redstone_torch", "purplestone_torch")]))
-    write(prefix + D + "loot_table/blocks/converter.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/repeater.json", jar), [("repeater", "converter")]))
+    write(prefix + D + "loot_table/blocks/purplestone_converter.json",
+          swap_ids(vanilla("data/minecraft/loot_table/blocks/repeater.json", jar), [("repeater", "purplestone_converter")]))
 
 # Recipes and their recipe-book advancements
 RECIPES = {
@@ -641,9 +648,9 @@ write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
     "type": "minecraft:crafting_shapeless", "category": "redstone", "group": "greenstone_paste",
     "ingredients": ["minecraft:redstone", "bluestone:bluestone", "minecraft:slime_ball", "minecraft:slime_ball"],
     "result": {"count": 4, "id": "bluestone:greenstone_paste"}})
-write(D + "recipe/wall_converter.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
+write(D + "recipe/converter_box.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
                                         "ingredients": ["bluestone:purplestone", "bluestone:greenstone_paste", "minecraft:stone"],
-                                        "result": {"id": "bluestone:wall_converter"}})
+                                        "result": {"id": "bluestone:converter_box"}})
 # Chain rails: like the powered rail, with iron, an iron chain and dust of their colour. Sticky rails: eight of a
 # rail around a slimeball.
 for rail, dust in [("chain_rail", "minecraft:redstone"), ("bluestone_chain_rail", "bluestone:bluestone")]:
@@ -657,14 +664,14 @@ STICKY_FROM = {"sticky_rail": "minecraft:rail", "sticky_powered_rail": "minecraf
 for rail, made_from in STICKY_FROM.items():
     write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc", "key": {"R": made_from, "#": "minecraft:slime_ball"},
                                      "pattern": ["RRR", "R#R", "RRR"], "result": {"count": 8, "id": f"bluestone:{rail}"}})
-write(D + "recipe/converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
+write(D + "recipe/purplestone_converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
                                    "key": {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
-                                   "pattern": ["R#B", "III"], "result": {"id": "bluestone:converter"}})
+                                   "pattern": ["R#B", "III"], "result": {"id": "bluestone:purplestone_converter"}})
 for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     template = vanilla("data/minecraft/advancement/recipes/redstone/repeater.json", jar)
     recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
-    for recipe, unlocked_by in [("purplestone", "bluestone"), ("converter", "purplestone"), ("greenstone_paste", "purplestone"),
-                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("wall_converter", "greenstone_paste"),
+    for recipe, unlocked_by in [("purplestone", "bluestone"), ("purplestone_converter", "purplestone"), ("greenstone_paste", "purplestone"),
+                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("converter_box", "greenstone_paste"),
                                 ("chain_rail", "minecraft:rail"), ("bluestone_chain_rail", "minecraft:rail")] + list(STICKY_FROM.items()):
         item = unlocked_by if ":" in unlocked_by else "bluestone:" + unlocked_by
         has = "has_" + item.split(":")[1]
@@ -748,16 +755,16 @@ write(D + "tags/worldgen/biome/has_more_bluestone.json",
       {"values": ["#minecraft:is_ocean", "#minecraft:is_river", "minecraft:swamp", "minecraft:mangrove_swamp"]})
 
 # Tags
-write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:wall_converter", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
+write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:converter_box", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail",
                    ] + ["bluestone:" + rail for rail in FLOOR_RAILS]}
 write("data/minecraft/tags/block/rails.json", RAILS)
 write("data/minecraft/tags/item/rails.json", RAILS)
 # Since 26.3 flowing water only breaks blocks in this tag; 26.1 and 26.2 break anything that doesn't block movement.
-# Purplestone and the converter, like redstone and the repeater, can't sit in water.
+# Purplestone and the purplestone converter, like redstone and the repeater, can't sit in water.
 write("data/minecraft/tags/block/washed_away_by_fluids.json",
-      {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:converter",
+      {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:purplestone_converter",
                   "bluestone:greenstone_paste", "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater",
                   "bluestone:greenstone_comparator"]})
 write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch", "bluestone:greenstone_torch"]})

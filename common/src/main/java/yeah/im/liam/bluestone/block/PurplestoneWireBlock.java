@@ -38,8 +38,8 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
     // Redstone or bluestone dust at 10 gives purplestone dust 5, instead of the 9 it would give its own kind.
     @Override
     protected int powerFromOtherDust(BlockState state) {
-        if (state.getBlock() instanceof WallConverterBlock) {
-            return Math.max(0, state.getValue(WallConverterBlock.POWER) - 1);
+        if (state.getBlock() instanceof ConverterBoxBlock) {
+            return super.powerFromOtherDust(state);
         }
         return Signals.isDust(state) && LISTENER.hears(Channel.ofSource(state)) ? state.getValue(POWER) / 2 : 0;
     }

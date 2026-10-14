@@ -1,0 +1,6 @@
+{
+  "parent": "bluestone:block/template_converter_box_light_down_north",
+  "textures": {
+    "light": "bluestone:block/converter_box_greenstone_overlay"
+  }
+}

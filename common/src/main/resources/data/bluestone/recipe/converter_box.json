@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "bluestone:purplestone",
+    "bluestone:greenstone_paste",
+    "minecraft:stone"
+  ],
+  "result": {
+    "id": "bluestone:converter_box"
+  }
+}

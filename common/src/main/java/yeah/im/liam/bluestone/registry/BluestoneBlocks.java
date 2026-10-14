@@ -30,7 +30,7 @@ import yeah.im.liam.bluestone.block.BluestoneTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.BluestoneWireBlock;
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
-import yeah.im.liam.bluestone.block.ConverterBlock;
+import yeah.im.liam.bluestone.block.PurplestoneConverterBlock;
 import yeah.im.liam.bluestone.block.GreenstoneBlock;
 import yeah.im.liam.bluestone.block.GreenstoneComparatorBlock;
 import yeah.im.liam.bluestone.block.GreenstonePasteBlock;
@@ -41,8 +41,8 @@ import yeah.im.liam.bluestone.block.PurplestoneBlock;
 import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
-import yeah.im.liam.bluestone.block.WallConverterBlock;
-import yeah.im.liam.bluestone.block.WallConverterBlockEntity;
+import yeah.im.liam.bluestone.block.ConverterBoxBlock;
+import yeah.im.liam.bluestone.block.ConverterBoxBlockEntity;
 
 /**
  * Block and item settings copy the redstone versions.
@@ -66,15 +66,15 @@ public final class BluestoneBlocks {
     private static PurplestoneBlock purplestoneBlock;
     private static PurplestoneTorchBlock purplestoneTorch;
     private static PurplestoneWallTorchBlock purplestoneWallTorch;
-    private static ConverterBlock converter;
+    private static PurplestoneConverterBlock purplestoneConverter;
     private static GreenstonePasteBlock paste;
     private static GreenstoneTorchBlock greenstoneTorch;
     private static GreenstoneWallTorchBlock greenstoneWallTorch;
     private static GreenstoneBlock greenstoneBlock;
     private static GreenstoneRepeaterBlock greenstoneRepeater;
     private static GreenstoneComparatorBlock greenstoneComparator;
-    private static WallConverterBlock wallConverter;
-    private static BlockEntityType<WallConverterBlockEntity> wallConverterEntity;
+    private static ConverterBoxBlock converterBox;
+    private static BlockEntityType<ConverterBoxBlockEntity> converterBoxEntity;
 
     private static Item dust;
     private static Item blockItem;
@@ -89,13 +89,13 @@ public final class BluestoneBlocks {
     private static Item purplestone;
     private static Item purplestoneTorchItem;
     private static Item purplestoneBlockItem;
-    private static Item converterItem;
+    private static Item purplestoneConverterItem;
     private static Item pasteItem;
     private static Item greenstoneTorchItem;
     private static Item greenstoneBlockItem;
     private static Item greenstoneRepeaterItem;
     private static Item greenstoneComparatorItem;
-    private static Item wallConverterItem;
+    private static Item converterBoxItem;
 
     private BluestoneBlocks() {
     }
@@ -136,7 +136,7 @@ public final class BluestoneBlocks {
             .overrideDescription(purplestoneTorch.getDescriptionId())))));
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
-        converter = blocks.register("converter", key -> new ConverterBlock(props(key, diodeProperties())));
+        purplestoneConverter = blocks.register("purplestone_converter", key -> new PurplestoneConverterBlock(props(key, diodeProperties())));
         paste = blocks.register("greenstone_paste", key -> new GreenstonePasteBlock(props(key, wireProperties())));
         greenstoneTorch = blocks.register("greenstone_torch", key -> new GreenstoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
         greenstoneWallTorch = blocks.register("greenstone_wall_torch", key -> new GreenstoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
@@ -150,7 +150,7 @@ public final class BluestoneBlocks {
             .isRedstoneConductor((state, level, pos) -> false))));
         greenstoneRepeater = blocks.register("greenstone_repeater", key -> new GreenstoneRepeaterBlock(props(key, diodeProperties())));
         greenstoneComparator = blocks.register("greenstone_comparator", key -> new GreenstoneComparatorBlock(props(key, diodeProperties())));
-        wallConverter = blocks.register("wall_converter", key -> new WallConverterBlock(props(key, BlockBehaviour.Properties.of()
+        converterBox = blocks.register("converter_box", key -> new ConverterBoxBlock(props(key, BlockBehaviour.Properties.of()
             .mapColor(MapColor.STONE)
             .requiresCorrectToolForDrops()
             .strength(1.5F, 6.0F)
@@ -174,14 +174,14 @@ public final class BluestoneBlocks {
         purplestoneTorchItem = items.register("purplestone_torch", key -> new StandingAndWallBlockItem(purplestoneTorch, purplestoneWallTorch, Direction.DOWN, itemProps(key)));
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
-        converterItem = blockItem(items, "converter", converter);
+        purplestoneConverterItem = blockItem(items, "purplestone_converter", purplestoneConverter);
         pasteItem = items.register("greenstone_paste", key -> new BlockItem(paste, itemProps(key)
             .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "greenstone"))));
         greenstoneTorchItem = items.register("greenstone_torch", key -> new StandingAndWallBlockItem(greenstoneTorch, greenstoneWallTorch, Direction.DOWN, itemProps(key)));
         greenstoneBlockItem = blockItem(items, "greenstone_block", greenstoneBlock);
         greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);
         greenstoneComparatorItem = blockItem(items, "greenstone_comparator", greenstoneComparator);
-        wallConverterItem = blockItem(items, "wall_converter", wallConverter);
+        converterBoxItem = blockItem(items, "converter_box", converterBox);
         poweredRailItem = blockItem(items, "bluestone_powered_rail", poweredRail);
         detectorRailItem = blockItem(items, "bluestone_detector_rail", detectorRail);
         activatorRailItem = blockItem(items, "bluestone_activator_rail", activatorRail);
@@ -189,11 +189,11 @@ public final class BluestoneBlocks {
     }
 
     public static void registerBlockEntities(Registrar<BlockEntityType<?>> types) {
-        wallConverterEntity = types.register("wall_converter", key -> new BlockEntityType<>(WallConverterBlockEntity::new, Set.of(wallConverter)));
+        converterBoxEntity = types.register("converter_box", key -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(converterBox)));
     }
 
-    public static BlockEntityType<WallConverterBlockEntity> wallConverterEntity() {
-        return wallConverterEntity;
+    public static BlockEntityType<ConverterBoxBlockEntity> converterBoxEntity() {
+        return converterBoxEntity;
     }
 
     public static Block comparator() {
@@ -231,7 +231,7 @@ public final class BluestoneBlocks {
     public static List<Item> creativeTabItems() {
         List<Item> items = new ArrayList<>(List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
             pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
-            purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem, wallConverterItem,
+            purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem,
             poweredRailItem, detectorRailItem, activatorRailItem));
         items.addAll(BluestoneRails.items());
         items.addAll(List.of(oreItem, deepslateOreItem));
@@ -241,7 +241,7 @@ public final class BluestoneBlocks {
     public static List<Item> components() {
         return List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
             pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
-            purplestone, purplestoneTorchItem, purplestoneBlockItem, converterItem, wallConverterItem);
+            purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem);
     }
 
     public static List<Item> rails() {

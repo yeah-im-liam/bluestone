@@ -1,0 +1,1204 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "face": "down",
+        "edge": "north",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_north_off"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "north",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_north_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "north",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_north_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "north",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_north_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "north",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_north_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "south",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_south_off"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "south",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_south_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "south",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_south_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "south",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_south_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "south",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_south_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "west",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_west_off"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "west",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_west_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "west",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_west_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "west",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_west_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "west",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_west_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "east",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_east_off"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "east",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_east_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "east",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_east_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "east",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_east_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "down",
+        "edge": "east",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_down_east_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "north",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_north_off"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "north",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_north_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "north",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_north_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "north",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_north_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "north",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_north_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "south",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_south_off"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "south",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_south_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "south",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_south_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "south",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_south_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "south",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_south_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "west",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_west_off"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "west",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_west_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "west",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_west_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "west",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_west_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "west",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_west_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "east",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_east_off"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "east",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_east_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "east",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_east_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "east",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_east_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "up",
+        "edge": "east",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_up_east_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "down",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_down_off"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "down",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_down_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "down",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_down_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "down",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_down_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "down",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_down_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "up",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_up_off"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "up",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_up_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "up",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_up_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "up",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_up_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "up",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_up_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "west",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_west_off"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "west",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_west_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "west",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_west_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "west",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_west_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "west",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_west_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "east",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_east_off"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "east",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_east_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "east",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_east_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "east",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_east_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "north",
+        "edge": "east",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_north_east_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "down",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_down_off"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "down",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_down_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "down",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_down_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "down",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_down_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "down",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_down_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "up",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_up_off"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "up",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_up_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "up",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_up_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "up",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_up_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "up",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_up_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "west",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_west_off"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "west",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_west_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "west",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_west_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "west",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_west_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "west",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_west_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "east",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_east_off"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "east",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_east_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "east",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_east_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "east",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_east_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "south",
+        "edge": "east",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_south_east_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "down",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_down_off"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "down",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_down_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "down",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_down_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "down",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_down_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "down",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_down_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "up",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_up_off"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "up",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_up_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "up",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_up_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "up",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_up_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "up",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_up_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "north",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_north_off"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "north",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_north_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "north",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_north_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "north",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_north_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "north",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_north_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "south",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_south_off"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "south",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_south_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "south",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_south_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "south",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_south_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "west",
+        "edge": "south",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_west_south_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "down",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_down_off"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "down",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_down_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "down",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_down_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "down",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_down_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "down",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_down_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "up",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_up_off"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "up",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_up_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "up",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_up_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "up",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_up_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "up",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_up_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "north",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_north_off"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "north",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_north_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "north",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_north_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "north",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_north_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "north",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_north_greenstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "south",
+        "color": "off"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_south_off"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "south",
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_south_redstone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "south",
+        "color": "bluestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_south_bluestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "south",
+        "color": "purplestone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_south_purplestone"
+      }
+    },
+    {
+      "when": {
+        "face": "east",
+        "edge": "south",
+        "color": "greenstone"
+      },
+      "apply": {
+        "model": "bluestone:block/converter_box_light_east_south_greenstone"
+      }
+    }
+  ]
+}

@@ -57,7 +57,7 @@ import yeah.im.liam.bluestone.signal.Signals;
  * where two faces both border a direction, {@link #SHARED} says which of them draws it. Paste joins only along its own
  * surface: the paste next to it on the same flat surface, paste round the edge of the block it lies on, the other
  * faces of its own space, and parts sitting on the same surface. It loses one level per space, hears only greenstone
- * and plain switches, and meets purplestone through the wall converter. Breaking it takes off the face looked at, and
+ * and plain switches, and meets the other kinds through the converter box. Breaking it takes off the face looked at, and
  * right-clicking a lone piece switches it between a cross and a dot, like dust.
  */
 public class GreenstonePasteBlock extends Block implements SignalBlock {
@@ -445,7 +445,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
     // blocks next to it, and smaller parts only if they sit on the same surface as the paste. A greenstone repeater only
     // bends it towards its front and back.
     private static boolean connectsTo(BlockGetter level, BlockPos pos, BlockState state, Direction face, Direction way) {
-        if (state.getBlock() instanceof WallConverterBlock) {
+        if (state.getBlock() instanceof ConverterBoxBlock) {
             return true;
         }
         if (state.getBlock() instanceof GreenstoneDiodeBlock) {
@@ -671,11 +671,11 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         for (BlockPos other : connectedPaste(level, pos, state)) {
             signal = Math.max(signal, level.getBlockState(other).getValue(POWER) - 1);
         }
-        // A wall converter it lies on or runs into.
+        // A converter box it lies on or runs into.
         for (Direction direction : Direction.values()) {
             BlockState neighbour = level.getBlockState(pos.relative(direction));
-            if (neighbour.getBlock() instanceof WallConverterBlock && state.getValue(SIDES.get(direction)).reaches()) {
-                signal = Math.max(signal, neighbour.getValue(WallConverterBlock.POWER) - 1);
+            if (neighbour.getBlock() instanceof ConverterBoxBlock && state.getValue(SIDES.get(direction)).reaches()) {
+                signal = Math.max(signal, neighbour.getValue(ConverterBoxBlock.POWER) - 1);
             }
         }
         return Math.max(0, signal);

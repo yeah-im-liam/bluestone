@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "R": "minecraft:redstone_torch",
+    "#": "bluestone:purplestone",
+    "B": "bluestone:bluestone_torch",
+    "I": "minecraft:stone"
+  },
+  "pattern": [
+    "R#B",
+    "III"
+  ],
+  "result": {
+    "id": "bluestone:purplestone_converter"
+  }
+}

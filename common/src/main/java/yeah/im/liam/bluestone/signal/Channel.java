@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Redstone and bluestone parts hear their own kind and purplestone, but not each other; purplestone hears both.
- * Greenstone hears only greenstone, and meets purplestone through the wall converter. Levers, buttons, observers and
+ * Greenstone hears only greenstone, and meets the others through the converter box. Levers, buttons, observers and
  * other plain sources belong to no channel, so everything hears them.
  */
 public enum Channel implements Listener {

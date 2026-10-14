@@ -268,9 +268,13 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
 
     /**
      * The power this dust takes along the wire from a piece of dust of another colour: one level less, as from its own
-     * kind, if it hears that colour, and none otherwise.
+     * kind, if it hears that colour, and none otherwise. A converter box passes on its power the same way to every
+     * colour.
      */
     protected int powerFromOtherDust(BlockState state) {
+        if (state.getBlock() instanceof ConverterBoxBlock) {
+            return Math.max(0, state.getValue(ConverterBoxBlock.POWER) - 1);
+        }
         return Signals.isDust(state) && channel.hears(Channel.ofSource(state)) ? Math.max(0, state.getValue(POWER) - 1) : 0;
     }
 

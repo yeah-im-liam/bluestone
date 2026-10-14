@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bluestone:block/converter_box_frame"
+    }
+  }
+}
