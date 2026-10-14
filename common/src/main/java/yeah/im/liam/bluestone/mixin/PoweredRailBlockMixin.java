@@ -13,14 +13,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import yeah.im.liam.bluestone.block.RailPower;
 import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.Signals;
 
 @Mixin(PoweredRailBlock.class)
 abstract class PoweredRailBlockMixin {
+    // Power also comes along the track from rails of the same kind and colour that the game doesn't chain to: sticky
+    // ones, and those on walls and ceilings.
     @WrapOperation(method = "updateState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean bluestone$listen(Level level, BlockPos pos, Operation<Boolean> original) {
-        return Signals.test(Channel.of((Block) (Object) this), () -> original.call(level, pos));
+        return Signals.test(Channel.of((Block) (Object) this), () -> original.call(level, pos)) || RailPower.along(level, pos, level.getBlockState(pos));
     }
 
     @WrapMethod(method = "findPoweredRailSignal")

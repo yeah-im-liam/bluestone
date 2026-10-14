@@ -335,6 +335,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         if (attached.getAxis().isHorizontal()) {
             if (hasEnd(state, Direction.DOWN)) {
                 WallRails.join(level, pos.below(), attached);
+                WallRails.join(level, pos.relative(attached.getOpposite()), attached);
             }
             if (hasEnd(state, Direction.UP)) {
                 WallRails.join(level, pos.above().relative(attached), attached.getOpposite());
@@ -374,7 +375,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         if (!takesPower() || !state.is(this)) {
             return;
         }
-        boolean powered = RailPower.attached(level, pos, state, channel);
+        boolean powered = RailPower.direct(level, pos, channel) || RailPower.along(level, pos, state);
         if (powered != state.getValue(POWERED)) {
             level.setBlock(pos, state.setValue(POWERED, powered), Block.UPDATE_ALL);
             level.updateNeighborsAt(pos.relative(state.getValue(ATTACHED)), this);

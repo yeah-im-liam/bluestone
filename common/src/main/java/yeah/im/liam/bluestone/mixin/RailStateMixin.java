@@ -56,6 +56,13 @@ abstract class RailStateMixin {
         }
     }
 
+    // Joining a rail laid next to it, the game works out this rail's shape afresh; one at the foot of a wall rail stays
+    // sloped up to it.
+    @Inject(method = "connectTo", at = @At("TAIL"))
+    private void bluestone$staySloped(RailState rail, CallbackInfo ci) {
+        bluestone$slope();
+    }
+
     // The game drops connections that lead to no rail; one that leads to a wall rail stays.
     @Inject(method = "removeSoftConnections", at = @At("TAIL"))
     private void bluestone$keepWallRails(CallbackInfo ci) {

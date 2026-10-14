@@ -1,5 +1,6 @@
 package yeah.im.liam.bluestone.rail;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -185,6 +186,23 @@ public final class SurfaceRails {
         return null;
     }
 
+    /**
+     * The pieces of track the piece at {@code pos} joins: floor, wall or ceiling rails, round corners.
+     */
+    public static List<BlockPos> neighbours(Level level, BlockPos pos) {
+        Track here = track(level, pos);
+        List<Direction> ends = here != null ? here.ends() : levelEnds(level, pos, level.getBlockState(pos));
+        List<BlockPos> neighbours = new ArrayList<>(2);
+        for (Direction end : ends) {
+            Track from = here != null ? here : new Track(pos, Direction.DOWN, end.getAxis(), Kind.PLAIN, false, null);
+            Step step = next(level, from, end, true);
+            if (step != null) {
+                neighbours.add(step.track().pos());
+            }
+        }
+        return neighbours;
+    }
+
     // A floor rail with an end pointing back the way the cart comes, straight or curved, and the end the cart leaves by.
     // Unless strict, any level floor rail will do: it could turn to join.
     private static @Nullable Step onFloor(Level level, BlockPos pos, Direction back, boolean strict) {
@@ -277,13 +295,17 @@ public final class SurfaceRails {
         BlockPos onPos = ride.from().floor() && !ride.to().floor() || ride.to().pos().equals(BlockPos.containing(pos)) ? ride.to().pos() : ride.from().pos();
         Track on = track(level, onPos);
         if (on == null) {
+            // A floor slope or curve isn't a piece of track by itself; the ride knows it.
+            on = onPos.equals(ride.to().pos()) && ride.to().floor() ? ride.to() : onPos.equals(ride.from().pos()) && ride.from().floor() ? ride.from() : null;
+        }
+        if (on == null) {
             rider.bluestone$setRide(null);
             return false;
         }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
-        // Chain rails set the pace while the cart is on them; off them, the cart goes back to the speed it came on at,
-        // but never faster than the chain rails moved it.
+        // Chain rails set the pace while the cart is on them; off them, the cart goes on at the speed it came on at, plus
+        // what it would have gained going down since, but never faster than they moved it.
         if (on.kind() == Kind.CHAIN) {
             if (Double.isNaN(rider.bluestone$chainEntry())) {
                 rider.bluestone$setChainEntry(speed);
@@ -301,8 +323,12 @@ public final class SurfaceRails {
                         heading = heading(pos, ride, height);
                     }
                     speed = CHAIN_SPEED;
+                    if (heading.y < 0.0) {
+                        rider.bluestone$setChainEntry(rider.bluestone$chainEntry() - GRAVITY * heading.y);
+                    }
                 } else {
                     hold = true;
+                    rider.bluestone$setChainEntry(0.0);
                 }
             }
             case POWERED -> {

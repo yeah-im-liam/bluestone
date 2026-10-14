@@ -16,7 +16,8 @@ public interface RailRider {
     void bluestone$setCooldown(int ticks);
 
     /**
-     * The speed the cart came onto chain rails at, or NaN when it isn't on chain rails.
+     * The speed the cart goes on at when it leaves the chain rails it is on (what it came on at, plus what it would have
+     * gained going down since), or NaN when it isn't on chain rails.
      */
     double bluestone$chainEntry();
 

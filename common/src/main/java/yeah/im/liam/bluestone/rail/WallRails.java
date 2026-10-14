@@ -33,6 +33,11 @@ public final class WallRails {
         if (level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite())) {
             return wallRail(level.getBlockState(pos.above()), way, Direction.DOWN);
         }
+        // A wall rail that comes right down to the floor beside this rail, and bends onto it.
+        BlockPos floor = ahead.below();
+        if (wallRail(level.getBlockState(ahead), way, Direction.DOWN) && level.getBlockState(floor).isFaceSturdy(level, floor, Direction.UP)) {
+            return true;
+        }
         return wallRail(level.getBlockState(ahead.below()), way.getOpposite(), Direction.UP);
     }
 

@@ -39,6 +39,10 @@ public class ChainRailBlock extends RailBlock {
         builder.add(REVERSED, POWERED);
     }
 
+    public Channel channel() {
+        return channel;
+    }
+
     // Straight and sloped only, like a powered rail.
     @Override
     public boolean isStraight() {
@@ -85,7 +89,7 @@ public class ChainRailBlock extends RailBlock {
         if (!state.is(this)) {
             return;
         }
-        boolean powered = RailPower.floor(level, pos, state, channel);
+        boolean powered = RailPower.floor(level, pos, state, channel) || RailPower.along(level, pos, state);
         if (powered != state.getValue(POWERED)) {
             level.setBlock(pos, state.setValue(POWERED, powered), Block.UPDATE_ALL);
             level.updateNeighborsAt(pos.below(), this);
