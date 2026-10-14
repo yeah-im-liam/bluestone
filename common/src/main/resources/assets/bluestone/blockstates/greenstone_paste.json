@@ -5,6 +5,13 @@
         "OR": [
           {
             "down": "face",
+            "north": "none",
+            "east": "none",
+            "south": "none",
+            "west": "none"
+          },
+          {
+            "down": "face",
             "east": "face",
             "north": "face"
           },
@@ -340,6 +347,13 @@
         "OR": [
           {
             "up": "face",
+            "north": "none",
+            "west": "none",
+            "south": "none",
+            "east": "none"
+          },
+          {
+            "up": "face",
             "west": "face",
             "north": "face"
           },
@@ -691,6 +705,13 @@
         "OR": [
           {
             "north": "face",
+            "up": "none",
+            "east": "none",
+            "down": "none",
+            "west": "none"
+          },
+          {
+            "north": "face",
             "east": "face",
             "up": "face"
           },
@@ -1033,6 +1054,13 @@
     {
       "when": {
         "OR": [
+          {
+            "south": "face",
+            "up": "none",
+            "west": "none",
+            "down": "none",
+            "east": "none"
+          },
           {
             "south": "face",
             "west": "face",
@@ -1380,6 +1408,13 @@
     {
       "when": {
         "OR": [
+          {
+            "west": "face",
+            "up": "none",
+            "north": "none",
+            "down": "none",
+            "south": "none"
+          },
           {
             "west": "face",
             "north": "face",
@@ -1731,6 +1766,13 @@
     {
       "when": {
         "OR": [
+          {
+            "east": "face",
+            "up": "none",
+            "south": "none",
+            "down": "none",
+            "north": "none"
+          },
           {
             "east": "face",
             "south": "face",

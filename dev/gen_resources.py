@@ -391,8 +391,9 @@ for face in VECTORS:
         variant = rotated(apply["model"].replace("minecraft:block/redstone_dust_", "bluestone:block/greenstone_paste_"), face, frame[turned])
         when = part["when"]
         if "OR" in when:
-            # The dot in the middle, where two lines meet at a corner.
-            groups = []
+            # The dot in the middle: on its own when a lone piece has been right-clicked into a dot, and where two lines
+            # meet at a corner.
+            groups = [dict({face: "face"}, **{frame[side]: "none" for side in ["north", "east", "south", "west"]})]
             for corner in when["OR"]:
                 sides = [side for side, value in corner.items() if value != "none"]
                 if len(sides) != 2:
