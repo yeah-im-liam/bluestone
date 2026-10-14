@@ -200,7 +200,7 @@ for variant in ["", "_on", "_subtract", "_on_subtract"]:
 write(A + "blockstates/greenstone_comparator.json", {"variants": variants})
 
 
-# Sticky rails and chain gear rails. A sticky rail on a floor is a copy of the game's rail of the same kind (and the
+# Sticky rails and chain rails. A sticky rail on a floor is a copy of the game's rail of the same kind (and the
 # bluestone kinds of the game's powered, detector and activator rails), with its own textures.
 STICKY = {"sticky_rail": "rail", "sticky_powered_rail": "powered_rail", "sticky_bluestone_powered_rail": "powered_rail",
           "sticky_detector_rail": "detector_rail", "sticky_bluestone_detector_rail": "detector_rail",
@@ -213,7 +213,7 @@ for ours, theirs in STICKY.items():
         write(A + f"models/block/{model_name.replace(theirs, ours, 1)}.json", model)
     write(A + f"blockstates/{ours}.json", swap_models(blockstate, [("minecraft:block/" + theirs, "bluestone:block/" + ours)]))
 
-# Chain gear rails have an arrow on their texture pointing the way they drive carts. On the game's rail models the
+# Chain rails have an arrow on their texture pointing the way they drive carts. On the game's rail models the
 # texture's bottom edge is south; a "_reversed" model turns the texture round where the rotation can't (on slopes).
 def flipped(model_name, textures, reversed_texture):
     model = vanilla(f"assets/minecraft/models/block/{model_name}.json")
@@ -226,7 +226,7 @@ def flipped(model_name, textures, reversed_texture):
 
 
 TURN = {0: "south", 90: "west", 180: "north", 270: "east"}
-CHAIN_RAILS = ["chain_gear_rail", "bluestone_chain_gear_rail", "sticky_chain_gear_rail", "sticky_bluestone_chain_gear_rail"]
+CHAIN_RAILS = ["chain_rail", "bluestone_chain_rail", "sticky_chain_rail", "sticky_bluestone_chain_rail"]
 for rail in CHAIN_RAILS:
     for on in ["", "_on"]:
         texture = {"rail": f"bluestone:block/{rail}{on}", "particle": f"bluestone:block/{rail}{on}"}
@@ -247,14 +247,14 @@ for rail in CHAIN_RAILS:
             if y:
                 out["y"] = y
             variants[f"powered={props['powered']},reversed={str(reversed_).lower()},shape={shape}"] = out
-    # Chain gear rails are straight, so they never curve; the curved shapes get the flat model to keep the game quiet.
+    # Chain rails are straight, so they never curve; the curved shapes get the flat model to keep the game quiet.
     for shape in ["south_east", "south_west", "north_west", "north_east"]:
         for reversed_ in ["false", "true"]:
             for powered in ["false", "true"]:
                 variants[f"powered={powered},reversed={reversed_},shape={shape}"] = {"model": f"bluestone:block/{rail}_flat"}
     write(A + f"blockstates/{rail}.json", {"variants": variants})
 
-# On walls and ceilings: the floor model turned onto the face it sits on, running the way it travels (a chain gear
+# On walls and ceilings: the floor model turned onto the face it sits on, running the way it travels (a chain
 # rail's arrow points that way), lit while powered. Bent round an inside corner, it is the slope model instead, turned
 # so it rises off its face towards the bend (the slope rises towards its model's north).
 OPPOSITE = {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}
@@ -268,7 +268,7 @@ def lit_rail(name):
     return lambda on, arrow_ahead, bent: f"bluestone:block/{name}{'_on' if on else ''}{'_raised_ne' if bent else ''}"
 
 
-# A chain gear rail's arrow points down its slope model, so bent at the end it travels towards it needs the turned one.
+# A chain rail's arrow points down its slope model, so bent at the end it travels towards it needs the turned one.
 def chain_rail(name):
     return lambda on, arrow_ahead, bent: (f"bluestone:block/{name}_raised_ne{'_reversed' if arrow_ahead else ''}{'_on' if on else ''}" if bent
                                           else f"bluestone:block/{name}_flat{'_on' if on else ''}")
@@ -277,7 +277,7 @@ def chain_rail(name):
 ATTACHED_MODELS = {"sticky_rail": plain_rail("bluestone:block/sticky_rail", "bluestone:block/sticky_rail_raised_ne")}
 for kind in ["powered", "bluestone_powered", "detector", "bluestone_detector", "activator", "bluestone_activator"]:
     ATTACHED_MODELS[f"sticky_{kind}_rail"] = lit_rail(f"sticky_{kind}_rail")
-for rail in ["sticky_chain_gear_rail", "sticky_bluestone_chain_gear_rail"]:
+for rail in ["sticky_chain_rail", "sticky_bluestone_chain_rail"]:
     ATTACHED_MODELS[rail] = chain_rail(rail)
 
 
@@ -436,7 +436,7 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_c
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
 # The redstone originals kept beside them for comparison are skipped.
-OURS = re.compile(r"bluestone|purplestone|greenstone|converter|sticky|chain_gear")
+OURS = re.compile(r"bluestone|purplestone|greenstone|converter|sticky|chain_rail")
 for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("programmer art", OUT / "programmer_art/assets/bluestone/textures")]:
     for png in sorted((ART / style).glob("*/*/*.png")):
         if not OURS.search(png.name):
@@ -479,8 +479,8 @@ write(A + "lang/en_us.json", {
     "block.bluestone.greenstone_repeater": "Greenstone Repeater",
     "block.bluestone.greenstone_comparator": "Greenstone Comparator",
     "block.bluestone.wall_converter": "Wall Converter",
-    "block.bluestone.chain_gear_rail": "Chain Gear Rail",
-    "block.bluestone.bluestone_chain_gear_rail": "Bluestone Chain Gear Rail",
+    "block.bluestone.chain_rail": "Chain Rail",
+    "block.bluestone.bluestone_chain_rail": "Bluestone Chain Rail",
     "block.bluestone.sticky_rail": "Sticky Rail",
     "block.bluestone.sticky_powered_rail": "Sticky Powered Rail",
     "block.bluestone.sticky_bluestone_powered_rail": "Sticky Bluestone Powered Rail",
@@ -488,8 +488,8 @@ write(A + "lang/en_us.json", {
     "block.bluestone.sticky_bluestone_detector_rail": "Sticky Bluestone Detector Rail",
     "block.bluestone.sticky_activator_rail": "Sticky Activator Rail",
     "block.bluestone.sticky_bluestone_activator_rail": "Sticky Bluestone Activator Rail",
-    "block.bluestone.sticky_chain_gear_rail": "Sticky Chain Gear Rail",
-    "block.bluestone.sticky_bluestone_chain_gear_rail": "Sticky Bluestone Chain Gear Rail",
+    "block.bluestone.sticky_chain_rail": "Sticky Chain Rail",
+    "block.bluestone.sticky_bluestone_chain_rail": "Sticky Bluestone Chain Rail",
     "block.bluestone.converter": "Converter",
     "trim_material.bluestone.bluestone": "Bluestone Material",
     "trim_material.bluestone.purplestone": "Purplestone Material",
@@ -592,16 +592,16 @@ write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
 write(D + "recipe/wall_converter.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
                                         "ingredients": ["bluestone:purplestone", "bluestone:greenstone_paste", "minecraft:stone"],
                                         "result": {"id": "bluestone:wall_converter"}})
-# Chain gear rails: like the powered rail, with iron, an iron chain and dust of their colour. Sticky rails: eight of a
+# Chain rails: like the powered rail, with iron, an iron chain and dust of their colour. Sticky rails: eight of a
 # rail around a slimeball.
-for rail, dust in [("chain_gear_rail", "minecraft:redstone"), ("bluestone_chain_gear_rail", "bluestone:bluestone")]:
+for rail, dust in [("chain_rail", "minecraft:redstone"), ("bluestone_chain_rail", "bluestone:bluestone")]:
     write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc",
                                      "key": {"I": "minecraft:iron_ingot", "C": "minecraft:iron_chain", "R": dust},
                                      "pattern": ["I I", "ICI", "IRI"], "result": {"count": 6, "id": f"bluestone:{rail}"}})
 STICKY_FROM = {"sticky_rail": "minecraft:rail", "sticky_powered_rail": "minecraft:powered_rail", "sticky_bluestone_powered_rail": "bluestone:bluestone_powered_rail",
                "sticky_detector_rail": "minecraft:detector_rail", "sticky_bluestone_detector_rail": "bluestone:bluestone_detector_rail",
                "sticky_activator_rail": "minecraft:activator_rail", "sticky_bluestone_activator_rail": "bluestone:bluestone_activator_rail",
-               "sticky_chain_gear_rail": "bluestone:chain_gear_rail", "sticky_bluestone_chain_gear_rail": "bluestone:bluestone_chain_gear_rail"}
+               "sticky_chain_rail": "bluestone:chain_rail", "sticky_bluestone_chain_rail": "bluestone:bluestone_chain_rail"}
 for rail, made_from in STICKY_FROM.items():
     write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc", "key": {"R": made_from, "#": "minecraft:slime_ball"},
                                      "pattern": ["RRR", "R#R", "RRR"], "result": {"count": 8, "id": f"bluestone:{rail}"}})
@@ -613,7 +613,7 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
     for recipe, unlocked_by in [("purplestone", "bluestone"), ("converter", "purplestone"), ("greenstone_paste", "purplestone"),
                                 ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("wall_converter", "greenstone_paste"),
-                                ("chain_gear_rail", "minecraft:rail"), ("bluestone_chain_gear_rail", "minecraft:rail")] + list(STICKY_FROM.items()):
+                                ("chain_rail", "minecraft:rail"), ("bluestone_chain_rail", "minecraft:rail")] + list(STICKY_FROM.items()):
         item = unlocked_by if ":" in unlocked_by else "bluestone:" + unlocked_by
         has = "has_" + item.split(":")[1]
         write(prefix + D + "advancement/recipes/redstone/" + recipe + ".json", {

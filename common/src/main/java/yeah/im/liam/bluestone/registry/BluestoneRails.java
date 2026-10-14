@@ -16,14 +16,14 @@ import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.block.AttachedRailBlock.Kind;
 import yeah.im.liam.bluestone.block.BluestoneDetectorRailBlock;
 import yeah.im.liam.bluestone.block.BluestonePoweredRailBlock;
-import yeah.im.liam.bluestone.block.ChainGearRailBlock;
+import yeah.im.liam.bluestone.block.ChainRailBlock;
 import yeah.im.liam.bluestone.block.StickyPoweredRailBlock;
 import yeah.im.liam.bluestone.block.StickyRailBlock;
 import yeah.im.liam.bluestone.signal.Channel;
 
 /**
- * Chain gear rails, and sticky rails, which also go on walls and ceilings: each sticky rail is a floor rail and an
- * {@link AttachedRailBlock} placed by the same item. The powered, detector, activator and chain gear rails come in a
+ * Chain rails, and sticky rails, which also go on walls and ceilings: each sticky rail is a floor rail and an
+ * {@link AttachedRailBlock} placed by the same item. The powered, detector, activator and chain rails come in a
  * redstone and a bluestone kind.
  */
 public final class BluestoneRails {
@@ -37,8 +37,8 @@ public final class BluestoneRails {
     }
 
     static void registerBlocks(Registrar<Block> blocks) {
-        floorOnly(blocks, "chain_gear_rail", properties -> new ChainGearRailBlock(properties, Channel.REDSTONE));
-        floorOnly(blocks, "bluestone_chain_gear_rail", properties -> new ChainGearRailBlock(properties, Channel.BLUESTONE));
+        floorOnly(blocks, "chain_rail", properties -> new ChainRailBlock(properties, Channel.REDSTONE));
+        floorOnly(blocks, "bluestone_chain_rail", properties -> new ChainRailBlock(properties, Channel.BLUESTONE));
         sticky(blocks, "sticky_rail", StickyRailBlock::new, Kind.PLAIN, null);
         sticky(blocks, "sticky_powered_rail", properties -> new StickyPoweredRailBlock(properties, false), Kind.POWERED, Channel.REDSTONE);
         sticky(blocks, "sticky_bluestone_powered_rail", properties -> new BluestonePoweredRailBlock(properties, false), Kind.POWERED, Channel.BLUESTONE);
@@ -46,8 +46,8 @@ public final class BluestoneRails {
         sticky(blocks, "sticky_bluestone_detector_rail", BluestoneDetectorRailBlock::new, Kind.DETECTOR, Channel.BLUESTONE);
         sticky(blocks, "sticky_activator_rail", properties -> new StickyPoweredRailBlock(properties, true), Kind.ACTIVATOR, Channel.REDSTONE);
         sticky(blocks, "sticky_bluestone_activator_rail", properties -> new BluestonePoweredRailBlock(properties, true), Kind.ACTIVATOR, Channel.BLUESTONE);
-        sticky(blocks, "sticky_chain_gear_rail", properties -> new ChainGearRailBlock(properties, Channel.REDSTONE), Kind.CHAIN, Channel.REDSTONE);
-        sticky(blocks, "sticky_bluestone_chain_gear_rail", properties -> new ChainGearRailBlock(properties, Channel.BLUESTONE), Kind.CHAIN, Channel.BLUESTONE);
+        sticky(blocks, "sticky_chain_rail", properties -> new ChainRailBlock(properties, Channel.REDSTONE), Kind.CHAIN, Channel.REDSTONE);
+        sticky(blocks, "sticky_bluestone_chain_rail", properties -> new ChainRailBlock(properties, Channel.BLUESTONE), Kind.CHAIN, Channel.BLUESTONE);
     }
 
     static void registerItems(Registrar<Item> items) {

@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.block.AttachedRailBlock.Kind;
-import yeah.im.liam.bluestone.block.ChainGearRailBlock;
+import yeah.im.liam.bluestone.block.ChainRailBlock;
 
 /**
  * Minecart movement on rails stuck to walls and ceilings. The game moves carts on floor rails as usual; once a cart
@@ -21,8 +21,8 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
  * turns at inside corners (track running into a wall carries on up it) and outside corners (track running over an
  * edge carries on down the other side). Climbing slows a cart and coming down speeds it up, more gently than falling;
  * a cart that stops climbing rolls back. On
- * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain gear rails move carts at
- * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still, and a cart leaving chain gear goes
+ * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain rails move carts at
+ * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still, and a cart leaving chain rails goes
  * back to the speed it came on at; powered rails speed carts up and
  * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again. Floor rails meeting a wall can
  * be straight or curved.
@@ -44,7 +44,7 @@ public final class SurfaceRails {
 
     /**
      * A piece of track: where it is, the face it sits on, the axis carts run along, what kind of rail it is, whether
-     * it is powered, the way it was placed (the way chain gear drives), and for a curve its other end.
+     * it is powered, the way it was placed (the way chain rails drive), and for a curve its other end.
      */
     public record Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel,
                         @Nullable Direction other) {
@@ -79,7 +79,7 @@ public final class SurfaceRails {
             return in.getOpposite();
         }
 
-        // The way a powered chain gear rail drives carts, or null.
+        // The way a powered chain rail drives carts, or null.
         @Nullable Direction drive() {
             return kind == Kind.CHAIN && powered ? travel : null;
         }
@@ -124,8 +124,8 @@ public final class SurfaceRails {
             if (axis == null) {
                 return null;
             }
-            if (state.getBlock() instanceof ChainGearRailBlock) {
-                return new Track(pos, Direction.DOWN, axis, Kind.CHAIN, state.getValue(ChainGearRailBlock.POWERED), ChainGearRailBlock.drive(state));
+            if (state.getBlock() instanceof ChainRailBlock) {
+                return new Track(pos, Direction.DOWN, axis, Kind.CHAIN, state.getValue(ChainRailBlock.POWERED), ChainRailBlock.drive(state));
             }
             return new Track(pos, Direction.DOWN, axis, Kind.PLAIN, false, null);
         }
@@ -246,8 +246,8 @@ public final class SurfaceRails {
         }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
-        // Chain gear sets the pace while the cart is on it; off it, the cart goes back to the speed it came on at, but
-        // never faster than the chain gear moved it.
+        // Chain rails set the pace while the cart is on them; off them, the cart goes back to the speed it came on at,
+        // but never faster than the chain rails moved it.
         if (on.kind() == Kind.CHAIN) {
             if (Double.isNaN(rider.bluestone$chainEntry())) {
                 rider.bluestone$setChainEntry(speed);
@@ -482,21 +482,21 @@ public final class SurfaceRails {
         return step == null || step.track().floor() ? null : new Ride(floor, entry.getOpposite(), step.track(), step.exit(), speed);
     }
 
-    // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
-    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain gear at,
-    // but never faster than the chain gear moved it.
+    // Chain rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
+    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain rails at,
+    // but never faster than they moved it.
     private static void driveOnFloor(Level level, AbstractMinecart cart, RailRider rider) {
         BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
         Vec3 velocity = cart.getDeltaMovement();
-        if (state.getBlock() instanceof ChainGearRailBlock) {
-            Direction drive = ChainGearRailBlock.drive(state);
+        if (state.getBlock() instanceof ChainRailBlock) {
+            Direction drive = ChainRailBlock.drive(state);
             if (drive == null) {
                 return;
             }
             if (Double.isNaN(rider.bluestone$chainEntry())) {
                 rider.bluestone$setChainEntry(velocity.horizontalDistance());
             }
-            double speed = state.getValue(ChainGearRailBlock.POWERED) ? CHAIN_SPEED : 0.0;
+            double speed = state.getValue(ChainRailBlock.POWERED) ? CHAIN_SPEED : 0.0;
             cart.setDeltaMovement(drive.getStepX() * speed, velocity.y, drive.getStepZ() * speed);
             return;
         }

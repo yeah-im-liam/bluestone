@@ -39,10 +39,11 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 
 /**
  * A sticky rail on a wall or ceiling (the floor ones are ordinary rails). {@link #ATTACHED} is the face it sits on and
- * {@link #TRAVEL} the way along it carts run; chain gear rails drive carts that way. Like the game's rails it turns to
+ * {@link #TRAVEL} the way along it carts run; chain rails drive carts that way. Like the game's rails it turns to
  * join the track around it, including floor rails it runs up from or down to, and {@link #BEND}s round an inside corner
- * to meet the track on the next face. Plain sticky rails also {@link #CURVE} like the game's rails. Its {@link Kind} says what it does to carts, and powered, chain gear and
- * activator rails are powered by their colour like the game's powered rails. {@link SurfaceRails} moves the carts.
+ * to meet the track on the next face. Plain sticky rails also {@link #CURVE} like the game's rails. Its {@link Kind}
+ * says what it does to carts, and powered, chain and activator rails are powered by their colour like the game's
+ * powered rails. {@link SurfaceRails} moves the carts.
  */
 public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, SignalBlock {
     public static final EnumProperty<Direction> ATTACHED = EnumProperty.create("attached", Direction.class, direction -> direction != Direction.DOWN);
@@ -193,7 +194,7 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
     }
 
     // On the face clicked, in whichever shape joins the most track around it, or else running the way the player looks
-    // along that face. Next to a rail running the same way it takes that rail's direction, so chain gear keeps driving
+    // along that face. Next to a rail running the same way it takes that rail's direction, so chain rails keep driving
     // the same way.
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {

@@ -1,0 +1,136 @@
+{
+  "variants": {
+    "powered=false,reversed=false,shape=ascending_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_reversed",
+      "y": 90
+    },
+    "powered=false,reversed=true,shape=ascending_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne",
+      "y": 90
+    },
+    "powered=false,reversed=false,shape=ascending_north": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne"
+    },
+    "powered=false,reversed=true,shape=ascending_north": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_reversed"
+    },
+    "powered=false,reversed=false,shape=ascending_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw"
+    },
+    "powered=false,reversed=true,shape=ascending_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_reversed"
+    },
+    "powered=false,reversed=false,shape=ascending_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_reversed",
+      "y": 90
+    },
+    "powered=false,reversed=true,shape=ascending_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw",
+      "y": 90
+    },
+    "powered=false,reversed=false,shape=east_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_reversed",
+      "y": 90
+    },
+    "powered=false,reversed=true,shape=east_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat",
+      "y": 90
+    },
+    "powered=false,reversed=false,shape=north_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=true,shape=north_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_reversed"
+    },
+    "powered=true,reversed=false,shape=ascending_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=ascending_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=ascending_north": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_on"
+    },
+    "powered=true,reversed=true,shape=ascending_north": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_ne_reversed_on"
+    },
+    "powered=true,reversed=false,shape=ascending_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_on"
+    },
+    "powered=true,reversed=true,shape=ascending_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_reversed_on"
+    },
+    "powered=true,reversed=false,shape=ascending_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=ascending_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_raised_sw_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=east_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_reversed_on",
+      "y": 90
+    },
+    "powered=true,reversed=true,shape=east_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_on",
+      "y": 90
+    },
+    "powered=true,reversed=false,shape=north_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_on"
+    },
+    "powered=true,reversed=true,shape=north_south": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat_reversed_on"
+    },
+    "powered=false,reversed=false,shape=south_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=false,shape=south_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=true,shape=south_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=true,shape=south_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=false,shape=south_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=false,shape=south_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=true,shape=south_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=true,shape=south_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=false,shape=north_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=false,shape=north_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=true,shape=north_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=true,shape=north_west": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=false,shape=north_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=false,shape=north_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=false,reversed=true,shape=north_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    },
+    "powered=true,reversed=true,shape=north_east": {
+      "model": "bluestone:block/sticky_bluestone_chain_rail_flat"
+    }
+  }
+}

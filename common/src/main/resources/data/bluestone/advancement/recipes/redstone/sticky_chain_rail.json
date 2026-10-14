@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_chain_rail": {
+      "conditions": {
+        "items": [
+          {
+            "items": "bluestone:chain_rail"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "bluestone:sticky_chain_rail"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_chain_rail"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "bluestone:sticky_chain_rail"
+    ]
+  }
+}

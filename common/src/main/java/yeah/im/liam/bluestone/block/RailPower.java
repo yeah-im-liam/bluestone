@@ -10,7 +10,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * Power for chain gear rails and rails on walls and ceilings, the way the game powers its powered rails: a rail is
+ * Power for chain rails and rails on walls and ceilings, the way the game powers its powered rails: a rail is
  * powered by a signal of its colour next to it, or through up to eight rails of the same kind in a line from one that
  * is. Only signals count, not the rails' own powered state, so a line can't keep itself on.
  */
@@ -29,7 +29,7 @@ final class RailPower {
         if (direct(level, pos, channel)) {
             return true;
         }
-        Direction.Axis axis = axis(state.getValue(ChainGearRailBlock.SHAPE));
+        Direction.Axis axis = axis(state.getValue(ChainRailBlock.SHAPE));
         for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {
             Direction way = Direction.fromAxisAndDirection(axis, sign);
             BlockPos at = pos;
@@ -50,7 +50,7 @@ final class RailPower {
     private static @Nullable BlockPos sameFloorRail(Level level, BlockPos pos, BlockState rail, Direction.Axis axis) {
         for (BlockPos candidate : new BlockPos[] {pos, pos.above(), pos.below()}) {
             BlockState state = level.getBlockState(candidate);
-            if (state.is(rail.getBlock()) && axis(state.getValue(ChainGearRailBlock.SHAPE)) == axis) {
+            if (state.is(rail.getBlock()) && axis(state.getValue(ChainRailBlock.SHAPE)) == axis) {
                 return candidate;
             }
         }
