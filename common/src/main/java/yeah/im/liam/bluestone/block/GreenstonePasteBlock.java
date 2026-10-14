@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -541,14 +540,8 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
-    // Paste in hand adds faces to paste rather than switching it.
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        return stack.is(asItem()) ? InteractionResult.PASS : super.useItemOn(stack, state, level, pos, player, hand, hitResult);
-    }
-
     // Like dust: right-clicking a lone piece of paste that joins nothing switches it between a cross, which powers the
-    // blocks round it, and a dot, which powers only the block it lies on.
+    // blocks round it, and a dot, which powers only the block it lies on, whatever is in hand.
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         List<Direction> faces = faces(state);
