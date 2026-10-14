@@ -4,9 +4,11 @@ import java.util.List;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.client.BluestoneTint;
+import yeah.im.liam.bluestone.client.WallConverterRenderer;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 
 @Mod(value = Bluestone.MOD_ID, dist = Dist.CLIENT)
@@ -16,5 +18,7 @@ public final class BluestoneNeoForgeClient {
             BluestoneBlocks.wires().forEach(wire -> event.register(List.of(BluestoneTint.wire(wire)), wire));
             event.register(List.of(BluestoneTint.paste(BluestoneBlocks.paste())), BluestoneBlocks.paste());
         });
+        modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) ->
+            event.registerBlockEntityRenderer(BluestoneBlocks.wallConverterEntity(), WallConverterRenderer::new));
     }
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "bluestone:block/template_wall_converter_light_south_west",
+  "textures": {
+    "light": "bluestone:block/wall_converter_greenstone_overlay"
+  }
+}

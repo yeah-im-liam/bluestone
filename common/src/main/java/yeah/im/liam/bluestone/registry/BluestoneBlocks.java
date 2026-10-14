@@ -2,6 +2,7 @@ package yeah.im.liam.bluestone.registry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.ToIntFunction;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -40,6 +42,7 @@ import yeah.im.liam.bluestone.block.PurplestoneTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWallTorchBlock;
 import yeah.im.liam.bluestone.block.PurplestoneWireBlock;
 import yeah.im.liam.bluestone.block.WallConverterBlock;
+import yeah.im.liam.bluestone.block.WallConverterBlockEntity;
 
 /**
  * Block and item settings copy the redstone versions.
@@ -71,6 +74,7 @@ public final class BluestoneBlocks {
     private static GreenstoneRepeaterBlock greenstoneRepeater;
     private static GreenstoneComparatorBlock greenstoneComparator;
     private static WallConverterBlock wallConverter;
+    private static BlockEntityType<WallConverterBlockEntity> wallConverterEntity;
 
     private static Item dust;
     private static Item blockItem;
@@ -182,6 +186,14 @@ public final class BluestoneBlocks {
         detectorRailItem = blockItem(items, "bluestone_detector_rail", detectorRail);
         activatorRailItem = blockItem(items, "bluestone_activator_rail", activatorRail);
         BluestoneRails.registerItems(items);
+    }
+
+    public static void registerBlockEntities(Registrar<BlockEntityType<?>> types) {
+        wallConverterEntity = types.register("wall_converter", key -> new BlockEntityType<>(WallConverterBlockEntity::new, Set.of(wallConverter)));
+    }
+
+    public static BlockEntityType<WallConverterBlockEntity> wallConverterEntity() {
+        return wallConverterEntity;
     }
 
     public static Block comparator() {

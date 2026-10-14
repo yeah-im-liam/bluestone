@@ -38,6 +38,7 @@ public final class BluestoneNeoForge {
     private static void register(RegisterEvent event) {
         event.register(Registries.BLOCK, helper -> BluestoneBlocks.registerBlocks(registrar(Registries.BLOCK, helper)));
         event.register(Registries.ITEM, helper -> BluestoneBlocks.registerItems(registrar(Registries.ITEM, helper)));
+        event.register(Registries.BLOCK_ENTITY_TYPE, helper -> BluestoneBlocks.registerBlockEntities(registrar(Registries.BLOCK_ENTITY_TYPE, helper)));
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(
             Bluestone.key(Registries.CREATIVE_MODE_TAB, "main"),
             CreativeModeTab.builder()

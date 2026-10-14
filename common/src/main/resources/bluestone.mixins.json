@@ -11,6 +11,7 @@
     "EntityMixin",
     "LevelMixin",
     "OreFeatureMixin",
+    "PistonBaseBlockMixin",
     "PoweredRailBlockMixin",
     "RailStateAccessor",
     "RailStateMixin",
@@ -22,6 +23,7 @@
   ],
   "client": [
     "AbstractMinecartRendererMixin",
+    "BlockStateDefinitionsMixin",
     "CameraMixin",
     "ClientItemInfoLoaderMixin",
     "ClientLevelMixin",

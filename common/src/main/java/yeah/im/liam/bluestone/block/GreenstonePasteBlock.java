@@ -219,8 +219,10 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return Shapes.box(min.x, min.y, min.z, max.x, max.y, max.z);
     }
 
-    // Whether a face draws its line towards a way, as the models show it (see SHARED).
-    private static boolean draws(BlockState state, Direction face, Direction way) {
+    /**
+     * Whether a face draws its line towards a way, as the models show it (see SHARED).
+     */
+    public static boolean draws(BlockState state, Direction face, Direction way) {
         Side side = state.getValue(SIDES.get(way));
         if (side != Side.LINE) {
             return side == Side.FACE;
