@@ -65,24 +65,46 @@ for name, src, prefix in [
     write(A + f"blockstates/{name}.json", swap_models(data, [("minecraft:block/" + prefix, "bluestone:block/" + name)]))
 
 # Block models
-for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_converter", "bluestone_ore", "deepslate_bluestone_ore"]:
+for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
-# Wall converter lights, drawn lit over the block by WallConverterRenderer, as a chiseled bookshelf's slots are drawn
-# over its body: a flat piece at the middle of each edge of each face, in the purplestone or the greenstone overlay. A
-# piece takes its texture from the same place as the face does, so it lands on the light painted into the block, and
-# sits a quarter of a pixel off the face, as dust does off the floor, so the face doesn't hide it. The states (face,
-# edge, color) belong to no block; BlockStateDefinitionsMixin loads them, as the game does item frames.
+# The wall converter is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
+# 6x6 middle, and the light at the middle of each edge lies in the side piece there. A lit side piece is drawn by
+# WallConverterRenderer in exactly the same place in the purplestone or the greenstone overlay, so it covers the unlit
+# one without standing off the face. Every piece takes its texture from the same place as a whole face would. The
+# states (face, edge, color) of the lit pieces belong to no block; BlockStateDefinitionsMixin loads them, as the game
+# does item frames.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
+SPANS = [(0, 5), (5, 11), (11, 16)]
+
+
+def face_piece(face, spans):
+    """A flat piece of a face: spans maps the face's two other axes to (from, to)."""
+    lo, hi = [0, 0, 0], [0, 0, 0]
+    lo[AXES[face]] = hi[AXES[face]] = 16 if FAR[face] else 0
+    for axis, (a, b) in spans.items():
+        lo[axis], hi[axis] = a, b
+    return lo, hi
+
+
+pieces = []
+for face in AXES:
+    u, v = [axis for axis in range(3) if axis != AXES[face]]
+    for su in SPANS:
+        for sv in SPANS:
+            lo, hi = face_piece(face, {u: su, v: sv})
+            pieces.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all", "cullface": face}}})
+write(A + "models/block/wall_converter.json", {"parent": "minecraft:block/block",
+                                                "textures": {"all": "bluestone:block/wall_converter", "particle": "#all"},
+                                                "elements": pieces})
 light_parts = []
 for face in AXES:
     for edge in AXES:
         if AXES[edge] == AXES[face]:
             continue
-        lo, hi = [6, 6, 6], [10, 10, 10]
-        lo[AXES[face]] = hi[AXES[face]] = 16.25 if FAR[face] else -0.25
-        lo[AXES[edge]], hi[AXES[edge]] = (14, 16) if FAR[edge] else (0, 2)
+        third = 3 - AXES[face] - AXES[edge]
+        lo, hi = face_piece(face, {AXES[edge]: SPANS[2] if FAR[edge] else SPANS[0], third: SPANS[1]})
         template = f"template_wall_converter_light_{face}_{edge}"
         write(A + f"models/block/{template}.json", {"textures": {"particle": "#light"},
                                                     "elements": [{"from": lo, "to": hi, "faces": {face: {"texture": "#light"}}}]})
