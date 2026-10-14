@@ -70,8 +70,9 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "wall_c
 
 # Wall converter lights, drawn lit over the block by WallConverterRenderer, as a chiseled bookshelf's slots are drawn
 # over its body: a flat piece at the middle of each edge of each face, in the purplestone or the greenstone overlay. A
-# piece takes its texture from the same place as the face does, so it lands on the light painted into the block. The
-# states (face, edge, color) belong to no block; BlockStateDefinitionsMixin loads them, as the game does item frames.
+# piece takes its texture from the same place as the face does, so it lands on the light painted into the block, and
+# sits a quarter of a pixel off the face, as dust does off the floor, so the face doesn't hide it. The states (face,
+# edge, color) belong to no block; BlockStateDefinitionsMixin loads them, as the game does item frames.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
 light_parts = []
@@ -80,7 +81,7 @@ for face in AXES:
         if AXES[edge] == AXES[face]:
             continue
         lo, hi = [6, 6, 6], [10, 10, 10]
-        lo[AXES[face]] = hi[AXES[face]] = 16 if FAR[face] else 0
+        lo[AXES[face]] = hi[AXES[face]] = 16.25 if FAR[face] else -0.25
         lo[AXES[edge]], hi[AXES[edge]] = (14, 16) if FAR[edge] else (0, 2)
         template = f"template_wall_converter_light_{face}_{edge}"
         write(A + f"models/block/{template}.json", {"textures": {"particle": "#light"},

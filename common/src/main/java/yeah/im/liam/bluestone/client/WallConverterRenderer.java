@@ -94,11 +94,11 @@ public final class WallConverterRenderer implements BlockEntityRenderer<WallConv
         });
     }
 
-    // The lights lie on the block's faces, so they are drawn pushed towards the camera, as an item frame's map is.
+    // The light models sit just off the block's faces (see gen_resources.py).
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         for (BlockModelRenderState light : state.lights) {
-            light.submitWithZOffset(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            light.submit(poseStack, collector, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         }
     }
 }
