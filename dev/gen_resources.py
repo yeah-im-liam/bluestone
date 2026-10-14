@@ -70,11 +70,12 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluest
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
 # The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
-# 6x6 middle, and the light at the middle of each edge lies in the side piece there. Unlit, the world draws it from
-# converter_box.json. While any light is on (lit=true) the world draws nothing and ConverterBoxRenderer draws the
-# whole block glowing: the frame (corners and middles) and every side piece, unlit or in the overlay of its colour.
-# Every piece takes its texture from the same place as a whole face would. The frame's and the side pieces' states
-# belong to no block; BlockStateDefinitionsMixin loads them, as the game does item frames.
+# 6x6 middle; the light at the middle of each edge lies in the side piece there, and the face's own light in the
+# middle piece. Unlit, the world draws it from converter_box.json. While any light is on (lit=true) the world draws
+# nothing and ConverterBoxRenderer draws the whole block glowing: the frame (the corners) and every side and middle
+# piece, unlit or in the overlay of its colour. Every piece takes its texture from the same place as a whole face
+# would. The states of the frame and the pieces belong to no block; BlockStateDefinitionsMixin loads them, as the
+# game does item frames.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
 SPANS = [(0, 5), (5, 11), (11, 16)]
@@ -96,7 +97,7 @@ for face in AXES:
         for sv in SPANS:
             lo, hi = face_piece(face, {u: su, v: sv})
             pieces.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all", "cullface": face}}})
-            if (su == SPANS[1]) == (sv == SPANS[1]):
+            if su != SPANS[1] and sv != SPANS[1]:
                 frame.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all"}}})
 BOX_TEXTURES = {"all": "bluestone:block/converter_box", "particle": "#all"}
 write(A + "models/block/converter_box.json", {"parent": "minecraft:block/block", "textures": BOX_TEXTURES, "elements": pieces})
@@ -122,6 +123,18 @@ for face in AXES:
             write(A + f"models/block/{name}.json", {"parent": f"bluestone:block/{template}", "textures": {"light": texture}})
             light_parts.append({"when": {"face": face, "edge": edge, "color": colour}, "apply": {"model": f"bluestone:block/{name}"}})
 write(A + "blockstates/converter_box_light.json", {"multipart": light_parts})
+center_parts = []
+for face in AXES:
+    u, v = [axis for axis in range(3) if axis != AXES[face]]
+    lo, hi = face_piece(face, {u: SPANS[1], v: SPANS[1]})
+    template = f"template_converter_box_center_{face}"
+    write(A + f"models/block/{template}.json", {"textures": {"particle": "#light"},
+                                                "elements": [{"from": lo, "to": hi, "faces": {face: {"texture": "#light"}}}]})
+    for colour, texture in LIGHT_TEXTURES.items():
+        name = f"converter_box_center_{face}_{colour}"
+        write(A + f"models/block/{name}.json", {"parent": f"bluestone:block/{template}", "textures": {"light": texture}})
+        center_parts.append({"when": {"face": face, "color": colour}, "apply": {"model": f"bluestone:block/{name}"}})
+write(A + "blockstates/converter_box_center.json", {"multipart": center_parts})
 
 for stone in ["bluestone", "purplestone", "greenstone"]:
     write(A + f"models/block/{stone}_torch.json", {"parent": "minecraft:block/template_redstone_torch", "textures": {"torch": f"bluestone:block/{stone}_torch"}})

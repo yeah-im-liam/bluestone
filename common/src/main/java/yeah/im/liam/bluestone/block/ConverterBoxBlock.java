@@ -32,10 +32,11 @@ import yeah.im.liam.bluestone.signal.Signals;
  * any wire. Signals of any colour from blocks next to it count as well. Dust of any colour lying on top of it is fed
  * by it too, as paste lying on it is.
  * <p>
- * Each face has a light at the middle of each edge. A light comes on, in the colour of the dust or paste, where powered
- * dust or paste meets that edge: dust or paste beside the block lights the edge of the face it runs into, and dust or
- * paste lying on the block lights the edges its lines run to. While any light is on (LIT) the whole block glows: its
- * renderer draws it instead of the world (ConverterBoxRenderer), and its block entity is only there for that.
+ * Each face has a light at the middle of each edge and one in its middle. A light comes on, in the colour of the dust or
+ * paste, where powered dust or paste meets the block: dust or paste beside the block lights the edge of the face it
+ * runs into, and dust or paste lying on the block lights the middle of the face it lies on and the edges its lines run
+ * to. While any light is on (LIT) the whole block glows: its renderer draws it instead of the world
+ * (ConverterBoxRenderer), and its block entity is only there for that.
  */
 public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
@@ -43,10 +44,11 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
     private static final Listener LISTENER = source -> true;
 
     /**
-     * Where a light is lit: the face it is on, the edge of that face, and the colour.
+     * Where a light is lit: the face it is on, the edge of that face (or null for the light in the middle of the face),
+     * and the colour.
      */
     public interface Light {
-        void lit(Direction face, Direction edge, Channel colour);
+        void lit(Direction face, @Nullable Direction edge, Channel colour);
     }
 
     public ConverterBoxBlock(Properties properties) {
@@ -83,6 +85,7 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
                     }
                 } else if (face == Direction.UP) {
                     // Dust on top of the block.
+                    light.lit(face, null, colour);
                     for (Direction edge : Direction.Plane.HORIZONTAL) {
                         if (there.getValue(ColoredWireBlock.PROPERTY_BY_DIRECTION.get(edge)).isConnected()) {
                             light.lit(face, edge, colour);
@@ -102,6 +105,9 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
                     if (beside || on) {
                         light.lit(face, edge, Channel.GREENSTONE);
                     }
+                }
+                if (GreenstonePasteBlock.hasFace(there, onBlock)) {
+                    light.lit(face, null, Channel.GREENSTONE);
                 }
             }
         }

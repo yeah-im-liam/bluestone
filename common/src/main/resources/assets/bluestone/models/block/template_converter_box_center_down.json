@@ -1,0 +1,24 @@
+{
+  "textures": {
+    "particle": "#light"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        0,
+        11
+      ],
+      "faces": {
+        "down": {
+          "texture": "#light"
+        }
+      }
+    }
+  ]
+}
