@@ -24,7 +24,8 @@
             16,
             0
           ],
-          "texture": "#rail"
+          "texture": "#rail",
+          "rotation": 180
         },
         "up": {
           "uv": [
@@ -33,7 +34,8 @@
             16,
             16
           ],
-          "texture": "#rail"
+          "texture": "#rail",
+          "rotation": 180
         }
       }
     }

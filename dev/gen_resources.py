@@ -268,11 +268,12 @@ for ours, theirs in STICKY.items():
         write(A + f"models/block/{model_name.replace(theirs, ours, 1)}.json", model)
     write(A + f"blockstates/{ours}.json", swap_models(blockstate, [("minecraft:block/" + theirs, "bluestone:block/" + ours)]))
 
-# Chain rails have an arrow on their texture pointing the way they drive carts. On the game's rail models the
-# texture's bottom edge is south; a "_reversed" model turns the texture round where the rotation can't (on slopes).
-def flipped(model_name, textures, reversed_texture):
+# Chain rails have an arrow on their texture pointing the way they drive carts, towards the texture's top edge. On the
+# game's rail models the texture's top edge is north, so the plain models turn the texture round to point the arrow
+# south; a "_reversed" model leaves it pointing north, where the model's rotation can't turn it (on slopes).
+def flipped(model_name, textures, turned):
     model = vanilla(f"assets/minecraft/models/block/{model_name}.json")
-    if reversed_texture:
+    if turned:
         for element in model["elements"]:
             for face in element["faces"].values():
                 face["rotation"] = (face.get("rotation", 0) + 180) % 360
@@ -286,8 +287,8 @@ for rail in CHAIN_RAILS:
     for on in ["", "_on"]:
         texture = {"rail": f"bluestone:block/{rail}{on}", "particle": f"bluestone:block/{rail}{on}"}
         for kind, template in [("flat", "rail_flat"), ("raised_ne", "template_rail_raised_ne"), ("raised_sw", "template_rail_raised_sw")]:
-            write(A + f"models/block/{rail}_{kind}{on}.json", flipped(template, texture, False))
-            write(A + f"models/block/{rail}_{kind}_reversed{on}.json", flipped(template, texture, True))
+            write(A + f"models/block/{rail}_{kind}{on}.json", flipped(template, texture, True))
+            write(A + f"models/block/{rail}_{kind}_reversed{on}.json", flipped(template, texture, False))
     variants = {}
     for key, variant in vanilla("assets/minecraft/blockstates/powered_rail.json")["variants"].items():
         props = dict(part.split("=") for part in key.split(","))
