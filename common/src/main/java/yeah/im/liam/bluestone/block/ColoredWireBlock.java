@@ -249,7 +249,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     public int getBlockSignal(Level level, BlockPos pos) {
-        return Signals.readForDust(listener(), () -> {
+        int signal = Signals.readForDust(listener(), () -> {
             shouldSignal = false;
             try {
                 return level.getBestNeighborSignal(pos);
@@ -257,6 +257,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
                 shouldSignal = true;
             }
         });
+        return Math.max(signal, ConverterBoxBlock.powerToDustOnTop(level, pos));
     }
 
     /**

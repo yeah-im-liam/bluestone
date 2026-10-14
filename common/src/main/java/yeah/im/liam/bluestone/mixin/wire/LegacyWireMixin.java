@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import yeah.im.liam.bluestone.block.ConverterBoxBlock;
 import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
@@ -20,7 +21,8 @@ import yeah.im.liam.bluestone.signal.Signals;
 abstract class LegacyWireMixin {
     @WrapMethod(method = "getBlockSignal")
     private int bluestone$listen(Level level, BlockPos pos, Operation<Integer> original) {
-        return Signals.readForDust(Channel.REDSTONE, () -> original.call(level, pos));
+        // A converter box under the dust powers it too.
+        return Math.max(Signals.readForDust(Channel.REDSTONE, () -> original.call(level, pos)), ConverterBoxBlock.powerToDustOnTop(level, pos));
     }
 
     // Fabric's dust asks here whether to bend towards a block; NeoForge asks the block's canConnectRedstone instead.

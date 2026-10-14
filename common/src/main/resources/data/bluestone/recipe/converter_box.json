@@ -1,10 +1,19 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "redstone",
-  "ingredients": [
-    "bluestone:purplestone",
-    "bluestone:greenstone_paste",
-    "minecraft:stone"
+  "group": "converter_box",
+  "key": {
+    "C": "minecraft:cobblestone",
+    "Q": "minecraft:quartz",
+    "T": "minecraft:redstone",
+    "L": "bluestone:bluestone",
+    "R": "bluestone:purplestone",
+    "B": "bluestone:greenstone_paste"
+  },
+  "pattern": [
+    "CTC",
+    "LQR",
+    "CBC"
   ],
   "result": {
     "id": "bluestone:converter_box"

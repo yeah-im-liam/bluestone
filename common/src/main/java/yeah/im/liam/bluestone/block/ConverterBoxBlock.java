@@ -29,7 +29,8 @@ import yeah.im.liam.bluestone.signal.Signals;
  * Joins every kind of dust and paste: redstone, bluestone and purplestone dust and greenstone paste. It takes on the
  * strongest of them touching it, on any side, and passes that strength on unchanged, so a signal crosses from any kind
  * to any other without losing anything. It is not a repeater: dust and paste fed by it are one level weaker, as from
- * any wire. Signals of any colour from blocks next to it count as well.
+ * any wire. Signals of any colour from blocks next to it count as well. Dust of any colour lying on top of it is fed
+ * by it too, as paste lying on it is.
  * <p>
  * Each face has a light at the middle of each edge. A light comes on, in the colour of the dust or paste, where powered
  * dust or paste meets that edge: dust or paste beside the block lights the edge of the face it runs into, and dust or
@@ -104,6 +105,15 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
                 }
             }
         }
+    }
+
+    /**
+     * The power a converter box gives dust of any colour lying on top of it: one level less, as along a wire. Paste on
+     * top takes it as from any box it lies on.
+     */
+    public static int powerToDustOnTop(BlockGetter level, BlockPos dust) {
+        BlockState below = level.getBlockState(dust.below());
+        return below.getBlock() instanceof ConverterBoxBlock ? Math.max(0, below.getValue(POWER) - 1) : 0;
     }
 
     private static boolean anyLit(BlockGetter level, BlockPos pos) {

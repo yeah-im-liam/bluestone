@@ -7,6 +7,7 @@ minecraft/resourcepacks/programmer_art.zip in the 26.3 asset index. The art fold
 with one folder per thing (bluestone torch, purplestone converter, ...). Each of those has block/, item/ or palettes/
 folders that say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
 """
+import itertools
 import json
 import re
 import shutil
@@ -648,9 +649,20 @@ write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
     "type": "minecraft:crafting_shapeless", "category": "redstone", "group": "greenstone_paste",
     "ingredients": ["minecraft:redstone", "bluestone:bluestone", "minecraft:slime_ball", "minecraft:slime_ball"],
     "result": {"count": 4, "id": "bluestone:greenstone_paste"}})
-write(D + "recipe/converter_box.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
-                                        "ingredients": ["bluestone:purplestone", "bluestone:greenstone_paste", "minecraft:stone"],
-                                        "result": {"id": "bluestone:converter_box"}})
+# The converter box: cobblestone in the corners, quartz in the middle and one of each dust around it, in any order.
+# A shaped recipe also matches its mirror image, so of the 24 orders only those with the left dust before the right one
+# are written. The recipe book shows them together (group).
+DUSTS = ["minecraft:redstone", "bluestone:bluestone", "bluestone:purplestone", "bluestone:greenstone_paste"]
+BOX_RECIPES = []
+for top, left, right, bottom in itertools.permutations(range(4)):
+    if left > right:
+        continue
+    name = "converter_box" if not BOX_RECIPES else f"converter_box_{len(BOX_RECIPES) + 1}"
+    write(D + f"recipe/{name}.json", {"type": "minecraft:crafting_shaped", "category": "redstone", "group": "converter_box",
+                                      "key": {"C": "minecraft:cobblestone", "Q": "minecraft:quartz",
+                                              "T": DUSTS[top], "L": DUSTS[left], "R": DUSTS[right], "B": DUSTS[bottom]},
+                                      "pattern": ["CTC", "LQR", "CBC"], "result": {"id": "bluestone:converter_box"}})
+    BOX_RECIPES.append(name)
 # Chain rails: like the powered rail, with iron, an iron chain and dust of their colour. Sticky rails: eight of a
 # rail around a slimeball.
 for rail, dust in [("chain_rail", "minecraft:redstone"), ("bluestone_chain_rail", "bluestone:bluestone")]:
@@ -670,9 +682,10 @@ write(D + "recipe/purplestone_converter.json", {"type": "minecraft:crafting_shap
 for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     template = vanilla("data/minecraft/advancement/recipes/redstone/repeater.json", jar)
     recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
+    box_unlocks = [(name, "greenstone_paste") for name in BOX_RECIPES]
     for recipe, unlocked_by in [("purplestone", "bluestone"), ("purplestone_converter", "purplestone"), ("greenstone_paste", "purplestone"),
-                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"), ("converter_box", "greenstone_paste"),
-                                ("chain_rail", "minecraft:rail"), ("bluestone_chain_rail", "minecraft:rail")] + list(STICKY_FROM.items()):
+                                ("greenstone_paste_from_redstone_and_bluestone", "bluestone"),
+                                ("chain_rail", "minecraft:rail"), ("bluestone_chain_rail", "minecraft:rail")] + box_unlocks + list(STICKY_FROM.items()):
         item = unlocked_by if ":" in unlocked_by else "bluestone:" + unlocked_by
         has = "has_" + item.split(":")[1]
         write(prefix + D + "advancement/recipes/redstone/" + recipe + ".json", {
