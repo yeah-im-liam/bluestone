@@ -22,12 +22,13 @@ import yeah.im.liam.bluestone.block.ChainGearRailBlock;
  * edge carries on down the other side). Climbing slows a cart and coming down speeds it up, more gently than falling;
  * a cart that stops climbing rolls back. On
  * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain gear rails move carts at
- * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still; powered rails speed carts up and
+ * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still, and a cart leaving chain gear goes
+ * back to the speed it came on at; powered rails speed carts up and
  * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again. Floor rails meeting a wall can
  * be straight or curved.
  */
 public final class SurfaceRails {
-    public static final double CHAIN_SPEED = 0.3;
+    public static final double CHAIN_SPEED = 0.2;
     public static final double MIN_CEILING_SPEED = 0.1;
     // Gravity along the track (a quarter of a falling cart's, so a cart at full speed climbs about five blocks), a
     // little less drag than on the floor, and the game's powered rail boost.
@@ -229,7 +230,7 @@ public final class SurfaceRails {
         if (ride == null) {
             ride = start(level, cart);
             if (ride == null) {
-                driveOnFloor(level, cart);
+                driveOnFloor(level, cart, rider);
                 return false;
             }
         }
@@ -245,6 +246,15 @@ public final class SurfaceRails {
         }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
+        // Chain gear sets the pace while the cart is on it; off it, the cart goes back to the speed it came on at.
+        if (on.kind() == Kind.CHAIN) {
+            if (Double.isNaN(rider.bluestone$chainEntry())) {
+                rider.bluestone$setChainEntry(speed);
+            }
+        } else if (!Double.isNaN(rider.bluestone$chainEntry())) {
+            speed = rider.bluestone$chainEntry();
+            rider.bluestone$setChainEntry(Double.NaN);
+        }
         boolean hold = false;
         switch (on.kind()) {
             case CHAIN -> {
@@ -364,6 +374,7 @@ public final class SurfaceRails {
     private static boolean fallOff(AbstractMinecart cart, RailRider rider, Vec3 velocity) {
         cart.setDeltaMovement(velocity);
         rider.bluestone$setRide(null);
+        rider.bluestone$setChainEntry(Double.NaN);
         rider.bluestone$setCooldown(COOLDOWN);
         return false;
     }
@@ -471,16 +482,29 @@ public final class SurfaceRails {
     }
 
     // Chain gear rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
-    // all while the rail is unpowered.
-    private static void driveOnFloor(Level level, AbstractMinecart cart) {
+    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain gear at.
+    private static void driveOnFloor(Level level, AbstractMinecart cart, RailRider rider) {
         BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
+        Vec3 velocity = cart.getDeltaMovement();
         if (state.getBlock() instanceof ChainGearRailBlock) {
             Direction drive = ChainGearRailBlock.drive(state);
             if (drive == null) {
                 return;
             }
+            if (Double.isNaN(rider.bluestone$chainEntry())) {
+                rider.bluestone$setChainEntry(velocity.horizontalDistance());
+            }
             double speed = state.getValue(ChainGearRailBlock.POWERED) ? CHAIN_SPEED : 0.0;
-            cart.setDeltaMovement(drive.getStepX() * speed, cart.getDeltaMovement().y, drive.getStepZ() * speed);
+            cart.setDeltaMovement(drive.getStepX() * speed, velocity.y, drive.getStepZ() * speed);
+            return;
+        }
+        double entry = rider.bluestone$chainEntry();
+        if (!Double.isNaN(entry)) {
+            rider.bluestone$setChainEntry(Double.NaN);
+            double horizontal = velocity.horizontalDistance();
+            if (BaseRailBlock.isRail(state) && horizontal > 1.0E-4) {
+                cart.setDeltaMovement(velocity.x / horizontal * entry, velocity.y, velocity.z / horizontal * entry);
+            }
         }
     }
 }

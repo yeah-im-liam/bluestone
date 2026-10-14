@@ -21,6 +21,8 @@ abstract class AbstractMinecartMixin implements RailRider {
     private SurfaceRails.@Nullable Ride bluestone$ride;
     @Unique
     private int bluestone$cooldown;
+    @Unique
+    private double bluestone$chainEntry = Double.NaN;
 
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/MinecartBehavior;tick()V"))
     private void bluestone$surfaceRails(MinecartBehavior behavior, Operation<Void> original) {
@@ -47,5 +49,15 @@ abstract class AbstractMinecartMixin implements RailRider {
     @Override
     public void bluestone$setCooldown(int ticks) {
         bluestone$cooldown = ticks;
+    }
+
+    @Override
+    public double bluestone$chainEntry() {
+        return bluestone$chainEntry;
+    }
+
+    @Override
+    public void bluestone$setChainEntry(double speed) {
+        bluestone$chainEntry = speed;
     }
 }
