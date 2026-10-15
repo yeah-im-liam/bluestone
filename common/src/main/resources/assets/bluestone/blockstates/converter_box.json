@@ -1,10 +1,7 @@
 {
   "variants": {
-    "lit=false": {
+    "": {
       "model": "bluestone:block/converter_box"
-    },
-    "lit=true": {
-      "model": "bluestone:block/converter_box_lit"
     }
   }
 }

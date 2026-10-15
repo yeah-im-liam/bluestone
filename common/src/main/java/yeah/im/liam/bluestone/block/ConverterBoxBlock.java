@@ -35,7 +35,7 @@ import yeah.im.liam.bluestone.signal.Signals;
  * Each face has a light at the middle of each edge and one in its middle. A light comes on, in the colour of the dust or
  * paste, where powered dust or paste meets the block: dust or paste beside the block lights the edge of the face it
  * runs into, and dust or paste lying on the block lights the middle of the face it lies on and the edges its lines run
- * to. While any light is on (LIT) the whole block glows: its renderer draws it instead of the world
+ * to. While any light is on (LIT) the whole block glows: its renderer draws it glowing over the world's block
  * (ConverterBoxRenderer), and its block entity is only there for that.
  */
 public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock {

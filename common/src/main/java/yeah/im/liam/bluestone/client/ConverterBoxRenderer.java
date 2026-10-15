@@ -35,10 +35,11 @@ import yeah.im.liam.bluestone.signal.Channel;
 /**
  * Draws a converter box while any of its lights is on, glowing as a whole, the way a chiseled bookshelf shows its books:
  * each face of the block is nine flat pieces, and a lit light is its piece (a side piece for a light at an edge, the
- * middle piece for the one in the middle) in the overlay of its colour instead. The world draws nothing for a lit box
- * (its model for lit=true is empty), so here the whole block is drawn at once at full brightness: the frame (the
- * corners of the faces) and every side and middle piece, unlit or lit. An unlit box is drawn by the world like any
- * block. The pieces are models of their own (models/block/converter_box_frame, converter_box_light_* and
+ * middle piece for the one in the middle) in the overlay of its colour instead. The world draws the box like any block,
+ * lit or not; while it is lit the whole block is drawn again here at full brightness, over the world's, nudged towards
+ * the camera so it covers it exactly: the frame (the corners of the faces) and every side and middle piece, unlit or
+ * lit. With the world's block always there, nothing shows through the box while the world redraws it after a change
+ * (an empty model for the lit box did). The pieces are models of their own (models/block/converter_box_frame, converter_box_light_* and
  * converter_box_center_*), loaded through the made-up block states of blockstates/converter_box_frame.json,
  * converter_box_light.json and converter_box_center.json the way the game loads its item frame models
  * (BlockStateDefinitionsMixin).

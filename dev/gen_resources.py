@@ -71,10 +71,10 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluest
 
 # The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
 # 6x6 middle; the light at the middle of each edge lies in the side piece there, and the face's own light in the
-# middle piece. Unlit, the world draws it from converter_box.json. While any light is on (lit=true) the world draws
-# nothing and ConverterBoxRenderer draws the whole block glowing: the frame (the corners) and every side and middle
-# piece, unlit or in the overlay of its colour. Every piece takes its texture from the same place as a whole face
-# would. The states of the frame and the pieces belong to no block; BlockStateDefinitionsMixin loads them, as the
+# middle piece. The world always draws it from converter_box.json. While any light is on (lit=true)
+# ConverterBoxRenderer draws the whole block again over that, glowing: the frame (the corners) and every side and
+# middle piece, unlit or in the overlay of its colour. Every piece takes its texture from the same place as a whole
+# face would. The states of the frame and the pieces belong to no block; BlockStateDefinitionsMixin loads them, as the
 # game does item frames.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
@@ -101,9 +101,7 @@ for face in AXES:
                 frame.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all"}}})
 BOX_TEXTURES = {"all": "bluestone:block/converter_box", "particle": "#all"}
 write(A + "models/block/converter_box.json", {"parent": "minecraft:block/block", "textures": BOX_TEXTURES, "elements": pieces})
-write(A + "models/block/converter_box_lit.json", {"textures": {"particle": "bluestone:block/converter_box"}})
-write(A + "blockstates/converter_box.json", {"variants": {"lit=false": {"model": "bluestone:block/converter_box"},
-                                                          "lit=true": {"model": "bluestone:block/converter_box_lit"}}})
+write(A + "blockstates/converter_box.json", {"variants": {"": {"model": "bluestone:block/converter_box"}}})
 write(A + "models/block/converter_box_frame.json", {"textures": BOX_TEXTURES, "elements": frame})
 write(A + "blockstates/converter_box_frame.json", {"variants": {"": {"model": "bluestone:block/converter_box_frame"}}})
 LIGHT_TEXTURES = {"off": "bluestone:block/converter_box"}
