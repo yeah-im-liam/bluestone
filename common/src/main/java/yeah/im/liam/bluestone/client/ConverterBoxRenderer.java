@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
@@ -34,7 +35,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 
 /**
  * Draws a converter box glowing while any of its lights is on, over the world's own drawing of it and nudged towards
- * the camera so it covers it exactly.
+ * the camera so it covers it exactly. Faces the world would cull, facing away or covered, are left out.
  */
 public final class ConverterBoxRenderer implements BlockEntityRenderer<ConverterBoxBlockEntity, ConverterBoxRenderer.State> {
     public static final Identifier FRAME_ID = Bluestone.id("converter_box_frame");
@@ -44,6 +45,7 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
     private static final EnumProperty<Direction> EDGE = EnumProperty.create("edge", Direction.class);
     private static final EnumProperty<Colour> COLOUR = EnumProperty.create("color", Colour.class);
     public static final StateDefinition<Block, BlockState> FRAME_DEFINITION = new StateDefinition.Builder<Block, BlockState>(Blocks.AIR)
+        .add(FACE)
         .create(Block::defaultBlockState, BlockState::new);
     public static final StateDefinition<Block, BlockState> LIGHT_DEFINITION = new StateDefinition.Builder<Block, BlockState>(Blocks.AIR)
         .add(FACE, EDGE, COLOUR)
@@ -117,9 +119,14 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
         if (!any[0]) {
             return;
         }
+        BlockPos pos = converter.getBlockPos();
+        BlockState box = converter.getBlockState();
         BlockStateModelSet models = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
-        collect(models, FRAME_DEFINITION.any(), state.parts);
         for (Direction face : Direction.values()) {
+            if (!facesCamera(pos, face, cameraPosition) || !Block.shouldRenderFace(box, level.getBlockState(pos.relative(face)), face)) {
+                continue;
+            }
+            collect(models, FRAME_DEFINITION.any().setValue(FACE, face), state.parts);
             Colour center = middle[face.ordinal()];
             collect(models, CENTER_DEFINITION.any().setValue(FACE, face).setValue(COLOUR, center != null ? center : Colour.OFF), state.parts);
             for (Direction edge : Direction.values()) {
@@ -129,6 +136,11 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
                 }
             }
         }
+    }
+
+    private static boolean facesCamera(BlockPos pos, Direction face, Vec3 camera) {
+        double plane = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? pos.get(face.getAxis()) + 1 : pos.get(face.getAxis());
+        return (camera.get(face.getAxis()) - plane) * face.getAxisDirection().getStep() > 0;
     }
 
     private void collect(BlockStateModelSet models, BlockState piece, List<BlockStateModelPart> parts) {

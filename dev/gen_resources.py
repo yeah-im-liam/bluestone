@@ -86,7 +86,7 @@ def face_piece(face, spans):
     return lo, hi
 
 
-pieces, frame = [], []
+pieces, frame = [], {face: [] for face in AXES}
 for face in AXES:
     u, v = [axis for axis in range(3) if axis != AXES[face]]
     for su in SPANS:
@@ -94,12 +94,13 @@ for face in AXES:
             lo, hi = face_piece(face, {u: su, v: sv})
             pieces.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all", "cullface": face}}})
             if su != SPANS[1] and sv != SPANS[1]:
-                frame.append({"from": lo, "to": hi, "faces": {face: {"texture": "#all"}}})
+                frame[face].append({"from": lo, "to": hi, "faces": {face: {"texture": "#all"}}})
 BOX_TEXTURES = {"all": "bluestone:block/converter_box", "particle": "#all"}
 write(A + "models/block/converter_box.json", {"parent": "minecraft:block/block", "textures": BOX_TEXTURES, "elements": pieces})
 write(A + "blockstates/converter_box.json", {"variants": {"": {"model": "bluestone:block/converter_box"}}})
-write(A + "models/block/converter_box_frame.json", {"textures": BOX_TEXTURES, "elements": frame})
-write(A + "blockstates/converter_box_frame.json", {"variants": {"": {"model": "bluestone:block/converter_box_frame"}}})
+for face in AXES:
+    write(A + f"models/block/converter_box_frame_{face}.json", {"textures": BOX_TEXTURES, "elements": frame[face]})
+write(A + "blockstates/converter_box_frame.json", {"variants": {f"face={face}": {"model": f"bluestone:block/converter_box_frame_{face}"} for face in AXES}})
 LIGHT_TEXTURES = {"off": "bluestone:block/converter_box"}
 LIGHT_TEXTURES.update({colour: f"bluestone:block/converter_box_{colour}_overlay" for colour in ["redstone", "bluestone", "purplestone", "greenstone"]})
 light_parts = []
@@ -526,11 +527,6 @@ write(A + "lang/en_us.json", {
     "block.bluestone.purplestone_torch": "Purplestone Torch",
     "block.bluestone.purplestone_block": "Block of Purplestone",
     "block.bluestone.greenstone_paste": "Greenstone Paste",
-    "block.minecraft.repeater": "Redstone Repeater",
-    "block.minecraft.comparator": "Redstone Comparator",
-    "block.minecraft.powered_rail": "Redstone Powered Rail",
-    "block.minecraft.detector_rail": "Redstone Detector Rail",
-    "block.minecraft.activator_rail": "Redstone Activator Rail",
     "block.bluestone.greenstone_torch": "Greenstone Torch",
     "block.bluestone.greenstone_block": "Block of Greenstone",
     "block.bluestone.greenstone_repeater": "Greenstone Repeater",
@@ -560,6 +556,12 @@ write(A + "lang/en_us.json", {
     "trim_material.bluestone.greenstone": "Greenstone Material",
     "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
+})
+# Vanilla names are renamed from the minecraft namespace, since the game merges namespaces in no fixed order.
+write("assets/minecraft/lang/en_us.json", {
+    "block.minecraft.powered_rail": "Redstone Powered Rail",
+    "block.minecraft.detector_rail": "Redstone Detector Rail",
+    "block.minecraft.activator_rail": "Redstone Activator Rail",
 })
 
 

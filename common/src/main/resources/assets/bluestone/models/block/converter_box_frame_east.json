@@ -1,0 +1,76 @@
+{
+  "textures": {
+    "all": "bluestone:block/converter_box",
+    "particle": "#all"
+  },
+  "elements": [
+    {
+      "from": [
+        16,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        5,
+        5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#all"
+        }
+      }
+    },
+    {
+      "from": [
+        16,
+        0,
+        11
+      ],
+      "to": [
+        16,
+        5,
+        16
+      ],
+      "faces": {
+        "east": {
+          "texture": "#all"
+        }
+      }
+    },
+    {
+      "from": [
+        16,
+        11,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#all"
+        }
+      }
+    },
+    {
+      "from": [
+        16,
+        11,
+        11
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "east": {
+          "texture": "#all"
+        }
+      }
+    }
+  ]
+}

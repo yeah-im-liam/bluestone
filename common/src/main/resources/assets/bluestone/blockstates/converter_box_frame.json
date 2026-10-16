@@ -1,7 +1,22 @@
 {
   "variants": {
-    "": {
-      "model": "bluestone:block/converter_box_frame"
+    "face=down": {
+      "model": "bluestone:block/converter_box_frame_down"
+    },
+    "face=up": {
+      "model": "bluestone:block/converter_box_frame_up"
+    },
+    "face=north": {
+      "model": "bluestone:block/converter_box_frame_north"
+    },
+    "face=south": {
+      "model": "bluestone:block/converter_box_frame_south"
+    },
+    "face=west": {
+      "model": "bluestone:block/converter_box_frame_west"
+    },
+    "face=east": {
+      "model": "bluestone:block/converter_box_frame_east"
     }
   }
 }
