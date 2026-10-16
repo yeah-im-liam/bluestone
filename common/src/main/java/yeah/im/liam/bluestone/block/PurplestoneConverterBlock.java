@@ -31,9 +31,7 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * A one-tick repeater that takes one kind of signal and gives out the other. Purplestone powers it whichever way it
- * is set. Right-clicking swaps the direction, and like a repeater it is locked by a repeater or comparator (of either
- * kind) pointing into its side. It looks like a repeater set to four ticks, and like one, water washes it away.
+ * A one-tick repeater that takes one kind of signal and gives out the other.
  */
 public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock {
     public static final EnumProperty<Mode> MODE = EnumProperty.create("mode", Mode.class);
@@ -62,7 +60,6 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         level.playSound(player, pos, SoundEvents.COMPARATOR_CLICK, SoundSource.BLOCKS, 0.3F, switched.getValue(MODE) == Mode.RED_TO_BLUE ? 0.5F : 0.55F);
         level.setBlockAndUpdate(pos, switched);
         if (!level.isClientSide()) {
-            // The output changed colour, so whatever it powers through the block in front has to look again.
             updateNeighborsInFront(level, pos, switched);
             checkTickOnNeighbor(level, pos, switched);
         }
@@ -86,7 +83,6 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         });
     }
 
-    // Repeaters and comparators of either kind lock it.
     @Override
     protected int getAlternateSignal(SignalGetter level, BlockPos pos, BlockState state) {
         return Signals.read(null, () -> {
@@ -141,7 +137,6 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
         double y = pos.getY() + 0.4 + (random.nextDouble() - 0.5) * 0.2;
         double z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
-        // Like a four-tick repeater: the torch at the output end, or the one at the input end.
         boolean inputTorch = random.nextBoolean();
         float offset = (inputTorch ? 7.0F : -5.0F) / 16.0F;
         Channel channel = inputTorch ? state.getValue(MODE).input : state.getValue(MODE).output;
@@ -154,9 +149,6 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         return state.getValue(MODE).output;
     }
 
-    /**
-     * Dust of the input's kind bends to the back, dust of the output's kind to the front, and purplestone to both.
-     */
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         Direction facing = state.getValue(FACING);

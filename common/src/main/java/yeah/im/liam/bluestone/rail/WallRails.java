@@ -17,23 +17,17 @@ import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.mixin.RailStateAccessor;
 
 /**
- * Floor rails joining sticky rails on walls, the way rails join a rail one block up or down. A floor rail joins a
- * wall rail that runs up the block in its way (that rail is just above it), sloping up to meet it, or one that runs
- * down the side of the block it sits on. RailStateMixin lets the game's rail logic count those as rails to connect to.
+ * Floor rails joining sticky rails on walls, the way rails join a rail one block up or down.
  */
 public final class WallRails {
     private WallRails() {
     }
 
-    /**
-     * Whether a floor rail at {@code pos} has a wall rail to join going {@code way}.
-     */
     public static boolean joins(BlockGetter level, BlockPos pos, Direction way) {
         BlockPos ahead = pos.relative(way);
         if (level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite())) {
             return wallRail(level.getBlockState(pos.above()), way, Direction.DOWN);
         }
-        // A wall rail that comes right down to the floor beside this rail, and bends onto it.
         BlockPos floor = ahead.below();
         if (wallRail(level.getBlockState(ahead), way, Direction.DOWN) && level.getBlockState(floor).isFaceSturdy(level, floor, Direction.UP)) {
             return true;
@@ -41,17 +35,11 @@ public final class WallRails {
         return wallRail(level.getBlockState(ahead.below()), way.getOpposite(), Direction.UP);
     }
 
-    /**
-     * Whether a floor rail at {@code pos} meets a wall rail going {@code way} at an inside corner, where it slopes up.
-     */
     public static boolean slopesUp(BlockGetter level, BlockPos pos, Direction way) {
         BlockPos ahead = pos.relative(way);
         return level.getBlockState(ahead).isFaceSturdy(level, ahead, way.getOpposite()) && wallRail(level.getBlockState(pos.above()), way, Direction.DOWN);
     }
 
-    /**
-     * A level straight floor rail turned into a slope up to the wall rail at one of its ends, or the shape as it was.
-     */
     public static RailShape sloped(BlockGetter level, BlockPos pos, RailShape shape) {
         if (shape == RailShape.NORTH_SOUTH || shape == RailShape.EAST_WEST) {
             for (Direction way : level(shape)) {
@@ -68,14 +56,10 @@ public final class WallRails {
         return shape;
     }
 
-    // A rail on the wall the given way, with an end pointing down to a rail at its foot or up to one on top.
     private static boolean wallRail(BlockState state, Direction attached, Direction end) {
         return state.getBlock() instanceof AttachedRailBlock && state.getValue(AttachedRailBlock.ATTACHED) == attached && AttachedRailBlock.hasEnd(state, end);
     }
 
-    /**
-     * The way from one floor rail to the next one along, or null if they aren't side by side.
-     */
     public static @Nullable Direction way(BlockPos from, BlockPos to) {
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             if (from.relative(direction).equals(to)) {
@@ -85,9 +69,6 @@ public final class WallRails {
         return null;
     }
 
-    /**
-     * Both ends of a floor rail of this shape, the low end first on a slope.
-     */
     public static List<Direction> ends(RailShape shape) {
         return switch (shape) {
             case ASCENDING_EAST -> List.of(Direction.WEST, Direction.EAST);
@@ -98,9 +79,6 @@ public final class WallRails {
         };
     }
 
-    /**
-     * The ways a floor rail of this shape leaves level, not up a slope.
-     */
     public static List<Direction> level(RailShape shape) {
         return switch (shape) {
             case NORTH_SOUTH -> List.of(Direction.NORTH, Direction.SOUTH);
@@ -116,10 +94,6 @@ public final class WallRails {
         };
     }
 
-    /**
-     * A wall rail has appeared: the floor rail at {@code pos} turns to join it going {@code way}, if it isn't already
-     * joined at both ends, the same as when a rail is laid next to it.
-     */
     public static void join(Level level, BlockPos pos, Direction way) {
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof BaseRailBlock rail) || !BaseRailBlock.isRail(state) || !joins(level, pos, way)) {
@@ -142,7 +116,6 @@ public final class WallRails {
         level.setBlock(pos, state.setValue(rail.getShapeProperty(), sloped(level, pos, shape(level, pos, ways, rail.isStraight()))), Block.UPDATE_ALL);
     }
 
-    // The game's choice of shape for a rail joined the given ways.
     private static RailShape shape(Level level, BlockPos pos, Set<Direction> ways, boolean straight) {
         boolean n = ways.contains(Direction.NORTH);
         boolean s = ways.contains(Direction.SOUTH);

@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import yeah.im.liam.bluestone.client.TrimItemModels;
 
 /**
- * Hands each item file to {@link TrimItemModels} between reading and decoding it. The lambda is the same in 26.1 to
- * 26.3 and in NeoForge's copy.
+ * Hands each item file to {@link TrimItemModels} between reading and decoding it.
  */
 @Mixin(ClientItemInfoLoader.class)
 abstract class ClientItemInfoLoaderMixin {

@@ -21,9 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.ticks.TickPriority;
 
 /**
- * The comparator for greenstone, on floors, walls and ceilings. It compares or subtracts its sides from its input like
- * the game's comparator, and reads containers and other blocks with a fill level behind it, directly or through a
- * solid block. It keeps its output strength in its state instead of a block entity.
+ * The comparator for greenstone, on floors, walls and ceilings.
  */
 public class GreenstoneComparatorBlock extends GreenstoneDiodeBlock {
     public static final EnumProperty<ComparatorMode> MODE = BlockStateProperties.MODE_COMPARATOR;

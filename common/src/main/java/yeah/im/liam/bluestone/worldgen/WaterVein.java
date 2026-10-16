@@ -11,13 +11,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * A bluestone vein held back while the game works out its shape. It is placed when one of its blocks touches water,
- * and otherwise only sometimes.
+ * A bluestone vein held back while the game works out its shape.
  */
 public final class WaterVein {
-    /**
-     * How often a vein that touches no water is placed anyway.
-     */
     public static final float DRY_CHANCE = 0.25F;
 
     private final List<BlockPos> positions = new ArrayList<>();

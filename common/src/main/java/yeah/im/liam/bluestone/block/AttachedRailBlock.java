@@ -38,12 +38,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 
 /**
- * A sticky rail on a wall or ceiling (the floor ones are ordinary rails). {@link #ATTACHED} is the face it sits on and
- * {@link #TRAVEL} the way along it carts run; chain rails drive carts that way. Like the game's rails it turns to
- * join the track around it, including floor rails it runs up from or down to, and {@link #BEND}s round an inside corner
- * to meet the track on the next face. Plain sticky rails also {@link #CURVE} like the game's rails. Its {@link Kind}
- * says what it does to carts, and powered, chain and activator rails are powered by their colour like the game's
- * powered rails. {@link SurfaceRails} moves the carts.
+ * A sticky rail on a wall or ceiling (the floor ones are ordinary rails).
  */
 public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, SignalBlock {
     public static final EnumProperty<Direction> ATTACHED = EnumProperty.create("attached", Direction.class, direction -> direction != Direction.DOWN);
@@ -60,22 +55,13 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
     ));
 
     public enum Kind {
-        // Carts roll freely.
         PLAIN,
-        // Powered: carts move at a fixed speed the way it travels. Unpowered: carts are held still.
         CHAIN,
-        // Powered: carts speed up. Unpowered: carts are braked to a stop.
         POWERED,
-        // Gives out a signal while a cart is on it.
         DETECTOR,
-        // Powered: carts on it are activated, as on the game's activator rail.
         ACTIVATOR
     }
 
-    /**
-     * Where the rail bends round an inside corner onto the next face, like a rail sloping up a block: nowhere, at the
-     * end it travels towards, or at the end behind.
-     */
     public enum Bend implements StringRepresentable {
         NONE("none"),
         AHEAD("ahead"),
@@ -93,10 +79,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
-    /**
-     * Whether the rail curves: not at all, or round to the left or right of the way it travels, as seen from in front of
-     * the face with that way up.
-     */
     public enum Curve implements StringRepresentable {
         NONE("none"),
         LEFT("left"),
@@ -114,7 +96,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
-    // A shape the rail can take: the way it travels, and how it curves.
     private record Shape(Direction travel, Curve curve) {
     }
 
@@ -159,9 +140,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return level.getBlockState(support).isFaceSturdy(level, support, attached.getOpposite());
     }
 
-    /**
-     * The other end of a curve: to the left or right of the way it travels, seen from in front of the face.
-     */
     public static Direction otherEnd(Direction attached, Direction travel, Curve curve) {
         if (curve == Curve.NONE) {
             return travel.getOpposite();
@@ -171,17 +149,11 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return curve == Curve.RIGHT ? toRight : toRight.getOpposite();
     }
 
-    /**
-     * The other end of a curved rail, or null if it runs straight.
-     */
     public static @Nullable Direction curveEnd(BlockState state) {
         Curve curve = state.getValue(CURVE);
         return curve == Curve.NONE ? null : otherEnd(state.getValue(ATTACHED), state.getValue(TRAVEL), curve);
     }
 
-    /**
-     * Whether a wall or ceiling rail has an end pointing the given way.
-     */
     public static boolean hasEnd(BlockState state, Direction way) {
         Direction travel = state.getValue(TRAVEL);
         Direction other = curveEnd(state);
@@ -193,9 +165,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return new SurfaceRails.Track(pos, attached, shape.travel().getAxis(), kind, false, shape.travel(), other);
     }
 
-    // On the face clicked, in whichever shape joins the most track around it, or else running the way the player looks
-    // along that face. Next to a rail running the same way it takes that rail's direction, so chain rails keep driving
-    // the same way.
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction attached = context.getClickedFace().getOpposite();
@@ -229,9 +198,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return state.canSurvive(level, pos) ? Waterlogging.place(state, context) : null;
     }
 
-    // The shape that joins the most track: 2 for each end that meets track that runs on from it, 1 for track that could
-    // turn to meet it. The current shape wins a tie, then a straight one. Only plain sticky rails curve, like the
-    // game's rails.
     private Shape bestShape(Level level, BlockPos pos, Direction attached, Shape current) {
         List<Shape> shapes = new ArrayList<>();
         shapes.add(current);
@@ -272,7 +238,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return best;
     }
 
-    // The direction of a rail on the same face just before or after this one along the axis, if it runs that way too.
     private static @Nullable Direction following(Level level, BlockPos pos, Direction attached, Direction.Axis axis) {
         for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {
             BlockState next = level.getBlockState(pos.relative(Direction.fromAxisAndDirection(axis, sign)));
@@ -284,7 +249,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return null;
     }
 
-    // Where a straight rail meets track on the face of a block in its way, it bends to that face.
     private Bend bend(Level level, BlockPos pos, Direction attached, Direction travel) {
         for (Direction end : new Direction[]{travel, travel.getOpposite()}) {
             BlockPos ahead = pos.relative(end);
@@ -296,8 +260,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return Bend.NONE;
     }
 
-    // Turns or curves to join more track when the track around it changes, like the game's rails when one is laid next
-    // to them, and bends to meet track round an inside corner.
     private void turn(Level level, BlockPos pos, BlockState state) {
         Direction attached = state.getValue(ATTACHED);
         Shape current = new Shape(state.getValue(TRAVEL), state.getValue(CURVE));
@@ -322,8 +284,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
-    // Tells the track it may now join: wall and ceiling rails round an outside corner, which aren't next to it, and
-    // floor rails at the foot and the top of the wall it runs up.
     private void joined(Level level, BlockPos pos, BlockState state) {
         Direction attached = state.getValue(ATTACHED);
         for (Direction way : Direction.values()) {
@@ -382,9 +342,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
-    /**
-     * A cart is on this rail: a detector rail turns on, and checks again in a second whether it should turn off.
-     */
     public void detect(ServerLevel level, BlockPos pos, BlockState state) {
         if (kind != Kind.DETECTOR) {
             return;
@@ -423,7 +380,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return kind == Kind.DETECTOR && state.getValue(POWERED) ? 15 : 0;
     }
 
-    // Like the game's detector rail, it strongly powers only the block it sits on.
     @Override
     protected int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return kind == Kind.DETECTOR && state.getValue(POWERED) && direction == state.getValue(ATTACHED).getOpposite() ? 15 : 0;
@@ -434,7 +390,6 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return channel != null ? channel : Channel.REDSTONE;
     }
 
-    // Dust of its colour, and purplestone dust, bend towards a detector rail.
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return kind == Kind.DETECTOR && direction != null && (wire == channel || wire == Channel.PURPLESTONE);

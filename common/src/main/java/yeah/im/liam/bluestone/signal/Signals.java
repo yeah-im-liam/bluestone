@@ -10,8 +10,7 @@ import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.GreenstonePasteBlock;
 
 /**
- * Tracks who is reading signals on the current thread. While a listener reads, sources it can't hear report no
- * signal.
+ * Tracks who is reading signals on the current thread.
  */
 public final class Signals {
     private static final ThreadLocal<Listener> LISTENER = new ThreadLocal<>();
@@ -21,18 +20,10 @@ public final class Signals {
     private Signals() {
     }
 
-    /**
-     * Reads signals as the given listener hears them, or everything for {@code null}.
-     */
     public static int read(@Nullable Listener listener, IntSupplier reader) {
         return read(listener, false, reader);
     }
 
-    /**
-     * Reads signals for dust working out its own power: as {@link #read}, but dust of every colour stays silent. Like
-     * the game's dust with its own kind, dust takes power from other dust only along the wire, one level weaker per
-     * block, so redstone and purplestone dust side by side can't keep each other powered.
-     */
     public static int readForDust(Listener listener, IntSupplier reader) {
         return read(listener, true, reader);
     }
@@ -56,9 +47,6 @@ public final class Signals {
         return read(listener, () -> reader.getAsBoolean() ? 1 : 0) != 0;
     }
 
-    /**
-     * The strength at which the current reader gets a signal from the given source: none if it can't hear it.
-     */
     public static int heard(BlockState source, int signal) {
         if (READERS.get() == 0) {
             return signal;

@@ -10,12 +10,11 @@ import yeah.im.liam.bluestone.block.ConverterBoxBlock;
 import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.Signals;
 
-// Minecraft 26.3 and later. Dust there asks each block whether to bend towards it, which the bluestone blocks answer.
+// Minecraft 26.3 and later.
 @Mixin(RedstoneWireBlock.class)
 abstract class ModernWireMixin {
     @WrapMethod(method = "getBlockSignal")
     private int bluestone$listen(Level level, BlockPos pos, Operation<Integer> original) {
-        // A converter box under the dust powers it too.
         return Math.max(Signals.readForDust(Channel.REDSTONE, () -> original.call(level, pos)), ConverterBoxBlock.powerToDustOnTop(level, pos));
     }
 }

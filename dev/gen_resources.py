@@ -69,13 +69,9 @@ for name, src, prefix in [
 for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluestone_ore", "deepslate_bluestone_ore"]:
     write(A + f"models/block/{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"bluestone:block/{name}"}})
 
-# The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
-# 6x6 middle; the light at the middle of each edge lies in the side piece there, and the face's own light in the
-# middle piece. The world always draws it from converter_box.json. While any light is on
-# ConverterBoxRenderer draws the whole block again over that, glowing: the frame (the corners) and every side and
-# middle piece, unlit or in the overlay of its colour. Every piece takes its texture from the same place as a whole
-# face would. The states of the frame and the pieces belong to no block; BlockStateDefinitionsMixin loads them, as the
-# game does item frames.
+# The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a 6x6
+# middle; the light at the middle of each edge lies in the side piece there, and the face's own light in the middle
+# piece.
 AXES = {"down": 1, "up": 1, "north": 2, "south": 2, "west": 0, "east": 0}
 FAR = {"down": False, "up": True, "north": False, "south": True, "west": False, "east": True}
 SPANS = [(0, 5), (5, 11), (11, 16)]
@@ -168,7 +164,7 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
 
 
 # The purplestone converter: shaped like a four-tick repeater, with the input-end torch in the input colour and the
-# output-end torch in the output colour. Its top is the same in both directions; only the torches swap.
+# output-end torch in the output colour.
 TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
            "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
 MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
@@ -217,9 +213,7 @@ for facing, y in ROTATION.items():
 write(A + "blockstates/purplestone_converter.json", {"variants": variants})
 
 
-# The greenstone repeater and comparator sit on any face (attached) and point any way along it (output). The game's
-# models lie on the floor pointing north; these rotations, measured from the game's own block model rotations (the
-# same in 26.1 and 26.3), turn the model's floor to the attached face and its north to the output.
+# The greenstone repeater and comparator sit on any face (attached) and point any way along it (output).
 ROTATIONS = {
     ("down", "east"): (0, 90, 0), ("down", "north"): (0, 0, 0), ("down", "south"): (0, 180, 0), ("down", "west"): (0, 270, 0),
     ("east", "down"): (90, 270, 0), ("east", "north"): (0, 0, 270), ("east", "south"): (0, 180, 270), ("east", "up"): (270, 90, 0),
@@ -266,8 +260,7 @@ for variant in ["", "_on", "_subtract", "_on_subtract"]:
 write(A + "blockstates/greenstone_comparator.json", {"variants": variants})
 
 
-# Sticky rails and chain rails. A sticky rail on a floor is a copy of the game's rail of the same kind (and the
-# bluestone kinds of the game's powered, detector and activator rails), with its own textures.
+# Sticky rails and chain rails.
 STICKY = {"sticky_rail": "rail", "sticky_powered_rail": "powered_rail", "sticky_bluestone_powered_rail": "powered_rail",
           "sticky_detector_rail": "detector_rail", "sticky_bluestone_detector_rail": "detector_rail",
           "sticky_activator_rail": "activator_rail", "sticky_bluestone_activator_rail": "activator_rail"}
@@ -279,9 +272,7 @@ for ours, theirs in STICKY.items():
         write(A + f"models/block/{model_name.replace(theirs, ours, 1)}.json", model)
     write(A + f"blockstates/{ours}.json", swap_models(blockstate, [("minecraft:block/" + theirs, "bluestone:block/" + ours)]))
 
-# Chain rails have an arrow on their texture pointing the way they drive carts, towards the texture's top edge. On the
-# game's rail models the texture's top edge is north, so the plain models turn the texture round to point the arrow
-# south; a "_reversed" model leaves it pointing north, where the model's rotation can't turn it (on slopes).
+# Chain rails have an arrow on their texture pointing the way they drive carts, towards the texture's top edge.
 def flipped(model_name, textures, turned):
     model = vanilla(f"assets/minecraft/models/block/{model_name}.json")
     if turned:
@@ -321,9 +312,8 @@ for rail in CHAIN_RAILS:
                 variants[f"powered={powered},reversed={reversed_},shape={shape}"] = {"model": f"bluestone:block/{rail}_flat"}
     write(A + f"blockstates/{rail}.json", {"variants": variants})
 
-# On walls and ceilings: the floor model turned onto the face it sits on, running the way it travels (a chain
-# rail's arrow points that way), lit while powered. Bent round an inside corner, it is the slope model instead, turned
-# so it rises off its face towards the bend (the slope rises towards its model's north).
+# On walls and ceilings: the floor model turned onto the face it sits on, running the way it travels (a chain rail's
+# arrow points that way), lit while powered.
 OPPOSITE = {"north": "south", "south": "north", "east": "west", "west": "east", "up": "down", "down": "up"}
 
 
@@ -357,8 +347,7 @@ def cross(a, b):
 
 
 # The plain sticky rail also curves (AttachedRailBlock.Curve): its other end is to the right of the way it travels
-# (travel x the way out of the face) or to the left. The game's corner model joins its south and east edges, and
-# turned with its north to some way, its east lands on attached x that way.
+# (travel x the way out of the face) or to the left.
 def curved(attached, travel, curve):
     right = cross(travel, OPPOSITE[attached])
     other = right if curve == "right" else OPPOSITE[right]
@@ -386,10 +375,7 @@ for rail, model in ATTACHED_MODELS.items():
 FLOOR_RAILS = CHAIN_RAILS[:2] + list(STICKY) + CHAIN_RAILS[2:]
 
 # Greenstone paste is redstone dust on any face, placed one face at a time: the game's dust models with their own
-# textures, and the game's dust blockstate once for each face, turned onto it. On a face, north/east/south/west are as
-# on the floor, turned with the face (GreenstonePasteBlock.toWorld): on the ceiling north stays north, on a wall north
-# is up. Paste has a property per direction in the world: "face" where it lies on that face, "line" where it runs off
-# that way. A dust line shows towards each edge whose direction isn't "none"; paste never draws dust's lines up walls.
+# textures, and the game's dust blockstate once for each face, turned onto it.
 def paste_sprite(value):
     if isinstance(value, dict):
         return dict(value, sprite=paste_sprite(value["sprite"]))
@@ -417,8 +403,8 @@ def paste_frame(attached):
     return {"north": north, "east": east, "south": NAMES[tuple(-c for c in VECTORS[north])], "west": NAMES[tuple(-c for c in VECTORS[east])]}
 
 
-# Where two faces both border a direction, "shared" says which draws its line: all, the first or the last of them in
-# the order below (GreenstonePasteBlock.Shared).
+# Where two faces both border a direction, "shared" says which draws its line: all, the first or the last of them in the
+# order below (GreenstonePasteBlock.Shared).
 ORDER = ["down", "up", "north", "south", "west", "east"]
 AXIS = {"down": "y", "up": "y", "north": "z", "south": "z", "west": "x", "east": "x"}
 
@@ -502,7 +488,6 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "conver
     write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
-# The redstone originals kept beside them for comparison are skipped.
 OURS = re.compile(r"bluestone|purplestone|greenstone|converter|sticky|chain_rail")
 for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("programmer art", OUT / "programmer_art/assets/bluestone/textures")]:
     for png in sorted((ART / style).glob("*/*/*.png")):
@@ -592,7 +577,8 @@ ID_PAIRS = [
     ("comparator", "bluestone_comparator"), ("powered_rail", "bluestone_powered_rail"), ("activator_rail", "bluestone_activator_rail"),
     ("detector_rail", "bluestone_detector_rail"), ("redstone", "bluestone"),
 ]
-# Minecraft 26.3 changed the loot table and advancement formats; mc26.1/ is a pack overlay with the old ones for 26.1 and 26.2.
+# Minecraft 26.3 changed the loot table and advancement formats; mc26.1/ is a pack overlay with the old ones for 26.1
+# and 26.2.
 for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
     for old, new in ID_PAIRS[:-1]:
         data = vanilla(f"data/minecraft/loot_table/blocks/{old}.json", jar)
@@ -669,8 +655,6 @@ write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
     "ingredients": ["minecraft:redstone", "bluestone:bluestone", "minecraft:slime_ball", "minecraft:slime_ball"],
     "result": {"count": 4, "id": "bluestone:greenstone_paste"}})
 # The converter box: cobblestone in the corners, quartz in the middle and one of each dust around it, in any order.
-# A shaped recipe also matches its mirror image, so of the 24 orders only those with the left dust before the right one
-# are written. The recipe book shows them together (group).
 DUSTS = ["minecraft:redstone", "bluestone:bluestone", "bluestone:purplestone", "bluestone:greenstone_paste"]
 BOX_RECIPES = []
 for top, left, right, bottom in itertools.permutations(range(4)):
@@ -682,8 +666,7 @@ for top, left, right, bottom in itertools.permutations(range(4)):
                                               "T": DUSTS[top], "L": DUSTS[left], "R": DUSTS[right], "B": DUSTS[bottom]},
                                       "pattern": ["CTC", "LQR", "CBC"], "result": {"id": "bluestone:converter_box"}})
     BOX_RECIPES.append(name)
-# Chain rails: like the powered rail, with iron, an iron chain and dust of their colour. Sticky rails: eight of a
-# rail around a slimeball.
+# Chain rails: like the powered rail, with iron, an iron chain and dust of their colour.
 for rail, dust in [("chain_rail", "minecraft:redstone"), ("bluestone_chain_rail", "bluestone:bluestone")]:
     write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc",
                                      "key": {"I": "minecraft:iron_ingot", "C": "minecraft:iron_chain", "R": dust},
@@ -736,9 +719,7 @@ write("pack.mcmeta", {
     ]},
 })
 
-# Armor trims. 26.3 builds trim textures from palette ids; 26.1 and 26.2 from asset names and the armor_trims atlas.
-# Colours are redstone's #971607 run through the same mix as each dust: red and blue swapped, 60% red plus full blue, or
-# red and green swapped. Each material is given by one item.
+# Armor trims.
 TRIMS = {"bluestone": "#071697", "purplestone": "#5A1697", "greenstone": "#169707"}
 TRIM_ITEMS = {"bluestone": "bluestone:bluestone", "purplestone": "bluestone:purplestone", "greenstone": "bluestone:greenstone_paste"}
 for material, color in TRIMS.items():
@@ -757,8 +738,7 @@ for atlas in ["items", "armor_trims"]:
         "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],
         "permutations": {material: "bluestone:trims/color_palettes/" + material for material in TRIMS}, "textures": source["textures"]}]})
 
-# Inventory icons of trimmed armor: one model per armor piece and material. client/TrimItemModels adds the cases to the
-# armor item files while the game loads them, so the vanilla item files are not replaced.
+# Inventory icons of trimmed armor: one model per armor piece and material.
 for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/items/") and n.endswith(".json")):
     definition = json.loads(z.read(name))
     cases = definition["model"].get("cases", []) if definition["model"].get("type") == "minecraft:select" else []
@@ -794,7 +774,6 @@ RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_det
 write("data/minecraft/tags/block/rails.json", RAILS)
 write("data/minecraft/tags/item/rails.json", RAILS)
 # Since 26.3 flowing water only breaks blocks in this tag; 26.1 and 26.2 break anything that doesn't block movement.
-# Purplestone and the purplestone converter, like redstone and the repeater, can't sit in water.
 write("data/minecraft/tags/block/washed_away_by_fluids.json",
       {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:purplestone_converter",
                   "bluestone:greenstone_paste", "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater",

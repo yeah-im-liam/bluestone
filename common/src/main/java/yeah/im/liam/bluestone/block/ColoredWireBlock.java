@@ -46,8 +46,7 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * The game's redstone dust for another signal channel. Dust that is also a {@link SimpleWaterloggedBlock} can sit in
- * water; the rest washes away like redstone dust.
+ * The game's redstone dust for another signal channel.
  */
 public abstract class ColoredWireBlock extends Block implements SignalBlock {
     public static final EnumProperty<RedstoneSide> NORTH = BlockStateProperties.NORTH_REDSTONE;
@@ -260,18 +259,10 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         return Math.max(signal, ConverterBoxBlock.powerToDustOnTop(level, pos));
     }
 
-    /**
-     * How this dust hears the blocks around it.
-     */
     protected Listener listener() {
         return channel;
     }
 
-    /**
-     * The power this dust takes along the wire from a piece of dust of another colour: one level less, as from its own
-     * kind, if it hears that colour, and none otherwise. A converter box passes on its power the same way to every
-     * colour.
-     */
     protected int powerFromOtherDust(BlockState state) {
         if (state.getBlock() instanceof ConverterBoxBlock) {
             return Math.max(0, state.getValue(ConverterBoxBlock.POWER) - 1);
@@ -398,9 +389,6 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         return colors[power];
     }
 
-    /**
-     * Turns one of redstone dust's colours into this dust's colour.
-     */
     @FunctionalInterface
     interface ColorMix {
         int mix(float red, float green, float blue);
@@ -488,7 +476,6 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         }
     }
 
-    // Only dust that can sit in water has the waterlogged property.
     private static BlockState withWater(BlockState state, boolean water) {
         return state.hasProperty(WATERLOGGED) ? state.setValue(WATERLOGGED, water) : state;
     }

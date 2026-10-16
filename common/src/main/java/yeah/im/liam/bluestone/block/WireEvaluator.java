@@ -42,8 +42,6 @@ abstract class WireEvaluator {
         return wireSignal;
     }
 
-    // What this dust gets from a piece of dust next to it: one level less than its own kind has, and whatever the dust
-    // makes of other colours.
     private int getReceivedSignal(BlockPos pos, BlockState state) {
         return state.is(wireBlock) ? Math.max(0, getWireSignal(pos, state) - 1) : wireBlock.powerFromOtherDust(state);
     }

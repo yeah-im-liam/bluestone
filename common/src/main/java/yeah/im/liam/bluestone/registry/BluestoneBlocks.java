@@ -48,7 +48,7 @@ import yeah.im.liam.bluestone.block.ConverterBoxBlockEntity;
  * Block and item settings copy the redstone versions.
  */
 public final class BluestoneBlocks {
-    // Broken off when a piston pushes it. Called DESTROY before Minecraft 26.3.
+    // Broken off when a piston pushes it.
     private static final PushReaction POPPED = pushReaction("POPPED", "DESTROY");
 
     private static BluestoneWireBlock wire;
@@ -224,10 +224,6 @@ public final class BluestoneBlocks {
         return purplestone;
     }
 
-    /**
-     * Everything for the mod's own creative tab: the bluestone, greenstone and purplestone parts, each in the order the
-     * redstone versions appear, then the converters.
-     */
     public static List<Item> creativeTabItems() {
         List<Item> items = new ArrayList<>(List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
             pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
@@ -243,8 +239,6 @@ public final class BluestoneBlocks {
             purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem);
     }
 
-    // Each set in the game's order, ending with its chain rail: redstone (after the game's activator rail), bluestone,
-    // then the sticky ones.
     public static List<Item> rails() {
         List<Item> rails = new ArrayList<>(List.of(BluestoneRails.item("chain_rail"), poweredRailItem, detectorRailItem, activatorRailItem));
         for (String name : List.of("bluestone_chain_rail", "sticky_rail", "sticky_powered_rail", "sticky_detector_rail", "sticky_activator_rail",

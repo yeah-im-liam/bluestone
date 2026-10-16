@@ -18,9 +18,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * The repeater for greenstone, on floors, walls and ceilings. It restores the signal to full strength; going around a
- * corner onto a wall doesn't. Right-clicking sets its delay, and a greenstone repeater or comparator pointing into its
- * side locks it.
+ * The repeater for greenstone, on floors, walls and ceilings.
  */
 public class GreenstoneRepeaterBlock extends GreenstoneDiodeBlock {
     public static final IntegerProperty DELAY = BlockStateProperties.DELAY;

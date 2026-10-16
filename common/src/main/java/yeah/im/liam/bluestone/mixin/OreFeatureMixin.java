@@ -19,8 +19,8 @@ import yeah.im.liam.bluestone.block.BluestoneOreBlock;
 import yeah.im.liam.bluestone.worldgen.WaterVein;
 
 /**
- * Bluestone veins use the game's ore feature; their blocks are held back until the whole vein is known, so that
- * {@link WaterVein} can favour veins that touch water.
+ * Bluestone veins use the game's ore feature; their blocks are held back until the whole vein is known, so that {@link
+ * WaterVein} can favour veins that touch water.
  */
 @Mixin(OreFeature.class)
 abstract class OreFeatureMixin {

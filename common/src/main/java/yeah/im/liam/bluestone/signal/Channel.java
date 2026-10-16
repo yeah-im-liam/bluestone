@@ -11,8 +11,6 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Redstone and bluestone parts hear their own kind and purplestone, but not each other; purplestone hears both.
- * Greenstone hears only greenstone, and meets the others through the converter box. Levers, buttons, observers and
- * other plain sources belong to no channel, so everything hears them.
  */
 public enum Channel implements Listener {
     REDSTONE,
@@ -31,10 +29,6 @@ public enum Channel implements Listener {
         return this == PURPLESTONE || source == PURPLESTONE;
     }
 
-    /**
-     * The channel a game block listens on when its own code reads signals: its own channel, or redstone for the
-     * game's blocks.
-     */
     public static Channel of(Block block) {
         return block instanceof SignalBlock signalBlock ? signalBlock.channel(block.defaultBlockState()) : REDSTONE;
     }

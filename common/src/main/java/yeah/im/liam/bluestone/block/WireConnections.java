@@ -11,7 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Whether dust bends towards a block of the game, such as a lever, an observer or (for purplestone dust) redstone parts.
+ * Whether dust bends towards a block of the game, such as a lever, an observer or (for purplestone dust) redstone
+ * parts.
  */
 final class WireConnections {
     // Minecraft 26.3 lets each block decide; 26.1 and 26.2 hard-code redstone dust, repeaters and observers.

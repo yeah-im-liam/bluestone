@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * The redstone ore with blue particles. Lighting up, dropping experience and ticking stay the game's.
+ * The redstone ore with blue particles.
  */
 public class BluestoneOreBlock extends RedStoneOreBlock {
     public BluestoneOreBlock(Properties properties) {

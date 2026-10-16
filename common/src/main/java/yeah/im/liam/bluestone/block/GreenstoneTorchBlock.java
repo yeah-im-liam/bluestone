@@ -17,7 +17,6 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
  * blocks such as lamps pick up its signal.
  */
 public class GreenstoneTorchBlock extends RedstoneTorchBlock implements SignalBlock {
-    // Redstone's particle colour with the red and green channels swapped.
     static final DustParticleOptions PARTICLE = new DustParticleOptions(0x00FF00, 1.0F);
 
     public GreenstoneTorchBlock(Properties properties) {
@@ -39,7 +38,6 @@ public class GreenstoneTorchBlock extends RedstoneTorchBlock implements SignalBl
         return Channel.GREENSTONE;
     }
 
-    // No dust bends towards greenstone parts.
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return false;

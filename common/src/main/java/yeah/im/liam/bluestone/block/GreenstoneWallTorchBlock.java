@@ -35,7 +35,6 @@ public class GreenstoneWallTorchBlock extends RedstoneWallTorchBlock implements 
         return Channel.GREENSTONE;
     }
 
-    // No dust bends towards greenstone parts.
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return false;

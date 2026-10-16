@@ -24,13 +24,11 @@ import yeah.im.liam.bluestone.client.CartTurns;
 import yeah.im.liam.bluestone.client.SurfaceCart;
 
 /**
- * Draws a minecart on a wall or ceiling rail turned to match the rail: its floor against the rail's face and its
- * length along the rail, the way the game draws a cart on a floor rail. Going from one to the other the turn is eased
- * in (see {@link CartTurns}).
+ * Draws a minecart on a wall or ceiling rail turned to match the rail: its floor against the rail's face and its length
+ * along the rail, the way the game draws a cart on a floor rail.
  */
 @Mixin(AbstractMinecartRenderer.class)
 abstract class AbstractMinecartRendererMixin {
-    // The game turns the cart about a point this far off the rail.
     @Unique
     private static final double PIVOT_HEIGHT = 0.375;
 
@@ -45,7 +43,6 @@ abstract class AbstractMinecartRendererMixin {
         Vec3 surfacePivot = Vec3.ZERO;
         if (rail.getBlock() instanceof AttachedRailBlock) {
             Direction attached = rail.getValue(AttachedRailBlock.ATTACHED);
-            // Along the rail: towards the end it is moving to, or the way the rail was placed.
             Direction along = rail.getValue(AttachedRailBlock.TRAVEL);
             Direction other = AttachedRailBlock.curveEnd(rail);
             Vec3 velocity = cart.getDeltaMovement();
@@ -55,7 +52,6 @@ abstract class AbstractMinecartRendererMixin {
             Vector3f x = new Vector3f(along.getStepX(), along.getStepY(), along.getStepZ());
             Vector3f y = new Vector3f(-attached.getStepX(), -attached.getStepY(), -attached.getStepZ());
             surface = new Matrix3f(x, y, x.cross(y, new Vector3f())).getNormalizedRotation(new Quaternionf());
-            // The pivot sits the game's height off the face the rail is on, wherever the cart is along it.
             Vec3 face = Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(attached.getUnitVec3i()).scale(0.5 - PIVOT_HEIGHT));
             Vec3 pivot = switch (attached.getAxis()) {
                 case X -> new Vec3(face.x, center.y, center.z);
@@ -64,7 +60,6 @@ abstract class AbstractMinecartRendererMixin {
             };
             surfacePivot = pivot.subtract(origin);
         }
-        // The game's own turn and pivot, as its newRender and oldRender draw them.
         Quaternionf game;
         Vec3 gamePivot;
         if (state.isNewRender) {

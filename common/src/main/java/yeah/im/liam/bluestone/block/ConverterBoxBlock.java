@@ -23,19 +23,12 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * Joins every kind of dust and paste. It takes on the strongest dust or paste touching it, and any signal from the
- * blocks next to it, and passes that on to dust and paste of every colour, one level weaker as from any wire.
- * <p>
- * Each face has a light at the middle of each edge and one in its middle (see {@link #lights}). Its block entity only
- * carries ConverterBoxRenderer, which draws the box glowing while any light is on.
+ * Joins every kind of dust and paste.
  */
 public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     private static final Listener LISTENER = source -> true;
 
-    /**
-     * A lit light: the face it is on, the edge of that face (null for the middle of the face), and its colour.
-     */
     public interface Light {
         void lit(Direction face, @Nullable Direction edge, Channel colour);
     }
@@ -58,12 +51,6 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         return state.is(Blocks.REDSTONE_WIRE) || state.getBlock() instanceof ColoredWireBlock;
     }
 
-    /**
-     * The lit lights of the box at a place. Powered dust or paste lights the box where it meets it: beside the box, the
-     * edge of the face it runs into; lying on it, the middle of that face and the edges its lines run to; lying flush
-     * with a face past one of its edges and running onto it, that edge. A block of redstone, bluestone, purplestone or
-     * greenstone lights every light of the face it covers.
-     */
     public static void lights(BlockGetter level, BlockPos pos, Light light) {
         touches(level, pos, (face, edge, colour, power) -> {
             if (power > 0) {
@@ -120,7 +107,6 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
                     }
                 }
             }
-            // Dust or paste lying level with this face past one of its edges, running onto it.
             for (Direction edge : Direction.values()) {
                 if (edge.getAxis() == face.getAxis()) {
                     continue;
@@ -138,9 +124,6 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         }
     }
 
-    /**
-     * The power a converter box gives dust of any colour lying on top of it: one level less, as along a wire.
-     */
     public static int powerToDustOnTop(BlockGetter level, BlockPos dust) {
         BlockState below = level.getBlockState(dust.below());
         return below.getBlock() instanceof ConverterBoxBlock ? Math.max(0, below.getValue(POWER) - 1) : 0;
@@ -188,7 +171,6 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         }
     }
 
-    // Dust and paste lying flush with a face are two blocks away, so the neighbours' neighbours are told as well.
     private void updateAround(Level level, BlockPos pos) {
         level.updateNeighborsAt(pos, this);
         for (Direction direction : Direction.values()) {

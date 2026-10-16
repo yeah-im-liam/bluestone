@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import yeah.im.liam.bluestone.block.ConverterBoxBlock;
 
 /**
- * Pistons don't move blocks with a block entity, so nothing in it is lost. The converter box's holds nothing, so it
- * moves like any other block.
+ * Pistons don't move blocks with a block entity, so nothing in it is lost.
  */
 @Mixin(PistonBaseBlock.class)
 abstract class PistonBaseBlockMixin {

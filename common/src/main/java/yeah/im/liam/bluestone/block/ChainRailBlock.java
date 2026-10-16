@@ -18,9 +18,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 
 /**
  * A straight rail that, while powered by its colour, moves minecarts at a fixed speed the way it was placed, whatever
- * speed or direction they come in with; unpowered, it holds them still. It gets power like a powered rail. The way it
- * drives is along its track: south or east, or north or west when {@link #REVERSED}, so it stays right when other
- * rails bend it round to the other axis.
+ * speed or direction they come in with; unpowered, it holds them still.
  */
 public class ChainRailBlock extends RailBlock {
     public static final BooleanProperty REVERSED = BooleanProperty.create("reversed");
@@ -43,7 +41,6 @@ public class ChainRailBlock extends RailBlock {
         return channel;
     }
 
-    // Straight and sloped only, like a powered rail.
     @Override
     public boolean isStraight() {
         return true;

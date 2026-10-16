@@ -24,9 +24,8 @@ import yeah.im.liam.bluestone.block.StickyRailBlock;
 import yeah.im.liam.bluestone.signal.Channel;
 
 /**
- * Chain rails, and sticky rails, which also go on walls and ceilings: each sticky rail is a floor rail and an
- * {@link AttachedRailBlock} placed by the same item. The powered, detector, activator and chain rails come in a
- * redstone and a bluestone kind.
+ * Chain rails, and sticky rails, which also go on walls and ceilings: each sticky rail is a floor rail and an {@link
+ * AttachedRailBlock} placed by the same item.
  */
 public final class BluestoneRails {
     private static final Map<String, Item> ITEMS = new HashMap<>();
@@ -91,9 +90,7 @@ public final class BluestoneRails {
         return ITEMS.get(name);
     }
 
-    /**
-     * Sticky powered and activator rails on the floor: minecarts on Fabric look for the game's own by block.
-     */
+    // Sticky powered and activator rails on the floor: minecarts on Fabric look for the game's own by block.
     public static boolean poweredRail(BlockState state) {
         return POWERED_RAILS.contains(state.getBlock());
     }

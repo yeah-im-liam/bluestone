@@ -12,10 +12,7 @@ import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.Bluestone;
 
 /**
- * Gives trimmed armor its bluestone, purplestone and greenstone icons. Each vanilla armor item picks its icon by trim
- * material; next to the redstone case goes a case for each of the mod's materials, pointing at the mod's own model.
- * This runs on the item files as the game reads them, after resource packs and other mods have had their say, instead
- * of replacing the files.
+ * Gives trimmed armor its bluestone, purplestone and greenstone icons.
  */
 public final class TrimItemModels {
     private static final List<String> MATERIALS = List.of("bluestone", "purplestone", "greenstone");
@@ -28,7 +25,6 @@ public final class TrimItemModels {
     }
 
     public static JsonElement addCases(Identifier item, JsonElement definition) {
-        // The mod has models for the vanilla armor only.
         if (item.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
             visit(item.getPath(), definition);
         }
@@ -73,7 +69,6 @@ public final class TrimItemModels {
             JsonObject model = new JsonObject();
             model.addProperty("type", MODEL.toString());
             model.addProperty("model", Bluestone.id("item/" + item + "_" + material + "_trim").toString());
-            // Leather armor tints its trimmed icons with the dye colour; keep whatever redstone's icon does.
             if (redstone.get("model") instanceof JsonObject redstoneModel && redstoneModel.get("tints") instanceof JsonArray tints) {
                 model.add("tints", tints.deepCopy());
             }

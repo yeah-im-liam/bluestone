@@ -34,8 +34,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 
 /**
  * Draws a converter box glowing while any of its lights is on, over the world's own drawing of it and nudged towards
- * the camera so it covers it exactly. Like a chiseled bookshelf, each face is nine flat pieces, and a lit light is its
- * piece in the overlay of its colour. The pieces are models on made-up block states (BlockStateDefinitionsMixin).
+ * the camera so it covers it exactly.
  */
 public final class ConverterBoxRenderer implements BlockEntityRenderer<ConverterBoxBlockEntity, ConverterBoxRenderer.State> {
     public static final Identifier FRAME_ID = Bluestone.id("converter_box_frame");
@@ -145,7 +144,6 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
         }
     }
 
-    // The glow shows as far off as the world draws blocks.
     @Override
     public int getViewDistance() {
         return 1024;

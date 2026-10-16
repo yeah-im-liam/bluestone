@@ -35,8 +35,6 @@ abstract class DiodeBlockMixin {
         return Signals.read(Channel.of((Block) (Object) this), () -> original.call(level, pos, state));
     }
 
-    // The game's comparator counts a Block of Redstone beside it at full strength and dust at its power; purplestone
-    // counts the same way.
     @ModifyReturnValue(method = "getAlternateSignal", at = @At("RETURN"))
     private int bluestone$purplestoneSides(int signal, @Local(argsOnly = true) SignalGetter level, @Local(argsOnly = true) BlockPos pos,
                                            @Local(argsOnly = true) BlockState state) {

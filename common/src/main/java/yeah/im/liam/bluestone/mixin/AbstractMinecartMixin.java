@@ -12,8 +12,8 @@ import yeah.im.liam.bluestone.rail.RailRider;
 import yeah.im.liam.bluestone.rail.SurfaceRails;
 
 /**
- * Lets {@link SurfaceRails} move carts on wall and ceiling rails in place of the game's movement, for both the old
- * and the experimental minecart behaviour.
+ * Lets {@link SurfaceRails} move carts on wall and ceiling rails in place of the game's movement, for both the old and
+ * the experimental minecart behaviour.
  */
 @Mixin(AbstractMinecart.class)
 abstract class AbstractMinecartMixin implements RailRider {

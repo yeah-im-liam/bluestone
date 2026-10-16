@@ -56,14 +56,11 @@ abstract class RailStateMixin {
         }
     }
 
-    // Joining a rail laid next to it, the game works out this rail's shape afresh; one at the foot of a wall rail stays
-    // sloped up to it.
     @Inject(method = "connectTo", at = @At("TAIL"))
     private void bluestone$staySloped(RailState rail, CallbackInfo ci) {
         bluestone$slope();
     }
 
-    // The game drops connections that lead to no rail; one that leads to a wall rail stays.
     @Inject(method = "removeSoftConnections", at = @At("TAIL"))
     private void bluestone$keepWallRails(CallbackInfo ci) {
         RailShape shape = state.getValue(((BaseRailBlock) state.getBlock()).getShapeProperty());
@@ -76,8 +73,6 @@ abstract class RailStateMixin {
         }
     }
 
-    // A rail laid at the foot of a wall rail slopes up to it. A wall rail down the side of the block this rail sits on
-    // isn't next to it, so it is told this rail is here.
     @Inject(method = "place", at = @At("TAIL"))
     private void bluestone$tellWallRails(boolean hasSignal, boolean first, RailShape defaultShape, CallbackInfoReturnable<RailState> cir) {
         bluestone$slope();

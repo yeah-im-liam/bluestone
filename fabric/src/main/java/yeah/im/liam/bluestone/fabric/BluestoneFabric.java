@@ -32,7 +32,6 @@ public final class BluestoneFabric implements ModInitializer {
         BluestoneBlocks.registerBlocks(registrar(BuiltInRegistries.BLOCK));
         BluestoneBlocks.registerItems(registrar(BuiltInRegistries.ITEM));
         BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE));
-        // The bluestone comparator keeps the game's comparator block entity.
         ((FabricBlockEntityType) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("comparator")))
             .addValidBlock(BluestoneBlocks.comparator());
         registerCreativeTabs();

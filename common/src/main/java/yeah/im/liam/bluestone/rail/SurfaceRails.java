@@ -20,36 +20,20 @@ import yeah.im.liam.bluestone.block.AttachedRailBlock.Kind;
 import yeah.im.liam.bluestone.block.ChainRailBlock;
 
 /**
- * Minecart movement on rails stuck to walls and ceilings. The game moves carts on floor rails as usual; once a cart
- * reaches a wall or ceiling rail, this takes over. The cart runs along each rail's middle line, round curves, and
- * turns at inside corners (track running into a wall carries on up it) and outside corners (track running over an
- * edge carries on down the other side). Climbing slows a cart and coming down speeds it up, more gently than falling;
- * a cart that stops climbing rolls back. On
- * a ceiling a cart needs {@link #MIN_CEILING_SPEED} to stay on. Powered chain rails move carts at
- * {@link #CHAIN_SPEED} the way they were placed and unpowered ones hold them still, and a cart leaving chain rails goes
- * back to the speed it came on at; powered rails speed carts up and
- * unpowered ones brake them to a stop. Back on a floor rail, the game takes over again. Floor rails meeting a wall can
- * be straight or curved.
+ * Minecart movement on rails stuck to walls and ceilings.
  */
 public final class SurfaceRails {
     public static final double CHAIN_SPEED = 0.2;
     public static final double MIN_CEILING_SPEED = 0.1;
-    // Gravity along the track (a quarter of a falling cart's, so a cart at full speed climbs about five blocks), a
-    // little less drag than on the floor, and the game's powered rail boost.
     private static final double GRAVITY = 0.015;
     private static final double DRAG = 0.995;
     private static final double BOOST = 0.06;
     private static final double MAX_SPEED = 1.0;
-    // Ticks after falling off before a cart can be picked up by a wall or ceiling rail again.
     private static final int COOLDOWN = 10;
 
     private SurfaceRails() {
     }
 
-    /**
-     * A piece of track: where it is, the face it sits on, the axis carts run along, what kind of rail it is, whether
-     * it is powered, the way it was placed (the way chain rails drive), and for a curve its other end.
-     */
     public record Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel,
                         @Nullable Direction other) {
         public Track(BlockPos pos, Direction attached, Direction.Axis axis, Kind kind, boolean powered, @Nullable Direction travel) {
@@ -60,9 +44,6 @@ public final class SurfaceRails {
             return attached == Direction.DOWN;
         }
 
-        /**
-         * Its two ends: either way along its axis, or for a curve the way it was placed and its other end.
-         */
         public List<Direction> ends() {
             return other != null ? List.of(travel, other)
                 : List.of(Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE), Direction.fromAxisAndDirection(axis, Direction.AxisDirection.NEGATIVE));
@@ -72,7 +53,6 @@ public final class SurfaceRails {
             return other != null ? way == travel || way == other : way.getAxis() == axis;
         }
 
-        // The end a cart leaves by after coming in by the given one.
         Direction out(Direction in) {
             if (other != null && in == travel) {
                 return other;
@@ -83,12 +63,10 @@ public final class SurfaceRails {
             return in.getOpposite();
         }
 
-        // The way a powered chain rail drives carts, or null.
         @Nullable Direction drive() {
             return kind == Kind.CHAIN && powered ? travel : null;
         }
 
-        // Where the middle of a cart of the given height is when it sits on this piece of track.
         Vec3 point(double height) {
             double y = switch (attached) {
                 case DOWN -> pos.getY() + height / 2.0;
@@ -99,16 +77,9 @@ public final class SurfaceRails {
         }
     }
 
-    /**
-     * The next piece of track and the way a cart goes on from it.
-     */
     record Step(Track track, Direction exit) {
     }
 
-    /**
-     * Where a cart is going: from one piece of track, which it left going {@code fromExit}, to the next, which it
-     * leaves going {@code exit}.
-     */
     public record Ride(Track from, Direction fromExit, Track to, Direction exit, double speed) {
         Ride reversed() {
             return new Ride(to, to.out(exit), from, from.out(fromExit), speed);
@@ -140,10 +111,6 @@ public final class SurfaceRails {
         return next(level, from, exit, true);
     }
 
-    /**
-     * Whether track carries on from {@code from} going {@code exit}. Unless {@code strict}, track there that runs the
-     * wrong way counts too: it could turn to join.
-     */
     public static boolean joins(Level level, Track from, Direction exit, boolean strict) {
         return next(level, from, exit, strict) != null;
     }
@@ -152,7 +119,6 @@ public final class SurfaceRails {
         Direction attached = from.attached();
         BlockPos ahead = from.pos().relative(exit);
         if (level.getBlockState(ahead).isFaceSturdy(level, ahead, exit.getOpposite())) {
-            // Inside corner: the track carries on up the block in the way.
             BlockPos upPos = from.pos().relative(attached.getOpposite());
             if (exit == Direction.DOWN) {
                 return onFloor(level, upPos, attached, strict);
@@ -160,7 +126,6 @@ public final class SurfaceRails {
             Track up = track(level, upPos);
             return up != null && up.attached() == exit && (!strict || up.hasEnd(attached)) ? new Step(up, up.out(attached)) : null;
         }
-        // Down a wall onto the floor rail below it.
         if (exit == Direction.DOWN) {
             Step floor = onFloor(level, ahead, attached, strict);
             if (floor != null) {
@@ -171,11 +136,9 @@ public final class SurfaceRails {
         if (next != null && next.attached() == attached && (!strict || next.hasEnd(exit.getOpposite()))) {
             return new Step(next, next.out(exit.getOpposite()));
         }
-        // Inside corner from the other side: the track ahead is on the block it runs into.
         if (next != null && next.attached() == exit && (!strict || next.hasEnd(attached))) {
             return new Step(next, next.out(attached));
         }
-        // Outside corner: around the edge of the block the track sits on, onto its top going up a wall.
         if (exit == Direction.UP) {
             return onFloor(level, ahead.relative(attached), attached.getOpposite(), strict);
         }
@@ -186,9 +149,6 @@ public final class SurfaceRails {
         return null;
     }
 
-    /**
-     * The pieces of track the piece at {@code pos} joins: floor, wall or ceiling rails, round corners.
-     */
     public static List<BlockPos> neighbours(Level level, BlockPos pos) {
         Track here = track(level, pos);
         List<Direction> ends = here != null ? here.ends() : levelEnds(level, pos, level.getBlockState(pos));
@@ -203,8 +163,6 @@ public final class SurfaceRails {
         return neighbours;
     }
 
-    // A floor rail with an end pointing back the way the cart comes, straight or curved, and the end the cart leaves by.
-    // Unless strict, any level floor rail will do: it could turn to join.
     private static @Nullable Step onFloor(Level level, BlockPos pos, Direction back, boolean strict) {
         List<Direction> ends = levelEnds(level, pos, level.getBlockState(pos));
         if (ends.isEmpty() || strict && !ends.contains(back)) {
@@ -218,7 +176,6 @@ public final class SurfaceRails {
         return new Step(track, out);
     }
 
-    // The two ends of a floor rail: straight, curved, or a slope up to a wall rail; none for anything else.
     private static List<Direction> levelEnds(Level level, BlockPos pos, BlockState state) {
         if (!(state.getBlock() instanceof BaseRailBlock rail) || !BaseRailBlock.isRail(state)) {
             return List.of();
@@ -231,14 +188,8 @@ public final class SurfaceRails {
         return WallRails.level(shape);
     }
 
-    // The cart is drawn turned about a point this far off the face its rail is on, as the game turns a cart on a floor
-    // rail (AbstractMinecartRendererMixin).
     private static final double PIVOT_HEIGHT = 0.375;
 
-    /**
-     * Where a rider of a cart on a wall or ceiling rail goes: turned with the cart about its pivot, so its eyes are
-     * where the turned cart carries them rather than inside the wall or ceiling. Null on any other rail.
-     */
     public static @Nullable Vec3 turnedRider(AbstractMinecart cart, Entity rider) {
         Vec3 center = cart.position().add(0.0, cart.getBbHeight() / 2.0, 0.0);
         BlockPos pos = BlockPos.containing(center);
@@ -253,8 +204,6 @@ public final class SurfaceRails {
             case Y -> new Vec3(center.x, face.y, center.z);
             case Z -> new Vec3(center.x, center.y, face.z);
         };
-        // The cart's floor faces out of the rail's face: on a wall up is turned towards that, on a ceiling turned over
-        // along the rail.
         Direction out = attached.getOpposite();
         Quaternionf turn = out == Direction.DOWN
             ? new Quaternionf().rotationAxis((float) Math.PI, rail.getValue(AttachedRailBlock.TRAVEL).getStepX(), 0.0F, rail.getValue(AttachedRailBlock.TRAVEL).getStepZ())
@@ -268,9 +217,6 @@ public final class SurfaceRails {
         return new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
     }
 
-    /**
-     * Runs before the game's minecart movement each tick; returns true when it moved the cart itself.
-     */
     public static boolean tick(AbstractMinecart cart) {
         if (!(cart.level() instanceof ServerLevel level)) {
             return false;
@@ -290,12 +236,9 @@ public final class SurfaceRails {
         }
         double height = cart.getBbHeight();
         Vec3 pos = cart.position().add(0.0, height / 2.0, 0.0);
-        // The track the cart is on now, fresh from the world so power changes count straight away. Turning from a floor
-        // rail up onto a wall or ceiling rail counts as being on the new rail.
         BlockPos onPos = ride.from().floor() && !ride.to().floor() || ride.to().pos().equals(BlockPos.containing(pos)) ? ride.to().pos() : ride.from().pos();
         Track on = track(level, onPos);
         if (on == null) {
-            // A floor slope or curve isn't a piece of track by itself; the ride knows it.
             on = onPos.equals(ride.to().pos()) && ride.to().floor() ? ride.to() : onPos.equals(ride.from().pos()) && ride.from().floor() ? ride.from() : null;
         }
         if (on == null) {
@@ -304,8 +247,6 @@ public final class SurfaceRails {
         }
         Vec3 heading = heading(pos, ride, height);
         double speed = ride.speed();
-        // Chain rails set the pace while the cart is on them; off them, the cart goes on at the speed it came on at, plus
-        // what it would have gained going down since, but never faster than they moved it.
         if (on.kind() == Kind.CHAIN) {
             if (Double.isNaN(rider.bluestone$chainEntry())) {
                 rider.bluestone$setChainEntry(speed);
@@ -376,7 +317,6 @@ public final class SurfaceRails {
             Track at = ride.to();
             Direction exit = at.drive() != null ? at.drive() : ride.exit();
             if (at.floor() && exit.getAxis().isHorizontal()) {
-                // Back on a floor rail: the game carries on from here.
                 place(cart, pos, height, unit(exit).scale(speed));
                 rider.bluestone$setRide(null);
                 return true;
@@ -384,7 +324,6 @@ public final class SurfaceRails {
             Step step = next(level, at, exit);
             if (step == null) {
                 if (exit == Direction.UP) {
-                    // Out of track going up: stop, and roll back next tick.
                     ride = new Ride(at, exit, at, exit, 0.0);
                     speed = 0.0;
                     heading = unit(exit);
@@ -402,7 +341,6 @@ public final class SurfaceRails {
         return true;
     }
 
-    // Detector rails notice the cart, and activator rails activate it.
     private static void affect(ServerLevel level, AbstractMinecart cart, Vec3 center) {
         BlockPos pos = BlockPos.containing(center);
         BlockState state = level.getBlockState(pos);
@@ -415,7 +353,6 @@ public final class SurfaceRails {
         }
     }
 
-    // Which way the cart is going: towards the next point, or on along the track once there.
     private static Vec3 heading(Vec3 pos, Ride ride, double height) {
         Vec3 delta = ride.to().point(height).subtract(pos);
         return delta.lengthSqr() > 1.0E-12 ? delta.normalize() : unit(ride.exit());
@@ -442,14 +379,12 @@ public final class SurfaceRails {
         return false;
     }
 
-    // Picks up a cart that is on a wall or ceiling rail, or about to leave a floor rail for one.
     private static @Nullable Ride start(Level level, AbstractMinecart cart) {
         double height = cart.getBbHeight();
         Vec3 center = cart.position().add(0.0, height / 2.0, 0.0);
         Vec3 velocity = cart.getDeltaMovement();
         Track here = track(level, BlockPos.containing(center));
         if (here != null && !here.floor()) {
-            // The end it is moving towards, if any.
             Direction moving = null;
             double along = 1.0E-4;
             for (Direction end : here.ends()) {
@@ -466,7 +401,6 @@ public final class SurfaceRails {
             } else if (here.hasEnd(Direction.DOWN)) {
                 exit = Direction.DOWN;
             } else if (here.attached() != Direction.UP) {
-                // Standing still on a sideways wall rail: it stays where it is.
                 exit = here.travel();
             } else {
                 return null;
@@ -477,7 +411,6 @@ public final class SurfaceRails {
             }
             Vec3 point = here.point(height);
             if (here.other() != null) {
-                // On a curve: from its middle.
                 cart.setPos(point.x, point.y - height / 2.0, point.z);
                 Step step = next(level, here, exit);
                 return step == null ? new Ride(here, exit, here, exit, speed) : new Ride(here, exit, step.track(), step.exit(), speed);
@@ -508,7 +441,6 @@ public final class SurfaceRails {
             : Direction.fromAxisAndDirection(floor.axis(), along > 0 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE);
         double speed = floor.drive() != null ? CHAIN_SPEED : Math.abs(along);
         Vec3 point = floor.point(height);
-        // Only once the cart reaches the middle of the floor rail, where the track turns.
         if (center.subtract(point).dot(unit(exit)) < -speed - 0.01) {
             return null;
         }
@@ -520,9 +452,6 @@ public final class SurfaceRails {
         return new Ride(floor, exit, step.track(), step.exit(), speed);
     }
 
-    // A cart on a curved floor rail, or a slope up to a wall rail, leaves by the end it didn't come in by. Into a wall it
-    // turns up the wall rail as soon as it is on the rail (a curve is too tight for a cart to follow); over an edge, it
-    // goes round the curve until past halfway. Rolling back, it leaves by the end it came in by.
     private static @Nullable Ride startOnCurve(Level level, AbstractMinecart cart, BlockPos railPos, Vec3 center, Vec3 velocity) {
         List<Direction> ends = levelEnds(level, railPos, level.getBlockState(railPos));
         if (ends.isEmpty()) {
@@ -544,9 +473,6 @@ public final class SurfaceRails {
         return step == null || step.track().floor() ? null : new Ride(floor, entry.getOpposite(), step.track(), step.exit(), speed);
     }
 
-    // Chain rails on the floor: the game moves the cart, at the rail's speed and the way it was placed, or not at
-    // all while the rail is unpowered. Back on another rail, the cart goes on at the speed it came onto the chain rails at,
-    // but never faster than they moved it.
     private static void driveOnFloor(Level level, AbstractMinecart cart, RailRider rider) {
         BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
         Vec3 velocity = cart.getDeltaMovement();

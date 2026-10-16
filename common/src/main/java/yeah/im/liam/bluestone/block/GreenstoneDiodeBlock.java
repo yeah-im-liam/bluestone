@@ -31,9 +31,7 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * The game's repeater and comparator logic for greenstone, on any face: floor, wall or ceiling. {@link #ATTACHED} is
- * the face it sits on and {@link #OUTPUT} the way its signal goes, along that face; the input is behind it and the
- * sides are the two directions left over.
+ * The game's repeater and comparator logic for greenstone, on any face: floor, wall or ceiling.
  */
 public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock {
     public static final EnumProperty<Direction> ATTACHED = EnumProperty.create("attached", Direction.class);
@@ -93,7 +91,6 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return level.getBlockState(support).isFaceSturdy(level, support, attached.getOpposite(), SupportType.RIGID);
     }
 
-    // On the face clicked, sending its signal the way the player looks along that face.
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction attached = context.getClickedFace().getOpposite();
@@ -164,7 +161,6 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         });
     }
 
-    // What the sides feed in: only other greenstone repeaters and comparators if diodesOnly, else any greenstone source.
     protected int getSideSignal(SignalGetter level, BlockPos pos, BlockState state, boolean diodesOnly) {
         return Signals.read(Channel.GREENSTONE, () -> {
             int signal = 0;
@@ -187,7 +183,6 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         });
     }
 
-    // Paste on the same face as this repeater or comparator; paste on other faces of that space doesn't reach it.
     private static boolean onSurface(BlockState paste, BlockState state) {
         return paste.getBlock() instanceof GreenstonePasteBlock && GreenstonePasteBlock.hasFace(paste, state.getValue(ATTACHED));
     }
@@ -207,8 +202,6 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return getSignal(state, level, pos, direction);
     }
 
-    // Changing state tells the block in front and everything around it, like the game's repeater. A new one checks its
-    // input straight away, so it turns on when placed next to something already powered.
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         updateNeighborsInFront(level, pos, state);

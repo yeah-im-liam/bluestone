@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
 /**
- * How the view of a rider turns with a cart on a wall or ceiling rail. Kept in config/bluestone-client.properties.
+ * How the view of a rider turns with a cart on a wall or ceiling rail.
  */
 public final class CartViewSettings {
     public enum Speed {

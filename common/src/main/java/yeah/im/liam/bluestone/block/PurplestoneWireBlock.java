@@ -10,10 +10,9 @@ import yeah.im.liam.bluestone.signal.Signals;
 
 /**
  * Purplestone dust takes power from both redstone and bluestone, but only at half strength, rounded down; both pick up
- * its own signal at full strength. Like redstone dust, it can't sit in water.
+ * its own signal at full strength.
  */
 public class PurplestoneWireBlock extends ColoredWireBlock {
-    // Redstone and bluestone signals come in at half strength; purplestone and plain sources such as levers at full.
     private static final Listener LISTENER = new Listener() {
         @Override
         public boolean hears(Channel source) {
@@ -35,7 +34,6 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
         return LISTENER;
     }
 
-    // Redstone or bluestone dust at 10 gives purplestone dust 5, instead of the 9 it would give its own kind.
     @Override
     protected int powerFromOtherDust(BlockState state) {
         if (state.getBlock() instanceof ConverterBoxBlock) {
@@ -44,7 +42,6 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
         return Signals.isDust(state) && LISTENER.hears(Channel.ofSource(state)) ? state.getValue(POWER) / 2 : 0;
     }
 
-    // Every kind of dust bends towards purplestone dust, since all of them can feed it.
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return true;

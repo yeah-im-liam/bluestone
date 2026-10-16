@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 /**
- * Minecraft 26.3 renamed RedStoneWireBlock to RedstoneWireBlock; this applies the dust mixin written for the running game.
+ * Minecraft 26.3 renamed RedStoneWireBlock to RedstoneWireBlock; this applies the dust mixin written for the running
+ * game.
  */
 public final class WireMixinPlugin implements IMixinConfigPlugin {
     private static final String OLD_WIRE = "net/minecraft/world/level/block/RedStoneWireBlock.class";

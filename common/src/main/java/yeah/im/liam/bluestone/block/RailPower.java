@@ -19,9 +19,9 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * Power for chain rails and rails on walls and ceilings, the way the game powers its powered rails: a rail is
- * powered by a signal of its colour next to it, or through up to eight rails of the same kind and colour along the
- * track from one that is. Only signals count, not the rails' own powered state, so a line can't keep itself on.
+ * Power for chain rails and rails on walls and ceilings, the way the game powers its powered rails: a rail is powered
+ * by a signal of its colour next to it, or through up to eight rails of the same kind and colour along the track from
+ * one that is.
  */
 public final class RailPower {
     private static final int REACH = 8;
@@ -33,7 +33,6 @@ public final class RailPower {
         return Signals.test(channel, () -> level.hasNeighborSignal(pos));
     }
 
-    // A floor rail: along its track, up and down slopes.
     static boolean floor(Level level, BlockPos pos, BlockState state, Channel channel) {
         if (direct(level, pos, channel)) {
             return true;
@@ -73,11 +72,6 @@ public final class RailPower {
         };
     }
 
-    /**
-     * Whether a powered, activator or chain rail gets power along its track: from a signal of its colour next to a rail
-     * of the same kind and colour (the game's or sticky, on a floor, wall or ceiling) up to eight rails along, round
-     * corners from floor to wall to ceiling.
-     */
     public static boolean along(Level level, BlockPos pos, BlockState state) {
         Kind kind = kind(state);
         if (kind == null) {
@@ -104,15 +98,11 @@ public final class RailPower {
         return false;
     }
 
-    /**
-     * Whether two rails pass power to each other: the same kind and colour, whether the game's or sticky.
-     */
     public static boolean samePower(BlockState a, BlockState b) {
         Kind kind = kind(a);
         return kind != null && kind == kind(b) && channel(a) == channel(b);
     }
 
-    // What a rail does to carts, as far as passing power goes: powered, activator or chain; null for any other rail.
     private static @Nullable Kind kind(BlockState state) {
         Block block = state.getBlock();
         if (block instanceof AttachedRailBlock rail) {

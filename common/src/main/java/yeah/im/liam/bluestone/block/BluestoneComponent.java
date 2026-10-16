@@ -15,9 +15,6 @@ public interface BluestoneComponent extends SignalBlock {
         return Channel.BLUESTONE;
     }
 
-    /**
-     * Bluestone and purplestone dust bend towards bluestone signal sources; redstone dust never does.
-     */
     @Override
     default boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return wire != Channel.REDSTONE && state.isSignalSource() && direction != null;

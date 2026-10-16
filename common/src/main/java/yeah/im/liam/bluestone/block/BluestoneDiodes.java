@@ -11,8 +11,8 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.Signals;
 
 /**
- * Input reading shared by the bluestone repeater and comparator: the game's diode logic with bluestone dust and
- * blocks in place of the redstone ones.
+ * Input reading shared by the bluestone repeater and comparator: the game's diode logic with bluestone dust and blocks
+ * in place of the redstone ones.
  */
 final class BluestoneDiodes {
     static final DustParticleOptions PARTICLE = new DustParticleOptions(0x0000FF, 1.0F);
@@ -20,7 +20,6 @@ final class BluestoneDiodes {
     private BluestoneDiodes() {
     }
 
-    // A powered bluestone particle (ClientLevelMixin adds a bubble underwater).
     static void particle(Level level, double x, double y, double z) {
         level.addParticle(PARTICLE, x, y, z, 0.0, 0.0, 0.0);
     }
@@ -34,7 +33,6 @@ final class BluestoneDiodes {
                 return input;
             }
             BlockState target = level.getBlockState(targetPos);
-            // Bluestone and purplestone dust, the dust that bluestone hears.
             return Math.max(input, target.getBlock() instanceof ColoredWireBlock ? target.getValue(ColoredWireBlock.POWER) : 0);
         });
     }

@@ -17,14 +17,11 @@ import yeah.im.liam.bluestone.block.GreenstoneComparatorBlock;
 
 @Mixin(Level.class)
 abstract class LevelMixin {
-    // Containers tell nearby comparators when their contents change; the game only looks for its own comparator.
     @WrapOperation(method = "updateNeighbourForOutputSignal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z"))
     private boolean bluestone$alsoBluestoneComparator(BlockState state, Object block, Operation<Boolean> original) {
         return original.call(state, block) || block == Blocks.COMPARATOR && state.getBlock() instanceof BluestoneComparatorBlock;
     }
 
-    // Greenstone comparators can sit on walls and ceilings, so they are looked for on all six sides, directly or
-    // through a solid block, the way the game looks for its own beside a container.
     @Inject(method = "updateNeighbourForOutputSignal", at = @At("TAIL"))
     private void bluestone$greenstoneComparators(BlockPos pos, Block block, CallbackInfo ci) {
         Level level = (Level) (Object) this;

@@ -22,7 +22,6 @@ public class GreenstoneBlock extends PoweredBlock implements SignalBlock {
         return Channel.GREENSTONE;
     }
 
-    // No dust bends towards greenstone parts.
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
         return false;
