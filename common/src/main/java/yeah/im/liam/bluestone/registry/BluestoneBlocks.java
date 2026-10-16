@@ -231,9 +231,8 @@ public final class BluestoneBlocks {
     public static List<Item> creativeTabItems() {
         List<Item> items = new ArrayList<>(List.of(dust, torchItem, blockItem, repeaterItem, comparatorItem,
             pasteItem, greenstoneTorchItem, greenstoneBlockItem, greenstoneRepeaterItem, greenstoneComparatorItem,
-            purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem,
-            poweredRailItem, detectorRailItem, activatorRailItem));
-        items.addAll(BluestoneRails.items());
+            purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem));
+        items.addAll(rails());
         items.addAll(List.of(oreItem, deepslateOreItem));
         return items;
     }
@@ -244,9 +243,15 @@ public final class BluestoneBlocks {
             purplestone, purplestoneTorchItem, purplestoneBlockItem, purplestoneConverterItem, converterBoxItem);
     }
 
+    // Each set in the game's order, ending with its chain rail: redstone (after the game's activator rail), bluestone,
+    // then the sticky ones.
     public static List<Item> rails() {
-        List<Item> rails = new ArrayList<>(List.of(poweredRailItem, detectorRailItem, activatorRailItem));
-        rails.addAll(BluestoneRails.items());
+        List<Item> rails = new ArrayList<>(List.of(BluestoneRails.item("chain_rail"), poweredRailItem, detectorRailItem, activatorRailItem));
+        for (String name : List.of("bluestone_chain_rail", "sticky_rail", "sticky_powered_rail", "sticky_detector_rail", "sticky_activator_rail",
+            "sticky_chain_rail", "sticky_bluestone_powered_rail", "sticky_bluestone_detector_rail", "sticky_bluestone_activator_rail",
+            "sticky_bluestone_chain_rail")) {
+            rails.add(BluestoneRails.item(name));
+        }
         return rails;
     }
 

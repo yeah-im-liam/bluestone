@@ -1,7 +1,9 @@
 package yeah.im.liam.bluestone.registry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
@@ -27,7 +29,7 @@ import yeah.im.liam.bluestone.signal.Channel;
  * redstone and a bluestone kind.
  */
 public final class BluestoneRails {
-    private static final List<Item> ITEMS = new ArrayList<>();
+    private static final Map<String, Item> ITEMS = new HashMap<>();
     private static final List<Block> POWERED_RAILS = new ArrayList<>();
     private static final List<Block> ACTIVATOR_RAILS = new ArrayList<>();
     private static final List<Runnable> ITEM_REGISTRATIONS = new ArrayList<>();
@@ -57,7 +59,7 @@ public final class BluestoneRails {
 
     private static void floorOnly(Registrar<Block> blocks, String name, Function<BlockBehaviour.Properties, Block> factory) {
         Block floor = blocks.register(name, key -> factory.apply(properties(key)));
-        ITEM_REGISTRATIONS.add(() -> ITEMS.add(itemRegistrar.register(name, key -> new BlockItem(floor, itemProperties(key)))));
+        ITEM_REGISTRATIONS.add(() -> ITEMS.put(name, itemRegistrar.register(name, key -> new BlockItem(floor, itemProperties(key)))));
     }
 
     private static void sticky(Registrar<Block> blocks, String name, Function<BlockBehaviour.Properties, Block> factory, Kind kind, @Nullable Channel channel) {
@@ -70,7 +72,7 @@ public final class BluestoneRails {
         } else if (kind == Kind.ACTIVATOR) {
             ACTIVATOR_RAILS.add(floor);
         }
-        ITEM_REGISTRATIONS.add(() -> ITEMS.add(itemRegistrar.register(name, key -> new SurfaceRailItem(floor, attached, itemProperties(key)))));
+        ITEM_REGISTRATIONS.add(() -> ITEMS.put(name, itemRegistrar.register(name, key -> new SurfaceRailItem(floor, attached, itemProperties(key)))));
     }
 
     private static BlockBehaviour.Properties properties(ResourceKey<Block> key) {
@@ -85,8 +87,8 @@ public final class BluestoneRails {
         return new Item.Properties().setId(key).useBlockDescriptionPrefix();
     }
 
-    public static List<Item> items() {
-        return ITEMS;
+    static Item item(String name) {
+        return ITEMS.get(name);
     }
 
     /**
