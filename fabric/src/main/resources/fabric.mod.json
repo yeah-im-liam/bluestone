@@ -16,6 +16,9 @@
     ],
     "client": [
       "yeah.im.liam.bluestone.fabric.client.BluestoneFabricClient"
+    ],
+    "modmenu": [
+      "yeah.im.liam.bluestone.fabric.client.ModMenuCompat"
     ]
   },
   "mixins": [
@@ -27,5 +30,8 @@
     "minecraft": "${fabric_minecraft_range}",
     "java": ">=${java_version}",
     "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
   }
 }

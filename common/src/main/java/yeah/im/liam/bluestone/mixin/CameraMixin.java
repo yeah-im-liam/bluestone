@@ -13,10 +13,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import yeah.im.liam.bluestone.client.CartTurns;
+import yeah.im.liam.bluestone.client.CartViewSettings;
 
 /**
- * The view of a rider in a cart on a wall or ceiling rail turns with the cart: the camera is tilted the way the rider
- * is drawn, from where the game seats it and about the cart's pivot, in first and third person alike.
+ * The view of a rider in a cart on a wall or ceiling rail turns with the cart, tilted the way the rider is drawn and
+ * about the cart's pivot: in first person, and in third person if the settings say so (CartViewSettings).
  */
 @Mixin(Camera.class)
 abstract class CameraMixin {
@@ -36,6 +37,8 @@ abstract class CameraMixin {
     private Vector3f left;
     @Shadow
     private int matrixPropertiesDirty;
+    @Shadow
+    private boolean detached;
 
     @Shadow
     protected abstract void setPosition(Vec3 position);
@@ -45,7 +48,8 @@ abstract class CameraMixin {
 
     @Inject(method = "alignWithEntity", at = @At("TAIL"))
     private void bluestone$tilt(float partialTicks, CallbackInfo ci) {
-        CartTurns.Tilt tilt = entity != null ? CartTurns.tilt(entity, partialTicks) : null;
+        CartViewSettings settings = CartViewSettings.get();
+        CartTurns.Tilt tilt = entity != null && (detached ? settings.thirdPerson : settings.firstPerson) ? CartTurns.tilt(entity, partialTicks) : null;
         if (tilt == null) {
             return;
         }

@@ -16,7 +16,6 @@ import org.jspecify.annotations.Nullable;
  */
 public final class CartTurns {
     // How quickly the drawn turn catches up with the cart, per second.
-    private static final float EASE = 10.0F;
     private static final Vector3f UP = new Vector3f(0.0F, 1.0F, 0.0F);
     private static final Map<AbstractMinecart, Turn> TURNS = new WeakHashMap<>();
 
@@ -64,7 +63,7 @@ public final class CartTurns {
             goal = endToEnd;
         }
         float seconds = Math.min((now - turn.time) / 1.0E9F, 0.25F);
-        float step = 1.0F - (float) Math.exp(-EASE * seconds);
+        float step = 1.0F - (float) Math.exp(-CartViewSettings.get().speed.ease * seconds);
         turn.shown.slerp(goal, step);
         turn.pivot = turn.pivot.lerp(goalPivot, step);
         turn.time = now;

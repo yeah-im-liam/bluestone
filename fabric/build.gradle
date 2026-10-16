@@ -22,9 +22,14 @@ configurations {
     }
 }
 
+repositories {
+    maven { url = "https://maven.terraformersmc.com/releases/" }
+}
+
 dependencies {
     implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
     implementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+    compileOnly "com.terraformersmc:modmenu:$rootProject.modmenu_version"
     compileOnly "io.github.llamalad7:mixinextras-common:0.5.0"
     common(project(path: ':common')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
