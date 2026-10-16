@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -107,6 +108,13 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
                     }
                 }
             }
+            if (face.getAxis().isHorizontal()) {
+                BlockState climbing = level.getBlockState(pos.relative(face).below());
+                Channel climbingDust = isDust(climbing) ? Channel.ofSource(climbing) : null;
+                if (climbingDust != null && climbing.getValue(ColoredWireBlock.PROPERTY_BY_DIRECTION.get(inward)) == RedstoneSide.UP) {
+                    touch.touch(face, Direction.DOWN, climbingDust, climbing.getValue(ColoredWireBlock.POWER));
+                }
+            }
             for (Direction edge : Direction.values()) {
                 if (edge.getAxis() == face.getAxis()) {
                     continue;
@@ -153,6 +161,22 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         }
     }
 
+    // Dust and paste running onto a face from beside the box are diagonal to it, so they look at their lines again.
+    @Override
+    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos, int flags, int updateLimit) {
+        for (Direction a : Direction.values()) {
+            for (Direction b : Direction.values()) {
+                if (a.getAxis() != b.getAxis() && a.ordinal() < b.ordinal()) {
+                    BlockPos other = pos.relative(a).relative(b);
+                    BlockState wire = level.getBlockState(other);
+                    if (isDust(wire) || wire.getBlock() instanceof GreenstonePasteBlock) {
+                        Block.updateOrDestroy(wire, Block.updateFromNeighbourShapes(wire, level, other), level, other, flags & ~Block.UPDATE_NEIGHBORS, updateLimit);
+                    }
+                }
+            }
+        }
+    }
+
     private void updatePower(Level level, BlockPos pos, BlockState state) {
         int[] power = {Signals.readForDust(LISTENER, () -> level.getBestNeighborSignal(pos))};
         for (Direction direction : Direction.values()) {
@@ -185,15 +209,15 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
 
     @Override
     public boolean connectsToWire(BlockState state, Channel wire, @Nullable Direction direction) {
-        return direction != null;
+        return true;
     }
 
     @Override
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return direction != null;
+        return true;
     }
 
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        return direction != null;
+        return true;
     }
 }

@@ -394,7 +394,13 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
     private boolean links(BlockGetter level, BlockPos pos, Direction face, Direction way) {
         BlockPos ahead = pos.relative(way);
         return isPaste(level, ahead, face) || isPaste(level, ahead.relative(face), way.getOpposite())
-            || connectsTo(level, ahead, level.getBlockState(ahead), face, way);
+            || connectsTo(level, ahead, level.getBlockState(ahead), face, way) || onBoxFace(level, ahead, face);
+    }
+
+    // The surface carries on onto the face of a converter box that nothing covers.
+    private static boolean onBoxFace(BlockGetter level, BlockPos ahead, Direction face) {
+        return level.getBlockState(ahead.relative(face)).getBlock() instanceof ConverterBoxBlock
+            && !level.getBlockState(ahead).isFaceSturdy(level, ahead, face);
     }
 
     private boolean isPaste(BlockGetter level, BlockPos pos, Direction face) {
