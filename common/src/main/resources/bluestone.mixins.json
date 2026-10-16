@@ -10,6 +10,7 @@
     "DiodeBlockMixin",
     "EntityMixin",
     "LevelMixin",
+    "LeverBlockMixin",
     "OreFeatureMixin",
     "PistonBaseBlockMixin",
     "PoweredRailBlockMixin",

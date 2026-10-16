@@ -182,6 +182,10 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
             this.output = output;
         }
 
+        public Channel input() {
+            return input;
+        }
+
         @Override
         public String getSerializedName() {
             return name;

@@ -119,7 +119,11 @@ public final class RailPower {
         return null;
     }
 
-    private static Channel channel(BlockState state) {
+    static boolean takesPower(BlockState state) {
+        return kind(state) != null;
+    }
+
+    static Channel channel(BlockState state) {
         return state.getBlock() instanceof ChainRailBlock chain ? chain.channel() : Channel.of(state.getBlock());
     }
 }

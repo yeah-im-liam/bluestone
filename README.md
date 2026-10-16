@@ -7,7 +7,7 @@ Inspired by [ajjxf's bluestone mod](https://modrinth.com/mod/bluestone_ajjxf).
 ## Features
 
 - **Bluestone:** dust, torches, repeaters, comparators, the Block of Bluestone, ores and powered, detector and activator rails, working exactly like their redstone versions.
-- **Kept apart:** redstone and bluestone ignore each other, so two circuits can run side by side without mixing. Levers, buttons, pressure plates, observers and other switches start either signal, and both power pistons, doors, lamps, TNT and the like.
+- **Kept apart:** redstone and bluestone ignore each other, so two circuits can run side by side without mixing. Levers, buttons, pressure plates, observers and other switches start either signal, and both power pistons, doors, lamps, TNT and the like. A lever's particles take the colour of the stones it powers.
 - **Underwater:** bluestone can be waterlogged and isn't washed away. Anything powered gives off bubbles underwater.
 - **Ore:** bluestone ore generates at redstone's heights, much more often in oceans, rivers and swamps and next to water.
 - **Purplestone:** dust, torches and a block that work with both redstone and bluestone. Purplestone dust takes a redstone or bluestone signal at half strength.
