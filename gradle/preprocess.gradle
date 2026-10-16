@@ -1,0 +1,166 @@
+// Builds every target from one source tree. Java lines between //#if and //#endif are kept or commented out with
+// //$$ depending on the target's Minecraft version and loader, for example:
+//
+//   //#if MC >= 1.21.2
+//   newCode();
+//   //#else
+//   //$$ oldCode();
+//   //#endif
+//
+// Conditions: MC <op> <version> (op is <, <=, >, >=, == or !=), FABRIC, NEOFORGE, FORGE, joined with !, && and ||
+// and grouped with parentheses. MC is the version the target compiles against.
+
+static int compareVersions(String a, String b) {
+    def x = a.tokenize('.')*.toInteger()
+    def y = b.tokenize('.')*.toInteger()
+    for (int i = 0; i < Math.max(x.size(), y.size()); i++) {
+        int d = (i < x.size() ? x[i] : 0) <=> (i < y.size() ? y[i] : 0)
+        if (d != 0) {
+            return d
+        }
+    }
+    return 0
+}
+
+static boolean evaluate(String condition, String mc, String loader, String where) {
+    def tokens = (condition =~ /\d+(?:\.\d+)*|[A-Za-z_]+|&&|\|\||[<>=!]=|[<>!()]/).collect { it }
+    int pos = 0
+    def peek = { pos < tokens.size() ? tokens[pos] : null }
+    def fail = { String why -> throw new GradleException("$where: $why in '$condition'") }
+    def expression
+    def atom
+    atom = {
+        def token = tokens[pos++]
+        if (token == '!') {
+            return !atom()
+        }
+        if (token == '(') {
+            boolean value = expression()
+            if (tokens[pos++] != ')') {
+                fail('missing )')
+            }
+            return value
+        }
+        if (token == 'MC') {
+            def op = tokens[pos++]
+            def version = tokens[pos++]
+            int d = compareVersions(mc, version)
+            switch (op) {
+                case '<': return d < 0
+                case '<=': return d <= 0
+                case '>': return d > 0
+                case '>=': return d >= 0
+                case '==': return d == 0
+                case '!=': return d != 0
+                default: fail("bad operator $op")
+            }
+        }
+        if (token in ['FABRIC', 'NEOFORGE', 'FORGE']) {
+            if (loader == 'common') {
+                fail("$token is not known in common code")
+            }
+            return token.toLowerCase() == loader
+        }
+        fail("unexpected $token")
+    }
+    def conjunction = {
+        boolean value = atom()
+        while (peek() == '&&') {
+            pos++
+            boolean right = atom()
+            value = value && right
+        }
+        return value
+    }
+    expression = {
+        boolean value = conjunction()
+        while (peek() == '||') {
+            pos++
+            boolean right = conjunction()
+            value = value || right
+        }
+        return value
+    }
+    boolean value = expression()
+    if (pos != tokens.size()) {
+        fail('trailing tokens')
+    }
+    return value
+}
+
+static String preprocess(String text, String mc, String loader, String name) {
+    def eol = text.contains('\r\n') ? '\r\n' : '\n'
+    def lines = text.split(/\r?\n/, -1)
+    def stack = []
+    boolean active = true
+    def out = new StringBuilder()
+    lines.eachWithIndex { String line, int i ->
+        def where = "$name:${i + 1}"
+        def trimmed = line.trim()
+        if (trimmed.startsWith('//#if ')) {
+            boolean value = evaluate(trimmed.substring(6), mc, loader, where)
+            stack << [parent: active, taken: value]
+            active = active && value
+        } else if (trimmed.startsWith('//#elseif ')) {
+            if (!stack) throw new GradleException("$where: //#elseif without //#if")
+            def top = stack[-1]
+            boolean value = !top.taken && evaluate(trimmed.substring(10), mc, loader, where)
+            top.taken = top.taken || value
+            active = top.parent && value
+        } else if (trimmed == '//#else') {
+            if (!stack) throw new GradleException("$where: //#else without //#if")
+            def top = stack[-1]
+            active = top.parent && !top.taken
+            top.taken = true
+        } else if (trimmed == '//#endif') {
+            if (!stack) throw new GradleException("$where: //#endif without //#if")
+            active = stack.remove(stack.size() - 1).parent
+        } else if (!trimmed.isEmpty()) {
+            def indent = line.substring(0, line.indexOf(trimmed))
+            if (active && trimmed.startsWith('//$$')) {
+                line = indent + trimmed.substring(trimmed.startsWith('//$$ ') ? 5 : 4)
+            } else if (!active && !trimmed.startsWith('//$$')) {
+                line = indent + '//$$ ' + trimmed
+            }
+        }
+        out << line
+        if (i < lines.size() - 1) {
+            out << eol
+        }
+    }
+    if (stack) {
+        throw new GradleException("$name: //#if without //#endif")
+    }
+    return out.toString()
+}
+
+def loader = project.name == 'common' ? 'common' : (project.name == 'neoforge' ? rootProject.neoforge_platform : project.name)
+def sourceDirs = [file('src/main/java')] + rootProject.compat.split(/[ ,]+/).collect { file("src/compat/$it/java") }
+def outputDir = layout.buildDirectory.dir('preprocessed/java')
+
+def preprocessJava = tasks.register('preprocessJava') {
+    def mc = rootProject.minecraft_version
+    inputs.files(sourceDirs.findAll { it.exists() })
+    inputs.property('mc', mc)
+    inputs.property('loader', loader)
+    outputs.dir(outputDir)
+    doLast {
+        def out = outputDir.get().asFile
+        project.delete(out)
+        sourceDirs.findAll { it.exists() }.each { dir ->
+            dir.eachFileRecurse(groovy.io.FileType.FILES) { source ->
+                def relative = dir.toPath().relativize(source.toPath()).toString()
+                def target = new File(out, relative)
+                if (target.exists()) {
+                    throw new GradleException("$relative is in more than one source folder")
+                }
+                target.parentFile.mkdirs()
+                target.setText(source.name.endsWith('.java') ? preprocess(source.getText('UTF-8'), mc, loader, relative) : source.getText('UTF-8'), 'UTF-8')
+            }
+        }
+    }
+}
+
+sourceSets.main.java.srcDirs = [outputDir]
+tasks.named('compileJava') { dependsOn preprocessJava }
+tasks.matching { it.name == 'sourcesJar' }.configureEach { dependsOn preprocessJava }

@@ -5,14 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+//#if MC >= 26.1
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+//#else
+//$$ import net.minecraft.client.renderer.block.model.BlockStateModel;
+//#endif
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+//#if MC >= 26.1
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+//#else
+//$$ import net.minecraft.client.renderer.state.CameraRenderState;
+//#endif
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
@@ -85,7 +93,11 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
     }
 
     public static final class State extends BlockEntityRenderState {
+        //#if MC >= 26.1
         private final List<BlockStateModelPart> parts = new ArrayList<>();
+        //#else
+        //$$ private final List<BlockStateModel> parts = new ArrayList<>();
+        //#endif
     }
 
     private final RandomSource random = RandomSource.create();
@@ -121,7 +133,11 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
         }
         BlockPos pos = converter.getBlockPos();
         BlockState box = converter.getBlockState();
+        //#if MC >= 26.1
         BlockStateModelSet models = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+        //#else
+        //$$ var models = Minecraft.getInstance().getBlockRenderer();
+        //#endif
         for (Direction face : Direction.values()) {
             if (!facesCamera(pos, face, cameraPosition) || !Block.shouldRenderFace(box, level.getBlockState(pos.relative(face)), face)) {
                 continue;
@@ -143,17 +159,30 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
         return (camera.get(face.getAxis()) - plane) * face.getAxisDirection().getStep() > 0;
     }
 
+    //#if MC >= 26.1
     private void collect(BlockStateModelSet models, BlockState piece, List<BlockStateModelPart> parts) {
         random.setSeed(42L);
         models.get(piece).collectParts(random, parts);
     }
+    //#else
+    //$$ private void collect(net.minecraft.client.renderer.block.BlockRenderDispatcher models, BlockState piece, List<BlockStateModel> parts) {
+    //$$     parts.add(models.getBlockModel(piece));
+    //$$ }
+    //#endif
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        //#if MC >= 26.1
         if (!state.parts.isEmpty()) {
             collector.submitBlockModel(poseStack, RenderTypes.entityCutoutZOffset(TextureAtlas.LOCATION_BLOCKS), state.parts, NO_TINTS,
                 FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         }
+        //#else
+        //$$ for (BlockStateModel model : state.parts) {
+        //$$     collector.submitBlockModel(poseStack, RenderTypes.entityCutoutNoCullZOffset(TextureAtlas.LOCATION_BLOCKS), model, 1.0F, 1.0F, 1.0F,
+        //$$         FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        //$$ }
+        //#endif
     }
 
     @Override

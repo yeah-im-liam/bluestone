@@ -1,9 +1,13 @@
 package yeah.im.liam.bluestone.client;
 
+//#if MC >= 26.1
 import java.util.Set;
 import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+//#else
+//$$ import net.minecraft.client.color.block.BlockColor;
+//#endif
 import yeah.im.liam.bluestone.block.ColoredWireBlock;
 import yeah.im.liam.bluestone.block.GreenstonePasteBlock;
 
@@ -14,6 +18,7 @@ public final class BluestoneTint {
     private BluestoneTint() {
     }
 
+    //#if MC >= 26.1
     public static BlockTintSource wire(ColoredWireBlock wire) {
         return new BlockTintSource() {
             @Override
@@ -41,4 +46,13 @@ public final class BluestoneTint {
             }
         };
     }
+    //#else
+    //$$ public static BlockColor wire(ColoredWireBlock wire) {
+    //$$     return (state, level, pos, tintIndex) -> wire.colorForPower(state.getValue(ColoredWireBlock.POWER));
+    //$$ }
+    //$$
+    //$$ public static BlockColor paste(GreenstonePasteBlock paste) {
+    //$$     return (state, level, pos, tintIndex) -> paste.colorForPower(state.getValue(GreenstonePasteBlock.POWER));
+    //$$ }
+    //#endif
 }

@@ -9,6 +9,9 @@ pluginManagement {
 
 rootProject.name = 'bluestone'
 
+// Only the loaders the chosen target builds for (see targets/).
+def target = startParameter.projectProperties.target ?: default_target
+def targetProperties = new Properties()
+file("targets/${target}.properties").withInputStream { targetProperties.load(it) }
 include 'common'
-include 'fabric'
-include 'neoforge'
+targetProperties.platforms.split(',').each { include it.trim() }

@@ -2,6 +2,9 @@ package yeah.im.liam.bluestone.mixin;
 
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
+//#if MC < 26.1
+//$$ import net.minecraft.world.level.Level;
+//#endif
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -35,8 +38,10 @@ abstract class CameraMixin {
     @Shadow
     @Final
     private Vector3f left;
+    //#if MC >= 26.1
     @Shadow
     private int matrixPropertiesDirty;
+    //#endif
     @Shadow
     private boolean detached;
 
@@ -46,8 +51,13 @@ abstract class CameraMixin {
     @Shadow
     public abstract Vec3 position();
 
+    //#if MC >= 26.1
     @Inject(method = "alignWithEntity", at = @At("TAIL"))
     private void bluestone$tilt(float partialTicks, CallbackInfo ci) {
+    //#else
+    //$$ @Inject(method = "setup", at = @At("TAIL"))
+    //$$ private void bluestone$tilt(Level level, Entity cameraEntity, boolean detachedCamera, boolean mirrored, float partialTicks, CallbackInfo ci) {
+    //#endif
         CartViewSettings settings = CartViewSettings.get();
         CartTurns.Tilt tilt = entity != null && (detached ? settings.thirdPerson : settings.firstPerson) ? CartTurns.tilt(entity, partialTicks) : null;
         if (tilt == null) {
@@ -57,7 +67,9 @@ abstract class CameraMixin {
         forwards.set(0.0F, 0.0F, -1.0F).rotate(rotation);
         up.set(0.0F, 1.0F, 0.0F).rotate(rotation);
         left.set(-1.0F, 0.0F, 0.0F).rotate(rotation);
+        //#if MC >= 26.1
         matrixPropertiesDirty |= 3;
+        //#endif
         Vec3 offset = tilt.seat().add(position().subtract(entity.getPosition(partialTicks))).subtract(tilt.pivot());
         Vector3f turned = new Vector3f((float) offset.x, (float) offset.y, (float) offset.z).rotate(tilt.tilt());
         setPosition(tilt.pivot().add(turned.x, turned.y, turned.z));

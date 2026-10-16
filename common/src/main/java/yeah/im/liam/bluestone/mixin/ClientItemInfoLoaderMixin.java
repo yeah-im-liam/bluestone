@@ -21,7 +21,12 @@ abstract class ClientItemInfoLoaderMixin {
     @Final
     private static FileToIdConverter LISTER;
 
+    // The lambda that reads one item file: Fabric knows it by its intermediary name before 26.1, NeoForge by javac's.
+    //#if MC >= 26.1
     @ModifyExpressionValue(method = "lambda$scheduleLoad$3", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StrictJsonParser;parse(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"))
+    //#else
+    //$$ @ModifyExpressionValue(method = {"lambda$scheduleLoad$3", "method_65926"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StrictJsonParser;parse(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"))
+    //#endif
     private static JsonElement bluestone$addTrims(JsonElement definition, @Local(argsOnly = true) Identifier file) {
         return TrimItemModels.addCases(LISTER.fileToId(file), definition);
     }

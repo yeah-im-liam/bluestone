@@ -7,7 +7,11 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+//#if MC >= 26.1
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+//#else
+//$$ import net.minecraft.client.renderer.state.CameraRenderState;
+//#endif
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -21,8 +25,13 @@ import yeah.im.liam.bluestone.client.SurfaceRider;
  */
 @Mixin(EntityRenderDispatcher.class)
 abstract class EntityRenderDispatcherMixin {
+    //#if MC >= 26.1
     @WrapOperation(method = "submit", at = @At(value = "INVOKE",
         target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"))
+    //#else
+    //$$ @WrapOperation(method = "submit", at = @At(value = "INVOKE",
+    //$$     target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V"))
+    //#endif
     private void bluestone$tilt(EntityRenderer<?, ?> renderer, EntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector,
                                 CameraRenderState camera, Operation<Void> original) {
         Quaternionf tilt = ((SurfaceRider) state).bluestone$tilt();

@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin.wire;
 
+// The wire class has this name only from Minecraft 26.3.
+//#if MC >= 26.1
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.core.BlockPos;
@@ -18,3 +20,4 @@ abstract class ModernWireMixin {
         return Math.max(Signals.readForDust(Channel.REDSTONE, () -> original.call(level, pos)), ConverterBoxBlock.powerToDustOnTop(level, pos));
     }
 }
+//#endif

@@ -27,11 +27,18 @@ repositories {
 }
 
 dependencies {
-    implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
-    implementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
-    compileOnly "com.terraformersmc:modmenu:$rootProject.modmenu_version"
+    if (rootProject.obfuscated) {
+        modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+        modCompileOnly "com.terraformersmc:modmenu:$rootProject.modmenu_version"
+        common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    } else {
+        implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+        implementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+        compileOnly "com.terraformersmc:modmenu:$rootProject.modmenu_version"
+        common(project(path: ':common')) { transitive false }
+    }
     compileOnly "io.github.llamalad7:mixinextras-common:0.5.0"
-    common(project(path: ':common')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 }
 
@@ -49,15 +56,25 @@ processResources {
     }
 }
 
-jar {
-    archiveClassifier = 'raw'
-}
-
 shadowJar {
     configurations = [project.configurations.shadowBundle]
-    archiveClassifier = null
-    // Loom only writes this into the unshadowed jar; Fabric Loader reads it to know the jar needs no remapping.
-    manifest.attributes('Fabric-Mapping-Namespace': 'official')
 }
 
-assemble.dependsOn shadowJar
+if (rootProject.obfuscated) {
+    shadowJar {
+        archiveClassifier = 'dev-shadow'
+    }
+    remapJar {
+        input.set shadowJar.archiveFile
+    }
+} else {
+    jar {
+        archiveClassifier = 'raw'
+    }
+    shadowJar {
+        archiveClassifier = null
+        // Loom only writes this into the unshadowed jar; Fabric Loader reads it to know the jar needs no remapping.
+        manifest.attributes('Fabric-Mapping-Namespace': 'official')
+    }
+    assemble.dependsOn shadowJar
+}

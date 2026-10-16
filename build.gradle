@@ -1,4 +1,5 @@
 plugins {
+    id 'dev.architectury.loom' version '1.17.493' apply false
     id 'dev.architectury.loom-no-remap' version '1.17.493' apply false
     id 'architectury-plugin' version '3.5.170'
     id 'com.gradleup.shadow' version '9.4.3' apply false
@@ -13,6 +14,9 @@ def targetProperties = new Properties()
 targetFile.withInputStream { targetProperties.load(it) }
 targetProperties.each { key, value -> rootProject.ext.set(key.toString(), value.toString()) }
 rootProject.ext.target = target
+rootProject.ext.obfuscated = rootProject.obfuscated.toBoolean()
+// The neoforge module builds a Forge-style jar for NeoForge 1.20.1, which is a fork of Forge.
+rootProject.ext.enabled_platforms = rootProject.platforms.split(',').collect { it == 'neoforge' ? rootProject.neoforge_platform : it }.join(',')
 
 architectury {
     minecraft = rootProject.minecraft_version
@@ -24,8 +28,11 @@ allprojects {
 }
 
 subprojects {
-    // Minecraft 26.1 and later ship without obfuscation, so the jars are not remapped.
-    apply plugin: 'dev.architectury.loom-no-remap'
+    if (project.name == 'neoforge') {
+        project.ext.set('loom.platform', rootProject.neoforge_platform)
+    }
+    // Minecraft 26.1 and later ship without obfuscation, so their jars are not remapped.
+    apply plugin: rootProject.obfuscated ? 'dev.architectury.loom' : 'dev.architectury.loom-no-remap'
     apply plugin: 'architectury-plugin'
 
     base {
@@ -38,11 +45,20 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
+        if (rootProject.obfuscated) {
+            mappings loom.officialMojangMappings()
+        }
     }
 
     java {
         withSourcesJar()
     }
+
+    // Code that differs between targets lives in src/compat/<name>, for each name in the target's compat list.
+    rootProject.compat.split(/[ ,]+/).each { name ->
+        sourceSets.main.resources.srcDir "src/compat/$name/resources"
+    }
+    apply from: rootProject.file('gradle/preprocess.gradle')
 
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = 'UTF-8'
@@ -52,6 +68,15 @@ subprojects {
     tasks.withType(JavaExec).configureEach {
         javaLauncher = javaToolchains.launcherFor {
             languageVersion = JavaLanguageVersion.of(rootProject.java_version as int)
+        }
+    }
+
+    if (rootProject.obfuscated) {
+        loom {
+            mixin {
+                useLegacyMixinAp = true
+                defaultRefmapName.set('bluestone-refmap.json')
+            }
         }
     }
 }
