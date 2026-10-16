@@ -671,11 +671,21 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         for (BlockPos other : connectedPaste(level, pos, state)) {
             signal = Math.max(signal, level.getBlockState(other).getValue(POWER) - 1);
         }
-        // A converter box it lies on or runs into.
+        // A converter box it lies on or runs into, or whose face its line runs onto, level with the face it lies on.
         for (Direction direction : Direction.values()) {
             BlockState neighbour = level.getBlockState(pos.relative(direction));
             if (neighbour.getBlock() instanceof ConverterBoxBlock && state.getValue(SIDES.get(direction)).reaches()) {
                 signal = Math.max(signal, neighbour.getValue(ConverterBoxBlock.POWER) - 1);
+            }
+        }
+        for (Direction face : faces(state)) {
+            for (Direction way : Direction.values()) {
+                if (way.getAxis() != face.getAxis() && draws(state, face, way)) {
+                    BlockState box = level.getBlockState(pos.relative(way).relative(face));
+                    if (box.getBlock() instanceof ConverterBoxBlock) {
+                        signal = Math.max(signal, box.getValue(ConverterBoxBlock.POWER) - 1);
+                    }
+                }
             }
         }
         return Math.max(0, signal);

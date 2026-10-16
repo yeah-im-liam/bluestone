@@ -71,7 +71,7 @@ for name in ["bluestone_block", "purplestone_block", "greenstone_block", "bluest
 
 # The converter box is built like a chiseled bookshelf: each face is nine flat pieces, 5x5 corners, 6x5 sides and a
 # 6x6 middle; the light at the middle of each edge lies in the side piece there, and the face's own light in the
-# middle piece. The world always draws it from converter_box.json. While any light is on (lit=true)
+# middle piece. The world always draws it from converter_box.json. While any light is on
 # ConverterBoxRenderer draws the whole block again over that, glowing: the frame (the corners) and every side and
 # middle piece, unlit or in the overlay of its colour. Every piece takes its texture from the same place as a whole
 # face would. The states of the frame and the pieces belong to no block; BlockStateDefinitionsMixin loads them, as the
