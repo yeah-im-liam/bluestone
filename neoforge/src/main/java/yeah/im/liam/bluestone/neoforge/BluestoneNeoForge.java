@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
@@ -49,7 +50,6 @@ public final class BluestoneNeoForge {
         ));
     }
 
-    // The bluestone comparator keeps the game's comparator block entity.
     private static void addComparator(BlockEntityTypeAddBlocksEvent event) {
         event.modify(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.withDefaultNamespace("comparator")), BluestoneBlocks.comparator());
     }
@@ -83,9 +83,11 @@ public final class BluestoneNeoForge {
         }
     }
 
-    // Fabric applies the textures in programmer_art/ together with the game's Programmer Art pack; NeoForge lists them as a pack of their own.
+    // Fabric applies the textures in programmer_art/ together with the game's Programmer Art pack; NeoForge lists them
+    // as a pack of their own. A NeoForge run from source doesn't count the common module's files as the mod's.
     private static void addPacks(AddPackFindersEvent event) {
-        if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+        if (event.getPackType() == PackType.CLIENT_RESOURCES
+            && ModList.get().getModFileById(Bluestone.MOD_ID).getFile().getContents().containsFile("programmer_art/pack.mcmeta")) {
             event.addPackFinders(Bluestone.id("programmer_art"), PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, false, Pack.Position.TOP);
         }
