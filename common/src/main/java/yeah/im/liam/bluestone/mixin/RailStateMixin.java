@@ -79,7 +79,11 @@ abstract class RailStateMixin {
         for (Direction way : Direction.Plane.HORIZONTAL) {
             BlockPos below = pos.relative(way).below();
             if (level.getBlockState(below).getBlock() instanceof AttachedRailBlock) {
+                //#if MC >= 1.21.2
                 level.neighborChanged(below, state.getBlock(), null);
+                //#else
+                //$$ level.neighborChanged(below, state.getBlock(), pos);
+                //#endif
             }
         }
     }

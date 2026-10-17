@@ -1,0 +1,34 @@
+{
+  "required": true,
+  "package": "yeah.im.liam.bluestone.mixin",
+  "plugin": "yeah.im.liam.bluestone.compat.WireMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "AbstractMinecartMixin",
+    "BlockStateBaseMixin",
+    "DiodeBlockMixin",
+    "EntityMixin",
+    "LevelMixin",
+    "LeverBlockMixin",
+    "OreFeatureMixin",
+    "PistonBaseBlockMixin",
+    "PoweredRailBlockMixin",
+    "RailStateAccessor",
+    "RailStateMixin",
+    "RedstoneTorchBlockMixin",
+    "RedstoneWallTorchBlockMixin",
+    "wire.LegacyWireMixin"
+  ],
+  "client": [
+    "BlockStateModelLoaderMixin",
+    "CameraMixin",
+    "EntityRenderDispatcherLegacyMixin",
+    "ItemBlockRenderTypesAccessor",
+    "LevelRendererMixin",
+    "MinecartRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Entity render states are new in 1.21.2; MinecartRendererMixin and EntityRenderDispatcherLegacyMixin before.
+//#if MC >= 1.21.2
 import net.minecraft.client.renderer.entity.state.MinecartRenderState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -31,3 +33,4 @@ abstract class MinecartRenderStateMixin implements SurfaceCart {
         bluestone$pivot = pivot;
     }
 }
+//#endif

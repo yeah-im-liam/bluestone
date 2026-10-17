@@ -39,12 +39,20 @@ abstract class LevelMixin {
             }
             BlockState state = level.getBlockState(next);
             if (state.getBlock() instanceof GreenstoneComparatorBlock) {
+                //#if MC >= 1.21.2
                 level.neighborChanged(state, next, block, null, false);
+                //#else
+                //$$ level.neighborChanged(state, next, block, pos, false);
+                //#endif
             } else if (state.isRedstoneConductor(level, next)) {
                 BlockPos further = next.relative(direction);
                 BlockState furtherState = level.getBlockState(further);
                 if (level.hasChunkAt(further) && furtherState.getBlock() instanceof GreenstoneComparatorBlock) {
+                    //#if MC >= 1.21.2
                     level.neighborChanged(furtherState, further, block, null, false);
+                    //#else
+                    //$$ level.neighborChanged(furtherState, further, block, pos, false);
+                    //#endif
                 }
             }
         }

@@ -428,7 +428,7 @@ public final class SurfaceRails {
             Step step = next(level, here, exit);
             return step == null ? new Ride(here, exit, here, exit, speed) : new Ride(here, exit, step.track(), step.exit(), speed);
         }
-        BlockPos railPos = cart.getCurrentBlockPosOrRailBelow();
+        BlockPos railPos = railPos(cart);
         Track floor = track(level, railPos);
         if (floor == null) {
             return startOnCurve(level, cart, railPos, center, velocity);
@@ -478,7 +478,7 @@ public final class SurfaceRails {
     }
 
     private static void driveOnFloor(Level level, AbstractMinecart cart, RailRider rider) {
-        BlockState state = level.getBlockState(cart.getCurrentBlockPosOrRailBelow());
+        BlockState state = level.getBlockState(railPos(cart));
         Vec3 velocity = cart.getDeltaMovement();
         if (state.getBlock() instanceof ChainRailBlock) {
             Direction drive = ChainRailBlock.drive(state);
@@ -500,5 +500,15 @@ public final class SurfaceRails {
                 cart.setDeltaMovement(velocity.x / horizontal * entry, velocity.y, velocity.z / horizontal * entry);
             }
         }
+    }
+
+    // The block a cart is in, or the rail just below it, as the game finds it from 1.21.2.
+    private static BlockPos railPos(AbstractMinecart cart) {
+        //#if MC >= 1.21.2
+        return cart.getCurrentBlockPosOrRailBelow();
+        //#else
+        //$$ BlockPos pos = BlockPos.containing(cart.position());
+        //$$ return cart.level().getBlockState(pos.below()).is(net.minecraft.tags.BlockTags.RAILS) ? pos.below() : pos;
+        //#endif
     }
 }

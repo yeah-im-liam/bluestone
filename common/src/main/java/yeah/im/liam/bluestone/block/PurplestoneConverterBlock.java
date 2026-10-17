@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.SignalGetter;
@@ -119,15 +120,26 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         return state.setValue(LOCKED, isLocked(context.getLevel(), context.getClickedPos(), state));
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         if (directionToNeighbour == Direction.DOWN && !canSurviveOn(level, neighbourPos, neighbourState)) {
             return Blocks.AIR.defaultBlockState();
         }
         if (!level.isClientSide() && directionToNeighbour.getAxis() != state.getValue(FACING).getAxis()) {
             return state.setValue(LOCKED, isLocked(level, pos, state));
         }
+        //#if MC >= 1.21.2
         return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+        //#else
+        //$$ return super.updateShape(state, directionToNeighbour, neighbourState, level, pos, neighbourPos);
+        //#endif
     }
 
     @Override

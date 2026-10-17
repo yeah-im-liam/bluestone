@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.fabric.mixin;
 
+// Minecart behaviours are new in 1.21.2; before, AbstractMinecartMixin covers the cart's own movement.
+//#if MC >= 1.21.2
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
@@ -22,3 +24,4 @@ abstract class NewMinecartBehaviorMixin {
         return original.call(state, block) || Rails.alsoBluestone(state, block);
     }
 }
+//#endif

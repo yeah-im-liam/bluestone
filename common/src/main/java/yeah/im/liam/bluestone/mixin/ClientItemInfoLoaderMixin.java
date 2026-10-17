@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Item definitions, and the loader for them, are new in 1.21.4.
+//#if MC >= 1.21.4
 import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -25,11 +27,20 @@ abstract class ClientItemInfoLoaderMixin {
     //#if MC >= 26.1
     @ModifyExpressionValue(method = "lambda$scheduleLoad$3", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StrictJsonParser;parse(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"))
     //#elseif MC >= 1.21.5
-    //$$ @ModifyExpressionValue(method = {"lambda$scheduleLoad$3", "method_65926"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StrictJsonParser;parse(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"))
+    //$$ // 1.21.6 reads the file with its own parser, 1.21.5 with Gson's (bluestone$addTrimsGson); each is optional.
+    //$$ @ModifyExpressionValue(method = {"lambda$scheduleLoad$3", "method_65926"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StrictJsonParser;parse(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"), require = 0)
     //#else
     //$$ @ModifyExpressionValue(method = {"lambda$scheduleLoad$2", "method_65926"}, at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonParser;parseReader(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"))
     //#endif
     private static JsonElement bluestone$addTrims(JsonElement definition, @Local(argsOnly = true) Identifier file) {
         return TrimItemModels.addCases(LISTER.fileToId(file), definition);
     }
+    //#if MC >= 1.21.5 && MC < 1.21.9
+    //$$
+    //$$ @ModifyExpressionValue(method = {"lambda$scheduleLoad$3", "method_65926"}, at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonParser;parseReader(Ljava/io/Reader;)Lcom/google/gson/JsonElement;"), require = 0)
+    //$$ private static JsonElement bluestone$addTrimsGson(JsonElement definition, @Local(argsOnly = true) Identifier file) {
+    //$$     return TrimItemModels.addCases(LISTER.fileToId(file), definition);
+    //$$ }
+    //#endif
 }
+//#endif

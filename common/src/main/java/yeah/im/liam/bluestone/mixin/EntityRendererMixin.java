@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Entity render states are new in 1.21.2; MinecartRendererMixin and EntityRenderDispatcherLegacyMixin before.
+//#if MC >= 1.21.2
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
@@ -20,3 +22,4 @@ abstract class EntityRendererMixin {
         CartTurns.ride(entity, cir.getReturnValue(), partialTicks);
     }
 }
+//#endif

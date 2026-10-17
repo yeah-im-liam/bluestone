@@ -16,7 +16,7 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
  * A torch on the purplestone channel: redstone or bluestone can turn it off, and both pick up its signal.
  */
 public class PurplestoneTorchBlock extends RedstoneTorchBlock implements SignalBlock {
-    static final DustParticleOptions PARTICLE = new DustParticleOptions(0x9900FF, 1.0F);
+    static final DustParticleOptions PARTICLE = Particles.dust(0x9900FF, 1.0F);
 
     public PurplestoneTorchBlock(Properties properties) {
         super(properties);

@@ -73,9 +73,19 @@ public class ChainRailBlock extends RailBlock {
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
+        //#if MC >= 1.21.2
         super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
+        //#else
+        //$$ super.neighborChanged(state, level, pos, block, neighbourPos, movedByPiston);
+        //#endif
         if (!level.isClientSide()) {
             updatePowered(level, pos);
         }

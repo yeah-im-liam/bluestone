@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Entity render states are new in 1.21.2; MinecartRendererMixin and EntityRenderDispatcherLegacyMixin before.
+//#if MC >= 1.21.2
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -70,3 +72,4 @@ abstract class EntityRenderDispatcherMixin {
         poseStack.popPose();
     }
 }
+//#endif

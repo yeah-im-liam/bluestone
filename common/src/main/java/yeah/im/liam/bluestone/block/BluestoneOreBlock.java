@@ -35,16 +35,28 @@ public class BluestoneOreBlock extends RedStoneOreBlock {
         }
     }
 
+    // Item use answers with an ItemInteractionResult in 1.20.5 to 1.21.1.
+    //#if MC >= 1.21.2
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    //#else
+    //$$ @Override
+    //$$ protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    //#endif
         if (level.isClientSide()) {
             spawnParticles(level, pos);
         } else {
             interact(state, level, pos);
         }
+        //#if MC >= 1.21.2
         return itemStack.getItem() instanceof BlockItem && new BlockPlaceContext(player, hand, itemStack, hitResult).canPlace()
             ? InteractionResult.PASS
             : InteractionResult.SUCCESS;
+        //#else
+        //$$ return itemStack.getItem() instanceof BlockItem && new BlockPlaceContext(player, hand, itemStack, hitResult).canPlace()
+        //$$     ? net.minecraft.world.ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+        //$$     : net.minecraft.world.ItemInteractionResult.SUCCESS;
+        //#endif
     }
 
     @Override
@@ -65,7 +77,11 @@ public class BluestoneOreBlock extends RedStoneOreBlock {
         RandomSource random = level.getRandom();
         for (Direction direction : Direction.values()) {
             BlockPos relative = pos.relative(direction);
+            //#if MC >= 1.21.2
             if (!level.getBlockState(relative).isSolidRender()) {
+            //#else
+            //$$ if (!level.getBlockState(relative).isSolidRender(level, relative)) {
+            //#endif
                 Direction.Axis axis = direction.getAxis();
                 double dx = axis == Direction.Axis.X ? 0.5 + 0.5625 * direction.getStepX() : random.nextFloat();
                 double dy = axis == Direction.Axis.Y ? 0.5 + 0.5625 * direction.getStepY() : random.nextFloat();

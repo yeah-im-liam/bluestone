@@ -87,7 +87,11 @@ public final class ConverterBoxPieces {
             return;
         }
         for (Direction face : Direction.values()) {
+            //#if MC >= 1.21.2
             if (!facesCamera(pos, face, camera) || !Block.shouldRenderFace(box, level.getBlockState(pos.relative(face)), face)) {
+            //#else
+            //$$ if (!facesCamera(pos, face, camera) || !Block.shouldRenderFace(box, level, pos, face, pos.relative(face))) {
+            //#endif
                 continue;
             }
             pieces.accept(FRAME_DEFINITION.any().setValue(FACE, face));

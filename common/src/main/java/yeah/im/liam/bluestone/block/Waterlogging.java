@@ -31,6 +31,6 @@ final class Waterlogging {
     }
 
     static boolean isWet(BlockState state) {
-        return state.getValueOrElse(BlockStateProperties.WATERLOGGED, false);
+        return state.getOptionalValue(BlockStateProperties.WATERLOGGED).orElse(false);
     }
 }

@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.block;
 
+// The redstone experiment this follows is new in 1.21.2.
+//#if MC >= 1.21.2
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -193,3 +195,4 @@ final class ExperimentalWireEvaluator extends WireEvaluator {
         return packed != -1 ? unpackPower(packed) : super.getWireSignal(pos, state);
     }
 }
+//#endif

@@ -56,7 +56,11 @@ public final class BluestoneNeoForge {
         event.register(Registries.BLOCK, helper -> BluestoneBlocks.registerBlocks(registrar(Registries.BLOCK, helper)));
         event.register(Registries.ITEM, helper -> BluestoneBlocks.registerItems(registrar(Registries.ITEM, helper)));
         event.register(Registries.BLOCK_ENTITY_TYPE, helper -> BluestoneBlocks.registerBlockEntities(registrar(Registries.BLOCK_ENTITY_TYPE, helper),
+            //#if MC >= 1.21.2
             block -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(block))));
+            //#else
+            //$$ block -> BlockEntityType.Builder.of(ConverterBoxBlockEntity::new, block).build(null)));
+            //#endif
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(
             Bluestone.key(Registries.CREATIVE_MODE_TAB, "main"),
             CreativeModeTab.builder()

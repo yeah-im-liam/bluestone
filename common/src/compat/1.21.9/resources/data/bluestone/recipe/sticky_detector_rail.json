@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": "minecraft:detector_rail",
+    "#": "minecraft:slime_ball"
+  },
+  "pattern": [
+    "RRR",
+    "R#R",
+    "RRR"
+  ],
+  "result": {
+    "count": 8,
+    "id": "bluestone:sticky_detector_rail"
+  }
+}

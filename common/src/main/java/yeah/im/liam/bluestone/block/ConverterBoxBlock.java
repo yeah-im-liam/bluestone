@@ -164,8 +164,14 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         updateAround(level, pos);
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
         if (!level.isClientSide()) {
             updatePower(level, pos, state);
         }

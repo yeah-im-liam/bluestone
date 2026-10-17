@@ -17,7 +17,7 @@ import yeah.im.liam.bluestone.signal.SignalBlock;
  * blocks such as lamps pick up its signal.
  */
 public class GreenstoneTorchBlock extends RedstoneTorchBlock implements SignalBlock {
-    static final DustParticleOptions PARTICLE = new DustParticleOptions(0x00FF00, 1.0F);
+    static final DustParticleOptions PARTICLE = Particles.dust(0x00FF00, 1.0F);
 
     public GreenstoneTorchBlock(Properties properties) {
         super(properties);

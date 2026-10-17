@@ -558,7 +558,7 @@ else:
     write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "pack_format": RESOURCE_FORMAT}})
 
 # Language
-write(A + "lang/en_us.json", {
+LANG = {
     "item.bluestone.bluestone": "Bluestone Dust",
     "block.bluestone.bluestone_wire": "Bluestone Wire",
     "block.bluestone.bluestone_torch": "Bluestone Torch",
@@ -605,7 +605,14 @@ write(A + "lang/en_us.json", {
     "trim_material.bluestone.greenstone": "Greenstone Material",
     "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
-})
+}
+# Wall torches and rails on walls share their block's name from 1.21.2; before that they need their own.
+for stone in ["bluestone", "purplestone", "greenstone"]:
+    LANG[f"block.bluestone.{stone}_wall_torch"] = LANG[f"block.bluestone.{stone}_torch"].replace(" Torch", " Wall Torch")
+for rail in FLOOR_RAILS:
+    if f"block.bluestone.{rail}" in LANG and rail.startswith("sticky"):
+        LANG[f"block.bluestone.attached_{rail}"] = LANG[f"block.bluestone.{rail}"]
+write(A + "lang/en_us.json", LANG)
 # Vanilla names are renamed from the minecraft namespace, since the game merges namespaces in no fixed order.
 write("assets/minecraft/lang/en_us.json", {
     "block.minecraft.powered_rail": "Redstone Powered Rail",

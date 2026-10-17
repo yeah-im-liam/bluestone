@@ -107,8 +107,15 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return state;
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         if (directionToNeighbour == state.getValue(ATTACHED) && !state.canSurvive(level, pos)) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -132,8 +139,14 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
         checkTickOnNeighbor(level, pos, state);
     }
 
@@ -230,8 +243,13 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
     protected void updateNeighborsInFront(Level level, BlockPos pos, BlockState state) {
         Direction output = state.getValue(OUTPUT);
         BlockPos front = pos.relative(output);
+        //#if MC >= 1.21.2
         level.neighborChanged(front, this, null);
         level.updateNeighborsAtExceptFromFacing(front, this, output.getOpposite(), null);
+        //#else
+        //$$ level.neighborChanged(front, this, pos);
+        //$$ level.updateNeighborsAtExceptFromFacing(front, this, output.getOpposite());
+        //#endif
     }
 
     @Override

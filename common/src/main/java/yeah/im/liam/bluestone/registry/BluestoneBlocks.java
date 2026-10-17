@@ -7,7 +7,12 @@ import java.util.function.ToIntFunction;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+//#if MC >= 1.21.2
 import net.minecraft.world.item.BlockItem;
+//#else
+//$$ import net.minecraft.world.item.BlockItem;
+//$$ import net.minecraft.world.item.ItemNameBlockItem;
+//#endif
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
@@ -127,21 +132,15 @@ public final class BluestoneBlocks {
             .strength(4.5F, 3.0F)
             .sound(SoundType.DEEPSLATE))));
         torch = blocks.register("bluestone_torch", key -> new BluestoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
-        wallTorch = blocks.register("bluestone_wall_torch", key -> new BluestoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
-            .overrideLootTable(torch.getLootTable())
-            .overrideDescription(torch.getDescriptionId())))));
+        wallTorch = blocks.register("bluestone_wall_torch", key -> new BluestoneWallTorchBlock(props(key, like(torchProperties(BlockBehaviour.Properties.of()), torch))));
         purplestoneTorch = blocks.register("purplestone_torch", key -> new PurplestoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
-        purplestoneWallTorch = blocks.register("purplestone_wall_torch", key -> new PurplestoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
-            .overrideLootTable(purplestoneTorch.getLootTable())
-            .overrideDescription(purplestoneTorch.getDescriptionId())))));
+        purplestoneWallTorch = blocks.register("purplestone_wall_torch", key -> new PurplestoneWallTorchBlock(props(key, like(torchProperties(BlockBehaviour.Properties.of()), purplestoneTorch))));
         repeater = blocks.register("bluestone_repeater", key -> new BluestoneRepeaterBlock(props(key, diodeProperties())));
         comparator = blocks.register("bluestone_comparator", key -> new BluestoneComparatorBlock(props(key, diodeProperties())));
         purplestoneConverter = blocks.register("purplestone_converter", key -> new PurplestoneConverterBlock(props(key, diodeProperties())));
         paste = blocks.register("greenstone_paste", key -> new GreenstonePasteBlock(props(key, wireProperties())));
         greenstoneTorch = blocks.register("greenstone_torch", key -> new GreenstoneTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()))));
-        greenstoneWallTorch = blocks.register("greenstone_wall_torch", key -> new GreenstoneWallTorchBlock(props(key, torchProperties(BlockBehaviour.Properties.of()
-            .overrideLootTable(greenstoneTorch.getLootTable())
-            .overrideDescription(greenstoneTorch.getDescriptionId())))));
+        greenstoneWallTorch = blocks.register("greenstone_wall_torch", key -> new GreenstoneWallTorchBlock(props(key, like(torchProperties(BlockBehaviour.Properties.of()), greenstoneTorch))));
         greenstoneBlock = blocks.register("greenstone_block", key -> new GreenstoneBlock(props(key, BlockBehaviour.Properties.of()
             .mapColor(MapColor.COLOR_GREEN)
             .requiresCorrectToolForDrops()
@@ -171,19 +170,24 @@ public final class BluestoneBlocks {
     }
 
     public static void registerItems(Registrar<Item> items) {
+        //#if MC >= 1.21.2
         dust = items.register("bluestone", key -> new BlockItem(wire, trim(new Item.Properties().setId(key).useItemDescriptionPrefix(), "bluestone")));
         purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, trim(new Item.Properties().setId(key).useItemDescriptionPrefix(), "purplestone")));
+        //#else
+        //$$ dust = items.register("bluestone", key -> new ItemNameBlockItem(wire, new Item.Properties()));
+        //$$ purplestone = items.register("purplestone", key -> new ItemNameBlockItem(purplestoneWire, new Item.Properties()));
+        //#endif
         blockItem = blockItem(items, "bluestone_block", block);
         purplestoneBlockItem = blockItem(items, "purplestone_block", purplestoneBlock);
         oreItem = blockItem(items, "bluestone_ore", ore);
         deepslateOreItem = blockItem(items, "deepslate_bluestone_ore", deepslateOre);
-        torchItem = items.register("bluestone_torch", key -> new StandingAndWallBlockItem(torch, wallTorch, Direction.DOWN, itemProps(key)));
-        purplestoneTorchItem = items.register("purplestone_torch", key -> new StandingAndWallBlockItem(purplestoneTorch, purplestoneWallTorch, Direction.DOWN, itemProps(key)));
+        torchItem = items.register("bluestone_torch", key -> torchItem(torch, wallTorch, key));
+        purplestoneTorchItem = items.register("purplestone_torch", key -> torchItem(purplestoneTorch, purplestoneWallTorch, key));
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
         purplestoneConverterItem = blockItem(items, "purplestone_converter", purplestoneConverter);
         pasteItem = items.register("greenstone_paste", key -> new BlockItem(paste, trim(itemProps(key), "greenstone")));
-        greenstoneTorchItem = items.register("greenstone_torch", key -> new StandingAndWallBlockItem(greenstoneTorch, greenstoneWallTorch, Direction.DOWN, itemProps(key)));
+        greenstoneTorchItem = items.register("greenstone_torch", key -> torchItem(greenstoneTorch, greenstoneWallTorch, key));
         greenstoneBlockItem = blockItem(items, "greenstone_block", greenstoneBlock);
         greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);
         greenstoneComparatorItem = blockItem(items, "greenstone_comparator", greenstoneComparator);
@@ -276,12 +280,38 @@ public final class BluestoneBlocks {
         return items.register(path, key -> new BlockItem(block, itemProps(key)));
     }
 
+    // The wall torch block and the properties swapped places in 1.21.2.
+    private static Item torchItem(Block torch, Block wallTorch, ResourceKey<Item> key) {
+        //#if MC >= 1.21.2
+        return new StandingAndWallBlockItem(torch, wallTorch, Direction.DOWN, itemProps(key));
+        //#else
+        //$$ return new StandingAndWallBlockItem(torch, wallTorch, itemProps(key), Direction.DOWN);
+        //#endif
+    }
+
     private static Item.Properties itemProps(ResourceKey<Item> key) {
+        //#if MC >= 1.21.2
         return new Item.Properties().setId(key).useBlockDescriptionPrefix();
+        //#else
+        //$$ return new Item.Properties();
+        //#endif
+    }
+
+    // A wall torch or wall rail drops what the block it was placed from drops, and from 1.21.2 shares its name too.
+    public static BlockBehaviour.Properties like(BlockBehaviour.Properties properties, Block floor) {
+        //#if MC >= 1.21.2
+        return properties.overrideLootTable(floor.getLootTable()).overrideDescription(floor.getDescriptionId());
+        //#else
+        //$$ return properties.dropsLike(floor);
+        //#endif
     }
 
     private static BlockBehaviour.Properties props(ResourceKey<Block> key, BlockBehaviour.Properties properties) {
+        //#if MC >= 1.21.2
         return properties.setId(key);
+        //#else
+        //$$ return properties;
+        //#endif
     }
 
     private static BlockBehaviour.Properties wireProperties() {

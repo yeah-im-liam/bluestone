@@ -1,25 +1,21 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Entity render states are new in 1.21.2; MinecartRendererMixin and EntityRenderDispatcherLegacyMixin before.
+//#if MC >= 1.21.2
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.AbstractMinecartRenderer;
 import net.minecraft.client.renderer.entity.state.MinecartRenderState;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import yeah.im.liam.bluestone.block.AttachedRailBlock;
 import yeah.im.liam.bluestone.client.CartTurns;
 import yeah.im.liam.bluestone.client.SurfaceCart;
 
@@ -29,59 +25,13 @@ import yeah.im.liam.bluestone.client.SurfaceCart;
  */
 @Mixin(AbstractMinecartRenderer.class)
 abstract class AbstractMinecartRendererMixin {
-    @Unique
-    private static final double PIVOT_HEIGHT = 0.375;
-
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;Lnet/minecraft/client/renderer/entity/state/MinecartRenderState;F)V",
         at = @At("TAIL"))
     private void bluestone$surface(AbstractMinecart cart, MinecartRenderState state, float partialTicks, CallbackInfo ci) {
         Vec3 origin = state.isNewRender && state.renderPos != null ? state.renderPos : new Vec3(state.x, state.y, state.z);
-        Vec3 center = origin.add(0.0, cart.getBbHeight() / 2.0, 0.0);
-        BlockPos pos = BlockPos.containing(center);
-        BlockState rail = cart.level().getBlockState(pos);
-        Quaternionf surface = null;
-        Vec3 surfacePivot = Vec3.ZERO;
-        if (rail.getBlock() instanceof AttachedRailBlock) {
-            Direction attached = rail.getValue(AttachedRailBlock.ATTACHED);
-            Direction along = rail.getValue(AttachedRailBlock.TRAVEL);
-            Direction other = AttachedRailBlock.curveEnd(rail);
-            Vec3 velocity = cart.getDeltaMovement();
-            if (other != null && velocity.dot(Vec3.atLowerCornerOf(other.getUnitVec3i())) > velocity.dot(Vec3.atLowerCornerOf(along.getUnitVec3i()))) {
-                along = other;
-            }
-            Vector3f x = new Vector3f(along.getStepX(), along.getStepY(), along.getStepZ());
-            Vector3f y = new Vector3f(-attached.getStepX(), -attached.getStepY(), -attached.getStepZ());
-            surface = new Matrix3f(x, y, x.cross(y, new Vector3f())).getNormalizedRotation(new Quaternionf());
-            Vec3 face = Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(attached.getUnitVec3i()).scale(0.5 - PIVOT_HEIGHT));
-            Vec3 pivot = switch (attached.getAxis()) {
-                case X -> new Vec3(face.x, center.y, center.z);
-                case Y -> new Vec3(center.x, face.y, center.z);
-                case Z -> new Vec3(center.x, center.y, face.z);
-            };
-            surfacePivot = pivot.subtract(origin);
-        }
-        Quaternionf game;
-        Vec3 gamePivot;
-        if (state.isNewRender) {
-            game = new Quaternionf().rotateY((float) Math.toRadians(state.yRot)).rotateZ((float) Math.toRadians(-state.xRot));
-            gamePivot = new Vec3(0.0, PIVOT_HEIGHT, 0.0);
-        } else {
-            float xRot = state.xRot;
-            float rotation = state.yRot;
-            Vec3 offset = Vec3.ZERO;
-            if (state.posOnRail != null && state.frontPos != null && state.backPos != null) {
-                offset = new Vec3(state.posOnRail.x - state.x, (state.frontPos.y + state.backPos.y) / 2.0 - state.y, state.posOnRail.z - state.z);
-                Vec3 direction = state.backPos.subtract(state.frontPos);
-                if (direction.length() != 0.0) {
-                    direction = direction.normalize();
-                    rotation = (float) (Math.atan2(direction.z, direction.x) * 180.0 / Math.PI);
-                    xRot = (float) (Math.atan(direction.y) * 73.0);
-                }
-            }
-            game = new Quaternionf().rotateY((float) Math.toRadians(180.0F - rotation)).rotateZ((float) Math.toRadians(-xRot));
-            gamePivot = offset.add(0.0, PIVOT_HEIGHT, 0.0);
-        }
-        CartTurns.Turned turned = CartTurns.turn(cart, surface, surfacePivot, game, gamePivot);
+        CartTurns.Turned game = state.isNewRender ? CartTurns.newTurn(state.yRot, state.xRot)
+            : CartTurns.railTurn(origin, state.posOnRail, state.frontPos, state.backPos, state.yRot, state.xRot);
+        CartTurns.Turned turned = CartTurns.surfaceTurn(cart, origin, game);
         ((SurfaceCart) state).bluestone$set(turned != null ? turned.turn() : null, turned != null ? turned.pivot() : Vec3.ZERO);
     }
 
@@ -126,3 +76,4 @@ abstract class AbstractMinecartRendererMixin {
         return true;
     }
 }
+//#endif

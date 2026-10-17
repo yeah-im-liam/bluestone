@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionResult;
@@ -62,7 +61,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     private static final Map<Direction, EnumProperty<Side>> SIDES = new EnumMap<>(Map.of(
         Direction.NORTH, NORTH, Direction.EAST, EAST, Direction.SOUTH, SOUTH, Direction.WEST, WEST, Direction.UP, UP, Direction.DOWN, DOWN));
-    private static final int[] COLORS = ColoredWireBlock.colorsFor((red, green, blue) -> ARGB.colorFromFloat(1.0F, green, red, blue));
+    private static final int[] COLORS = ColoredWireBlock.colorsFor((red, green, blue) -> ColoredWireBlock.opaque(green, red, blue));
     private static final VoxelShape[][] OUTLINES = new VoxelShape[6][16];
     private static final Direction[] FACE_SIDES = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
@@ -276,8 +275,15 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return face == null ? null : withConnections(context.getLevel(), context.getClickedPos(), state.setValue(SIDES.get(face), Side.FACE), false);
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         if (faces(state).isEmpty()) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -592,8 +598,14 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
         if (!level.isClientSide()) {
             updatePower(level, pos, state);
         }
@@ -662,7 +674,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         double x = pos.getX() + 0.5 + 0.45 * face.getStepX() + (face.getStepX() == 0 ? (random.nextDouble() - 0.5) * 0.4 : 0.0);
         double y = pos.getY() + 0.5 + 0.45 * face.getStepY() + (face.getStepY() == 0 ? (random.nextDouble() - 0.5) * 0.4 : 0.0);
         double z = pos.getZ() + 0.5 + 0.45 * face.getStepZ() + (face.getStepZ() == 0 ? (random.nextDouble() - 0.5) * 0.4 : 0.0);
-        level.addParticle(new DustParticleOptions(COLORS[power], 1.0F), x, y, z, 0.0, 0.0, 0.0);
+        level.addParticle(Particles.dust(COLORS[power], 1.0F), x, y, z, 0.0, 0.0, 0.0);
     }
 
     @Override

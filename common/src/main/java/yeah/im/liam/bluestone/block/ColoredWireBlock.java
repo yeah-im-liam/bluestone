@@ -33,7 +33,10 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import net.minecraft.world.level.material.FluidState;
+//#if MC >= 1.21.2
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+//#else
+//#endif
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -84,6 +87,23 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
             .setValue(EAST, RedstoneSide.SIDE)
             .setValue(SOUTH, RedstoneSide.SIDE)
             .setValue(WEST, RedstoneSide.SIDE);
+    }
+
+    // What redstone dust reads, along the wire, from a neighbour that is not redstone dust: purplestone dust and converter
+    // boxes, one level weaker per block as from redstone dust.
+    public static int powerForRedstoneDust(BlockState state) {
+        if (state.getBlock() instanceof ColoredWireBlock wire && Channel.REDSTONE.hears(wire.channel(state))) {
+            return state.getValue(POWER);
+        }
+        if (state.getBlock() instanceof ConverterBoxBlock) {
+            return state.getValue(ConverterBoxBlock.POWER);
+        }
+        return 0;
+    }
+
+    // An opaque colour from channels between 0 and 1, as the game's ARGB.colorFromFloat makes it.
+    public static int opaque(float red, float green, float blue) {
+        return 0xFF000000 | Mth.floor(red * 255.0F) << 16 | Mth.floor(green * 255.0F) << 8 | Mth.floor(blue * 255.0F);
     }
 
     private Function<BlockState, VoxelShape> makeShapes() {
@@ -167,8 +187,15 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         return state;
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         Waterlogging.scheduleTick(state, level, ticks, pos);
         if (directionToNeighbour == Direction.DOWN) {
             return !canSurviveOn(level, neighbourPos, neighbourState) ? Blocks.AIR.defaultBlockState() : state;
@@ -210,12 +237,20 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
                 blockPos.move(Direction.DOWN);
                 if (level.getBlockState(blockPos).is(this)) {
                     BlockPos neighborPos = blockPos.relative(direction.getOpposite());
+                    //#if MC >= 1.21.2
                     level.neighborShapeChanged(direction.getOpposite(), blockPos, neighborPos, level.getBlockState(neighborPos), updateFlags, updateLimit);
+                    //#else
+                    //$$ level.neighborShapeChanged(direction.getOpposite(), level.getBlockState(neighborPos), blockPos, neighborPos, updateFlags, updateLimit);
+                    //#endif
                 }
                 blockPos.setWithOffset(pos, direction).move(Direction.UP);
                 if (level.getBlockState(blockPos).is(this)) {
                     BlockPos neighborPos = blockPos.relative(direction.getOpposite());
+                    //#if MC >= 1.21.2
                     level.neighborShapeChanged(direction.getOpposite(), blockPos, neighborPos, level.getBlockState(neighborPos), updateFlags, updateLimit);
+                    //#else
+                    //$$ level.neighborShapeChanged(direction.getOpposite(), level.getBlockState(neighborPos), blockPos, neighborPos, updateFlags, updateLimit);
+                    //#endif
                 }
             }
         }
@@ -255,7 +290,10 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
 
     private void updatePowerStrength(Level level, BlockPos pos, BlockState state, @Nullable Orientation orientation, boolean shapeUpdateWiresAroundInitialPosition) {
         if (useExperimentalEvaluator(level)) {
+            //#if MC >= 1.21.2
             new ExperimentalWireEvaluator(this).updatePowerStrength(level, pos, state, orientation, shapeUpdateWiresAroundInitialPosition);
+            //#else
+            //#endif
         } else {
             evaluator.updatePowerStrength(level, pos, state, orientation, shapeUpdateWiresAroundInitialPosition);
         }
@@ -339,8 +377,14 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
         if (!level.isClientSide() && (block != this || !useExperimentalEvaluator(level))) {
             if (state.canSurvive(level, pos)) {
                 updatePowerStrength(level, pos, state, orientation, false);
@@ -352,7 +396,11 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     private static boolean useExperimentalEvaluator(Level level) {
+        //#if MC >= 1.21.2
         return level.enabledFeatures().contains(FeatureFlags.REDSTONE_EXPERIMENTS);
+        //#else
+        //$$ return false;
+        //#endif
     }
 
     @Override
@@ -439,7 +487,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
             double x = 0.5 + 0.4375F * side.getStepX() + positionOnLine * along.getStepX();
             double y = 0.5 + 0.4375F * side.getStepY() + positionOnLine * along.getStepY();
             double z = 0.5 + 0.4375F * side.getStepZ() + positionOnLine * along.getStepZ();
-            level.addParticle(new DustParticleOptions(color, 1.0F), pos.getX() + x, pos.getY() + y, pos.getZ() + z, 0.0, 0.0, 0.0);
+            level.addParticle(Particles.dust(color, 1.0F), pos.getX() + x, pos.getY() + y, pos.getZ() + z, 0.0, 0.0, 0.0);
         }
     }
 
@@ -530,12 +578,19 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     private void updatesOnShapeChange(Level level, BlockPos pos, BlockState oldState, BlockState newState) {
+        //#if MC >= 1.21.2
         Orientation orientation = ExperimentalRedstoneUtils.initialOrientation(level, null, Direction.UP);
+        //#else
+        //#endif
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockPos relativePos = pos.relative(direction);
             EnumProperty<RedstoneSide> property = PROPERTY_BY_DIRECTION.get(direction);
             if (oldState.getValue(property).isConnected() != newState.getValue(property).isConnected() && level.getBlockState(relativePos).isRedstoneConductor(level, relativePos)) {
+                //#if MC >= 1.21.2
                 level.updateNeighborsAtExceptFromFacing(relativePos, newState.getBlock(), direction.getOpposite(), ExperimentalRedstoneUtils.withFront(orientation, direction));
+                //#else
+                //$$ level.updateNeighborsAtExceptFromFacing(relativePos, newState.getBlock(), direction.getOpposite());
+                //#endif
             }
         }
     }

@@ -63,9 +63,7 @@ public final class BluestoneRails {
 
     private static void sticky(Registrar<Block> blocks, String name, Function<BlockBehaviour.Properties, Block> factory, Kind kind, @Nullable Channel channel) {
         Block floor = blocks.register(name, key -> factory.apply(properties(key)));
-        Block attached = blocks.register("attached_" + name, key -> new AttachedRailBlock(properties(key)
-            .overrideLootTable(floor.getLootTable())
-            .overrideDescription(floor.getDescriptionId()), kind, channel));
+        Block attached = blocks.register("attached_" + name, key -> new AttachedRailBlock(BluestoneBlocks.like(properties(key), floor), kind, channel));
         if (kind == Kind.POWERED) {
             POWERED_RAILS.add(floor);
         } else if (kind == Kind.ACTIVATOR) {
@@ -75,15 +73,23 @@ public final class BluestoneRails {
     }
 
     private static BlockBehaviour.Properties properties(ResourceKey<Block> key) {
-        return BlockBehaviour.Properties.of()
+        BlockBehaviour.Properties properties = BlockBehaviour.Properties.of()
             .noCollision()
             .strength(0.7F)
-            .sound(SoundType.METAL)
-            .setId(key);
+            .sound(SoundType.METAL);
+        //#if MC >= 1.21.2
+        return properties.setId(key);
+        //#else
+        //$$ return properties;
+        //#endif
     }
 
     private static Item.Properties itemProperties(ResourceKey<Item> key) {
+        //#if MC >= 1.21.2
         return new Item.Properties().setId(key).useBlockDescriptionPrefix();
+        //#else
+        //$$ return new Item.Properties();
+        //#endif
     }
 
     static Item item(String name) {

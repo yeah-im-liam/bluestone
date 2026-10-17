@@ -1,7 +1,6 @@
 package yeah.im.liam.bluestone.block;
 
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.signal.Channel;
@@ -26,7 +25,7 @@ public class PurplestoneWireBlock extends ColoredWireBlock {
     };
 
     public PurplestoneWireBlock(Properties properties) {
-        super(properties, Channel.PURPLESTONE, (red, green, blue) -> ARGB.colorFromFloat(1.0F, red * 0.6F, green, red));
+        super(properties, Channel.PURPLESTONE, (red, green, blue) -> opaque(red * 0.6F, green, red));
     }
 
     @Override

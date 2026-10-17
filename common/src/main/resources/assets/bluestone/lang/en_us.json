@@ -44,5 +44,17 @@
   "trim_material.bluestone.purplestone": "Purplestone Material",
   "trim_material.bluestone.greenstone": "Greenstone Material",
   "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
-  "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered"
+  "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
+  "block.bluestone.bluestone_wall_torch": "Bluestone Wall Torch",
+  "block.bluestone.purplestone_wall_torch": "Purplestone Wall Torch",
+  "block.bluestone.greenstone_wall_torch": "Greenstone Wall Torch",
+  "block.bluestone.attached_sticky_rail": "Sticky Rail",
+  "block.bluestone.attached_sticky_powered_rail": "Sticky Redstone Powered Rail",
+  "block.bluestone.attached_sticky_bluestone_powered_rail": "Sticky Bluestone Powered Rail",
+  "block.bluestone.attached_sticky_detector_rail": "Sticky Redstone Detector Rail",
+  "block.bluestone.attached_sticky_bluestone_detector_rail": "Sticky Bluestone Detector Rail",
+  "block.bluestone.attached_sticky_activator_rail": "Sticky Redstone Activator Rail",
+  "block.bluestone.attached_sticky_bluestone_activator_rail": "Sticky Bluestone Activator Rail",
+  "block.bluestone.attached_sticky_chain_rail": "Sticky Redstone Chain Rail",
+  "block.bluestone.attached_sticky_bluestone_chain_rail": "Sticky Bluestone Chain Rail"
 }

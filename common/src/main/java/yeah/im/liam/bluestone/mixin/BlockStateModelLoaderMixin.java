@@ -20,6 +20,7 @@ package yeah.im.liam.bluestone.mixin;
  //$$ */
 //$$ @Mixin(BlockStateModelLoader.class)
 //$$ abstract class BlockStateModelLoaderMixin {
+    //#if MC >= 1.21.2
     //$$ @ModifyReturnValue(method = "definitionLocationToBlockMapper", at = @At("RETURN"))
     //$$ private static Function<Identifier, StateDefinition<Block, BlockState>> bluestone$addLights(Function<Identifier, StateDefinition<Block, BlockState>> definitions) {
         //$$ return id -> ConverterBoxPieces.LIGHT_ID.equals(id) ? ConverterBoxPieces.LIGHT_DEFINITION
@@ -27,5 +28,19 @@ package yeah.im.liam.bluestone.mixin;
             //$$ : ConverterBoxPieces.FRAME_ID.equals(id) ? ConverterBoxPieces.FRAME_DEFINITION
             //$$ : definitions.apply(id);
     //$$ }
+    //#else
+    //$$ // Before 1.21.2 the loader loads the item frames' definitions and every block's one by one.
+    //$$ @org.spongepowered.asm.mixin.Shadow
+    //$$ private void loadBlockStateDefinitions(Identifier id, StateDefinition<Block, BlockState> definition) {
+    //$$     throw new AssertionError();
+    //$$ }
+    //$$
+    //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "loadAllBlockStates", at = @At("TAIL"))
+    //$$ private void bluestone$addLights(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+    //$$     loadBlockStateDefinitions(ConverterBoxPieces.FRAME_ID, ConverterBoxPieces.FRAME_DEFINITION);
+    //$$     loadBlockStateDefinitions(ConverterBoxPieces.LIGHT_ID, ConverterBoxPieces.LIGHT_DEFINITION);
+    //$$     loadBlockStateDefinitions(ConverterBoxPieces.CENTER_ID, ConverterBoxPieces.CENTER_DEFINITION);
+    //$$ }
+    //#endif
 //$$ }
 //#endif

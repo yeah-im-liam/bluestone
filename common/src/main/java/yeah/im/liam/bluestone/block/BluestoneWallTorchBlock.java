@@ -6,6 +6,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
@@ -29,10 +30,21 @@ public class BluestoneWallTorchBlock extends RedstoneWallTorchBlock implements S
         return Waterlogging.place(super.getStateForPlacement(context), context);
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         Waterlogging.scheduleTick(state, level, ticks, pos);
+        //#if MC >= 1.21.2
         return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+        //#else
+        //$$ return super.updateShape(state, directionToNeighbour, neighbourState, level, pos, neighbourPos);
+        //#endif
     }
 
     @Override

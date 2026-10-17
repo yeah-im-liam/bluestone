@@ -14,6 +14,7 @@ import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
@@ -289,7 +290,11 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         for (Direction way : Direction.values()) {
             BlockPos around = pos.relative(way).relative(attached);
             if (way.getAxis() != attached.getAxis() && level.getBlockState(around).getBlock() instanceof AttachedRailBlock) {
+                //#if MC >= 1.21.2
                 level.neighborChanged(around, this, null);
+                //#else
+                //$$ level.neighborChanged(around, this, pos);
+                //#endif
             }
         }
         if (attached.getAxis().isHorizontal()) {
@@ -303,8 +308,15 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+    //#else
+    //$$ @Override
+    //$$ protected BlockState updateShape(BlockState state, Direction directionToNeighbour, BlockState neighbourState, LevelAccessor level, BlockPos pos, BlockPos neighbourPos) {
+    //$$     LevelAccessor ticks = level;
+    //$$     RandomSource random = level.getRandom();
+    //#endif
         Waterlogging.scheduleTick(state, level, ticks, pos);
         return directionToNeighbour == state.getValue(ATTACHED) && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : state;
     }
@@ -322,8 +334,14 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
     }
 
+    //#if MC >= 1.21.2
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighbourPos, boolean movedByPiston) {
+    //$$     Orientation orientation = null;
+    //#endif
         if (!level.isClientSide()) {
             turn(level, pos, state);
             updatePowered(level, pos);

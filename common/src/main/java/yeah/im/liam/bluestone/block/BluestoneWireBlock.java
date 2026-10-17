@@ -1,7 +1,6 @@
 package yeah.im.liam.bluestone.block;
 
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
@@ -13,7 +12,7 @@ import yeah.im.liam.bluestone.signal.Channel;
  */
 public class BluestoneWireBlock extends ColoredWireBlock implements BluestoneComponent, SimpleWaterloggedBlock {
     public BluestoneWireBlock(Properties properties) {
-        super(properties, Channel.BLUESTONE, (red, green, blue) -> ARGB.colorFromFloat(1.0F, blue, green, red));
+        super(properties, Channel.BLUESTONE, (red, green, blue) -> opaque(blue, green, red));
     }
 
     @Override

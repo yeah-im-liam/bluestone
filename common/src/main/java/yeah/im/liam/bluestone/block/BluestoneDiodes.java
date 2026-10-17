@@ -15,7 +15,7 @@ import yeah.im.liam.bluestone.signal.Signals;
  * in place of the redstone ones.
  */
 final class BluestoneDiodes {
-    static final DustParticleOptions PARTICLE = new DustParticleOptions(0x0000FF, 1.0F);
+    static final DustParticleOptions PARTICLE = Particles.dust(0x0000FF, 1.0F);
 
     private BluestoneDiodes() {
     }

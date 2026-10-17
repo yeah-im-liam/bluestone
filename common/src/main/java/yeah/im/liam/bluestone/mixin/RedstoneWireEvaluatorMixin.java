@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// The game's wire evaluator is new in 1.21.2; LegacyWireMixin hooks the wire itself before.
+//#if MC >= 1.21.2
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,12 +20,7 @@ import yeah.im.liam.bluestone.signal.Channel;
 abstract class RedstoneWireEvaluatorMixin {
     @ModifyReturnValue(method = "getWireSignal", at = @At("RETURN"))
     private int bluestone$otherDust(int signal, @Local(argsOnly = true) BlockState state) {
-        if (signal == 0 && state.getBlock() instanceof ColoredWireBlock wire && Channel.REDSTONE.hears(wire.channel(state))) {
-            return state.getValue(ColoredWireBlock.POWER);
-        }
-        if (signal == 0 && state.getBlock() instanceof ConverterBoxBlock) {
-            return state.getValue(ConverterBoxBlock.POWER);
-        }
-        return signal;
+        return signal == 0 ? ColoredWireBlock.powerForRedstoneDust(state) : signal;
     }
 }
+//#endif

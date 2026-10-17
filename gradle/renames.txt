@@ -8,3 +8,9 @@
 1.21.11 Identifier ResourceLocation
 1.21.11 net.minecraft.world.entity.npc.villager. net.minecraft.world.entity.npc.
 1.21.9 noCollision noCollission
+1.21.2 net.minecraft.world.level.redstone.Orientation yeah.im.liam.bluestone.compat.Orientation
+1.21.2 net.minecraft.world.level.ScheduledTickAccess net.minecraft.world.level.LevelAccessor
+1.21.2 getUnitVec3i getNormal
+1.21.2 isSlope isAscending
+1.21.2 getApproximateNearest getNearest
+1.21.2 ScheduledTickAccess LevelAccessor

@@ -1,0 +1,8 @@
+{
+  "parent": "block/redstone_dust_side_alt",
+  "textures": {
+    "line": "bluestone:block/greenstone_paste_line1",
+    "particle": "bluestone:block/greenstone_paste_dot",
+    "overlay": "bluestone:block/greenstone_paste_overlay"
+  }
+}
