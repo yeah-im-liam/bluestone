@@ -183,7 +183,7 @@ public final class SurfaceRails {
         RailShape shape = state.getValue(rail.getShapeProperty());
         if (shape.isSlope()) {
             List<Direction> ends = WallRails.ends(shape);
-            return WallRails.slopesUp(level, pos, ends.getLast()) ? ends : List.of();
+            return WallRails.slopesUp(level, pos, ends.get(ends.size() - 1)) ? ends : List.of();
         }
         return WallRails.level(shape);
     }

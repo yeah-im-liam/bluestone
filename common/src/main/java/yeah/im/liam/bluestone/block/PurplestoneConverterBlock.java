@@ -59,8 +59,14 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         return 2;
     }
 
+    // Blocks are used through use() with any item before 1.20.5.
+    //#if MC >= 1.20.5
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    //#else
+    //$$ @Override
+    //$$ public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hitResult) {
+    //#endif
         if (!player.getAbilities().mayBuild) {
             return InteractionResult.PASS;
         }

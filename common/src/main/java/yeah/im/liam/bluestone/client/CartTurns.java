@@ -147,7 +147,12 @@ public final class CartTurns {
         if (turn == null || !turn.ours) {
             return null;
         }
+        // Where the game seats the rider (Entity.positionRider); the rider's own offset is a height before 1.20.5.
+        //#if MC >= 1.20.5
         Vec3 seat = cart.getPassengerRidingPosition(rider).subtract(rider.getVehicleAttachmentPoint(cart)).subtract(cart.position());
+        //#else
+        //$$ Vec3 seat = cart.getPassengerRidingPosition(rider).add(0.0, rider.getMyRidingOffset(cart), 0.0).subtract(cart.position());
+        //#endif
         return new Tilt(new Quaternionf(turn.tilt), cart.getPosition(partialTicks).add(turn.pivot), cart.getPosition(partialTicks).add(seat));
     }
 

@@ -42,8 +42,13 @@ abstract class AbstractMinecartMixin implements RailRider {
         }
     }
     //#else
-    //$$ // Before 1.21.2 the movement is in tick itself, from applying gravity on; what follows it still runs.
+    //$$ // Before 1.21.2 the movement is in tick itself, from applying gravity on; what follows it still runs. Gravity is
+    //$$ // applyGravity() from 1.20.5 and starts with an isNoGravity() check before.
+    //#if MC >= 1.20.5
     //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;applyGravity()V"), cancellable = true)
+    //#else
+    //$$ @org.spongepowered.asm.mixin.injection.Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isNoGravity()Z", ordinal = 0), cancellable = true)
+    //#endif
     //$$ private void bluestone$surfaceRails(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
     //$$     if (SurfaceRails.tick((AbstractMinecart) (Object) this)) {
     //$$         updateInWaterStateAndDoFluidPushing();

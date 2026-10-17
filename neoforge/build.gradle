@@ -55,6 +55,11 @@ processResources {
 
     filesMatching('META-INF/neoforge.mods.toml') {
         expand tokens
+        // Before 20.5 NeoForge reads META-INF/mods.toml, where a required dependency is `mandatory`.
+        if (rootProject.findProperty('neoforge_mods_toml') == 'true') {
+            filter { it.replace('type = "required"', 'mandatory = true') }
+            path = 'META-INF/mods.toml'
+        }
     }
 }
 

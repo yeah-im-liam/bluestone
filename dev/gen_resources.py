@@ -559,6 +559,12 @@ elif since("1.21.9"):
     write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "min_format": RESOURCE_FORMAT, "max_format": RESOURCE_FORMAT}})
 else:
     write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "pack_format": RESOURCE_FORMAT}})
+# NeoForge makes up a mod's own pack metadata only from 20.4 and Forge never does, so jars before 1.20.5 carry one. It
+# serves the assets and the data of every version in the range.
+if not since("1.20.5"):
+    formats = [f for v in (PACK_VERSION, json.loads(oldest.read("version.json"))["pack_version"]) for f in (v["resource"], v["data"])]
+    write("pack.mcmeta", {"pack": {"description": "Bluestone", "pack_format": PACK_VERSION["data"],
+                                   "supported_formats": [min(formats), max(formats)]}})
 
 # Language
 LANG = {

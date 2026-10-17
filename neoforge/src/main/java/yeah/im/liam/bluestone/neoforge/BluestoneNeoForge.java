@@ -136,13 +136,18 @@ public final class BluestoneNeoForge {
             event.addPackFinders(Bluestone.id("programmer_art"), PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, false, Pack.Position.TOP);
             //#else
-            //$$ // NeoForge 20.5 has no addPackFinders; this is what it does from 20.6.
+            //$$ // NeoForge 20.5 and older have no addPackFinders; this is what it does from 20.6.
             //$$ java.nio.file.Path root = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art");
+            //#if MC >= 1.20.5
             //$$ Pack pack = Pack.readMetaAndCreate(
             //$$     new net.minecraft.server.packs.PackLocationInfo("mod/" + Bluestone.id("programmer_art"),
             //$$         Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, java.util.Optional.empty()),
             //$$     net.minecraft.server.packs.repository.BuiltInPackSource.fromName(path -> new net.minecraft.server.packs.PathPackResources(path, root)),
             //$$     PackType.CLIENT_RESOURCES, new net.minecraft.server.packs.PackSelectionConfig(false, Pack.Position.TOP, false));
+            //#else
+            //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id("programmer_art"), Component.translatable("pack.bluestone.programmer_art"), false,
+            //$$     new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+            //#endif
             //$$ if (pack != null) {
             //$$     event.addRepositorySource(packs -> packs.accept(pack));
             //$$ }

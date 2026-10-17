@@ -12,7 +12,9 @@ import net.neoforged.fml.common.Mod;
 //#endif
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+//#if MC >= 1.20.5
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+//#endif
 import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.client.BluestoneTint;
 import yeah.im.liam.bluestone.client.CartViewScreen;
@@ -28,7 +30,13 @@ import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 //#endif
 public final class BluestoneNeoForgeClient {
     public BluestoneNeoForgeClient(IEventBus modEventBus, ModContainer container) {
+        // The settings screen factory is a ConfigScreenFactory record before 20.5.
+        //#if MC >= 1.20.5
         container.registerExtensionPoint(IConfigScreenFactory.class, (mod, parent) -> new CartViewScreen(parent));
+        //#else
+        //$$ container.registerExtensionPoint(net.neoforged.neoforge.client.ConfigScreenHandler.ConfigScreenFactory.class,
+        //$$     () -> new net.neoforged.neoforge.client.ConfigScreenHandler.ConfigScreenFactory((minecraft, parent) -> new CartViewScreen(parent)));
+        //#endif
         //#if MC >= 26.1
         modEventBus.addListener((RegisterColorHandlersEvent.BlockTintSources event) -> {
             BluestoneBlocks.wires().forEach(wire -> event.register(List.of(BluestoneTint.wire(wire)), wire));

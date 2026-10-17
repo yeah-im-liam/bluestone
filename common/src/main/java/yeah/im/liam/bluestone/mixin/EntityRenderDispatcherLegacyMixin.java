@@ -33,7 +33,7 @@ package yeah.im.liam.bluestone.mixin;
 //$$         Vec3 seat = tilt.seat().subtract(tilt.pivot());
 //$$         poseStack.pushPose();
 //$$         poseStack.translate(pivot.x, pivot.y, pivot.z);
-//$$         poseStack.mulPose(new Matrix4f().rotation(tilt.tilt()));
+//$$         poseStack.mulPose(tilt.tilt());
 //$$         poseStack.translate(seat.x, seat.y, seat.z);
 //$$         original.call(renderer, entity, yRot, partialTicks, poseStack, buffers, light);
 //$$         poseStack.popPose();

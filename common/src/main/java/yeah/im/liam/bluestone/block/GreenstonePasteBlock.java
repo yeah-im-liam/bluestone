@@ -338,7 +338,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             return false;
         }
         for (Direction way : Direction.values()) {
-            if (way.getAxis() != faces.getFirst().getAxis() && state.getValue(SIDES.get(way)) != Side.NONE) {
+            if (way.getAxis() != faces.get(0).getAxis() && state.getValue(SIDES.get(way)) != Side.NONE) {
                 return false;
             }
         }
@@ -365,7 +365,7 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             }
             for (Direction way : Direction.values()) {
                 if (way.getAxis() != face.getAxis() && !faces.contains(way)
-                    && (edges.isEmpty() && !dot || edges.size() == 1 && edges.getFirst() == way.getOpposite())) {
+                    && (edges.isEmpty() && !dot || edges.size() == 1 && edges.get(0) == way.getOpposite())) {
                     ways.add(way);
                 }
             }
@@ -388,8 +388,8 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             state = state.setValue(SIDES.get(way), side);
             if (side == Side.LINE && bordering.size() > 1) {
                 Shared needed = drawing.size() == bordering.size() ? Shared.ALL
-                    : drawing.equals(List.of(bordering.getFirst())) ? Shared.FIRST
-                    : drawing.equals(List.of(bordering.getLast())) ? Shared.LAST : Shared.ALL;
+                    : drawing.equals(List.of(bordering.get(0))) ? Shared.FIRST
+                    : drawing.equals(List.of(bordering.get(bordering.size() - 1))) ? Shared.LAST : Shared.ALL;
                 clash |= shared != null && shared != needed;
                 shared = needed;
             }
@@ -506,13 +506,19 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         }
     }
 
+    // Blocks are used through use() with any item before 1.20.5.
+    //#if MC >= 1.20.5
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    //#else
+    //$$ @Override
+    //$$ public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, net.minecraft.world.InteractionHand hand, BlockHitResult hitResult) {
+    //#endif
         List<Direction> faces = faces(state);
         if (!player.getAbilities().mayBuild || faces.size() != 1) {
             return InteractionResult.PASS;
         }
-        Direction face = faces.getFirst();
+        Direction face = faces.get(0);
         BlockState switched = state.setValue(SHARED, Shared.ALL);
         for (Direction way : Direction.values()) {
             if (way.getAxis() != face.getAxis()) {
@@ -554,7 +560,12 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
 
     private static @Nullable Direction lookedAt(BlockState state, BlockPos pos, Player player) {
         Vec3 eye = player.getEyePosition();
+        // Players have an interaction range attribute from 1.20.5; before, the reach is fixed.
+        //#if MC >= 1.20.5
         Vec3 end = eye.add(player.getViewVector(1.0F).scale(player.blockInteractionRange() + 1.0));
+        //#else
+        //$$ Vec3 end = eye.add(player.getViewVector(1.0F).scale((player.isCreative() ? 5.0 : 4.5) + 1.0));
+        //#endif
         Direction best = null;
         double nearest = Double.MAX_VALUE;
         for (Direction face : faces(state)) {

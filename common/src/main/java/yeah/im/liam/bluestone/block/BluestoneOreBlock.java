@@ -35,20 +35,24 @@ public class BluestoneOreBlock extends RedStoneOreBlock {
         }
     }
 
-    // Item use answers with an ItemInteractionResult in 1.20.5 to 1.21.1.
+    // Item use answers with an ItemInteractionResult in 1.20.5 to 1.21.1, and goes through use() before.
     //#if MC >= 1.21.2
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-    //#else
+    //#elseif MC >= 1.20.5
     //$$ @Override
     //$$ protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    //#else
+    //$$ @Override
+    //$$ public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    //$$     ItemStack itemStack = player.getItemInHand(hand);
     //#endif
         if (level.isClientSide()) {
             spawnParticles(level, pos);
         } else {
             interact(state, level, pos);
         }
-        //#if MC >= 1.21.2
+        //#if MC >= 1.21.2 || MC < 1.20.5
         return itemStack.getItem() instanceof BlockItem && new BlockPlaceContext(player, hand, itemStack, hitResult).canPlace()
             ? InteractionResult.PASS
             : InteractionResult.SUCCESS;

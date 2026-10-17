@@ -38,8 +38,14 @@ package yeah.im.liam.bluestone.trade;
 //$$         if (offer == null || !offer.getResult().is(Items.REDSTONE) || random.nextFloat() >= 0.25F) {
 //$$             return offer;
 //$$         }
+//$$         // Costs are ItemCosts from 1.20.5 and item stacks before.
+//#if MC >= 1.20.5
 //$$         return new MerchantOffer(offer.getItemCostA(), offer.getItemCostB(), new ItemStack(BluestoneBlocks.dust(), offer.getResult().getCount()),
 //$$             offer.getMaxUses(), offer.getXp(), offer.getPriceMultiplier());
+//#else
+//$$         return new MerchantOffer(offer.getBaseCostA(), offer.getCostB(), new ItemStack(BluestoneBlocks.dust(), offer.getResult().getCount()),
+//$$             offer.getMaxUses(), offer.getXp(), offer.getPriceMultiplier());
+//#endif
 //$$     }
 //$$ }
 //#endif
