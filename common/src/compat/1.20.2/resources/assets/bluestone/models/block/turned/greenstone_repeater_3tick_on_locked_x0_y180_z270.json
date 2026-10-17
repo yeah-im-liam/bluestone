@@ -4,7 +4,7 @@
     "particle": "bluestone:block/greenstone_repeater_on",
     "slab": "bluestone:block/greenstone_back",
     "top": "bluestone:block/greenstone_repeater_on",
-    "lit": "bluestone:block/greenstone_torch",
+    "lit": "bluestone:block/old/greenstone_torch",
     "lock": "block/bedrock"
   },
   "elements": [
@@ -99,6 +99,16 @@
         6
       ],
       "faces": {
+        "east": {
+          "texture": "#lock",
+          "uv": [
+            7,
+            2,
+            9,
+            14
+          ],
+          "rotation": 180
+        },
         "west": {
           "texture": "#lock",
           "uv": [
@@ -152,14 +162,13 @@
       }
     },
     {
-      "shade": false,
       "from": [
         9,
         7,
         12
       ],
       "to": [
-        14,
+        9,
         9,
         14
       ],
@@ -173,33 +182,27 @@
             8
           ],
           "rotation": 90
-        },
-        "south": {
-          "texture": "#lit",
-          "uv": [
-            7,
-            6,
-            9,
-            11
-          ],
-          "rotation": 270
-        },
-        "north": {
-          "texture": "#lit",
-          "uv": [
-            7,
-            6,
-            9,
-            11
-          ],
-          "rotation": 90
-        },
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        7,
+        11
+      ],
+      "to": [
+        14,
+        9,
+        15
+      ],
+      "faces": {
         "up": {
           "texture": "#lit",
           "uv": [
-            7,
             6,
-            9,
+            5,
+            10,
             11
           ],
           "rotation": 270
@@ -207,9 +210,9 @@
         "down": {
           "texture": "#lit",
           "uv": [
-            7,
             6,
-            9,
+            5,
+            10,
             11
           ],
           "rotation": 270
@@ -217,152 +220,36 @@
       }
     },
     {
-      "shade": false,
       "from": [
-        11.5,
-        6.5,
-        11.5
+        8,
+        6,
+        12
       ],
       "to": [
-        14.5,
-        9.5,
-        14.5
-      ],
-      "faces": {
-        "west": {
-          "texture": "#lit",
-          "uv": [
-            8,
-            5,
-            9,
-            6
-          ],
-          "rotation": 90
-        }
-      }
-    },
-    {
-      "shade": false,
-      "from": [
-        5.5,
-        6.5,
-        11.5
-      ],
-      "to": [
-        8.5,
-        9.5,
-        14.5
-      ],
-      "faces": {
-        "east": {
-          "texture": "#lit",
-          "uv": [
-            7,
-            5,
-            8,
-            6
-          ],
-          "rotation": 90
-        }
-      }
-    },
-    {
-      "shade": false,
-      "from": [
-        8.5,
-        6.5,
-        14.5
-      ],
-      "to": [
-        11.5,
-        9.5,
-        17.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#lit",
-          "uv": [
-            9,
-            6,
-            10,
-            7
-          ],
-          "rotation": 90
-        }
-      }
-    },
-    {
-      "shade": false,
-      "from": [
-        8.5,
-        6.5,
-        8.5
-      ],
-      "to": [
-        11.5,
-        9.5,
-        11.5
+        14,
+        10,
+        14
       ],
       "faces": {
         "south": {
           "texture": "#lit",
           "uv": [
             6,
-            6,
-            7,
-            7
-          ],
-          "rotation": 270
-        }
-      }
-    },
-    {
-      "shade": false,
-      "from": [
-        8.5,
-        9.5,
-        11.5
-      ],
-      "to": [
-        11.5,
-        12.5,
-        14.5
-      ],
-      "faces": {
-        "down": {
-          "texture": "#lit",
-          "uv": [
-            9,
-            7,
+            5,
             10,
-            8
+            11
           ],
           "rotation": 270
-        }
-      }
-    },
-    {
-      "shade": false,
-      "from": [
-        8.5,
-        3.5,
-        11.5
-      ],
-      "to": [
-        11.5,
-        6.5,
-        14.5
-      ],
-      "faces": {
-        "up": {
+        },
+        "north": {
           "texture": "#lit",
           "uv": [
             6,
-            7,
-            7,
-            8
+            5,
+            10,
+            11
           ],
-          "rotation": 270
+          "rotation": 90
         }
       }
     }

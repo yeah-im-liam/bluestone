@@ -5,7 +5,7 @@
     "slab": "bluestone:block/greenstone_back",
     "top": "bluestone:block/greenstone_repeater",
     "lock": "block/bedrock",
-    "unlit": "bluestone:block/greenstone_torch_off"
+    "unlit": "bluestone:block/old/greenstone_torch_off"
   },
   "elements": [
     {
@@ -98,6 +98,16 @@
         14
       ],
       "faces": {
+        "south": {
+          "texture": "#lock",
+          "uv": [
+            7,
+            2,
+            9,
+            14
+          ],
+          "rotation": 180
+        },
         "north": {
           "texture": "#lock",
           "uv": [
@@ -161,6 +171,16 @@
         14
       ],
       "faces": {
+        "south": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 90
+        },
         "north": {
           "texture": "#unlit",
           "uv": [

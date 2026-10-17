@@ -4,7 +4,7 @@
     "particle": "bluestone:block/greenstone_repeater",
     "slab": "bluestone:block/greenstone_back",
     "top": "bluestone:block/greenstone_repeater",
-    "unlit": "bluestone:block/greenstone_torch_off"
+    "unlit": "bluestone:block/old/greenstone_torch_off"
   },
   "elements": [
     {
@@ -98,6 +98,16 @@
         8
       ],
       "faces": {
+        "east": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 90
+        },
         "west": {
           "texture": "#unlit",
           "uv": [
@@ -162,6 +172,16 @@
         14
       ],
       "faces": {
+        "east": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 90
+        },
         "west": {
           "texture": "#unlit",
           "uv": [

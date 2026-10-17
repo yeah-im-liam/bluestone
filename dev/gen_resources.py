@@ -24,9 +24,6 @@ OUT = Path(sys.argv[3])
 ART = Path(sys.argv[4])           # bluestone/textures (the user's art)
 programmer_art_zip = zipfile.ZipFile(sys.argv[5])
 oldest = zipfile.ZipFile(sys.argv[6]) if len(sys.argv) > 6 else z
-# A 1.21.2+ jar (1.21.4's): the game's torches, repeaters and comparators changed shape in 1.21.2 and the mod's art
-# follows the newer ones, so before 1.21.2 the mod's own blocks get copies of the newer models.
-modern = zipfile.ZipFile(sys.argv[7]) if len(sys.argv) > 7 else z
 OLDEST = json.loads(oldest.read("version.json"))["id"]
 
 
@@ -169,29 +166,8 @@ for face in AXES:
 write(A + "blockstates/converter_box_center.json", {"multipart": center_parts})
 
 # The game's redstone torch models with the mod's textures (their parents changed over the versions).
-def newer_shape(name):
-    """The id to build on for the game's model block/<name>: before 1.21.2 a copy of 1.21.4's under
-    bluestone:block/template/, with any parent the older game lacks copied too."""
-    if since("1.21.2"):
-        return f"minecraft:block/{name}"
-    model = vanilla(f"assets/minecraft/models/block/{name}.json", modern)
-    if "parent" in model:
-        parent = model["parent"].removeprefix("minecraft:")
-        exists = f"assets/minecraft/models/{parent}.json" in z.namelist()
-        model["parent"] = "minecraft:" + parent if exists else newer_shape(parent.removeprefix("block/"))
-    write(A + f"models/block/template/{name}.json", model)
-    # Programmer Art keeps the old shapes, as it does from 1.21.2 by replacing the game's models.
-    if f"assets/minecraft/models/block/{name}.json" in z.namelist():
-        write(f"programmer_art/{A}models/block/template/{name}.json", {"parent": f"minecraft:block/{name}"})
-    return f"bluestone:block/template/{name}"
-
-
-def newer_model(name):
-    return vanilla(f"assets/minecraft/models/block/{name}.json", z if since("1.21.2") else modern)
-
-
-# Before 1.21.2 the mod's torches are their Programmer Art versions, on the game's torch shape of then; the textures
-# are copied under block/old/ so the repeaters and comparators keep the normal ones.
+# Before 1.21.2 the mod's torches, also those on its repeaters, comparators and converter, are their Programmer Art
+# versions on the game's shapes of then (copied under block/old/, as the normal textures stay for newer versions).
 OLD_TORCH = "" if since("1.21.2") else "old/"
 
 
@@ -206,16 +182,16 @@ def torch_models(source, prefix, textures=""):
 
 torch_models(vanilla, A, OLD_TORCH)
 
-TORCH_TEXTURES = {"unlit": "bluestone:block/bluestone_torch_off", "lit": "bluestone:block/bluestone_torch"}
+TORCH_TEXTURES = {"unlit": f"bluestone:block/{OLD_TORCH}bluestone_torch_off", "lit": f"bluestone:block/{OLD_TORCH}bluestone_torch"}
 
 
 def diode_model(vanilla_name, ours, top, torches=TORCH_TEXTURES):
-    parent = newer_model(vanilla_name)
+    parent = vanilla(f"assets/minecraft/models/block/{vanilla_name}.json")
     textures = {"particle": top, "top": top}
     for key, value in torches.items():
         if key in parent["textures"]:
             textures[key] = value
-    write(A + f"models/block/{ours}.json", {"parent": newer_shape(vanilla_name), "textures": textures})
+    write(A + f"models/block/{ours}.json", {"parent": f"minecraft:block/{vanilla_name}", "textures": textures})
 
 
 for delay in range(1, 5):
@@ -236,7 +212,7 @@ for rail in ["powered_rail", "activator_rail", "detector_rail"]:
 # The purplestone converter: shaped like a four-tick repeater, with the input-end torch in the input colour and the
 # output-end torch in the output colour.
 TORCHES = {"red": ("minecraft:block/redstone_torch", "minecraft:block/redstone_torch_off"),
-           "blue": ("bluestone:block/bluestone_torch", "bluestone:block/bluestone_torch_off")}
+           "blue": (f"bluestone:block/{OLD_TORCH}bluestone_torch", f"bluestone:block/{OLD_TORCH}bluestone_torch_off")}
 MODES = {"red_to_blue": ("red", "blue"), "blue_to_red": ("blue", "red")}
 
 
@@ -267,7 +243,7 @@ def converter_models(source, prefix):
                 write(prefix + "models/block/purplestone_converter_" + mode + on + locked + ".json", model)
 
 
-converter_models(newer_model, A)
+converter_models(lambda name: vanilla("assets/minecraft/models/block/" + name + ".json"), A)
 converter_models(lambda name: programmer_art("assets/minecraft/models/block/" + name + ".json"), "programmer_art/" + A)
 ROTATION = {"south": 0, "west": 90, "north": 180, "east": 270}
 variants = {}
@@ -310,7 +286,8 @@ def rotated(model, attached, output):
 
 ALL_PAIRS = [(a, b) for a in AXES for b in AXES]
 # Greenstone repeaters and comparators have their own sides and back, greenstone_back, in place of smooth stone.
-GREEN_TORCHES = {"unlit": "bluestone:block/greenstone_torch_off", "lit": "bluestone:block/greenstone_torch", "slab": "bluestone:block/greenstone_back"}
+GREEN_TORCHES = {"unlit": f"bluestone:block/{OLD_TORCH}greenstone_torch_off", "lit": f"bluestone:block/{OLD_TORCH}greenstone_torch",
+                 "slab": "bluestone:block/greenstone_back"}
 variants = {}
 for delay in range(1, 5):
     for on in ["", "_on"]:

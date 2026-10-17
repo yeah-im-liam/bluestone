@@ -4,8 +4,8 @@
     "particle": "bluestone:block/greenstone_comparator",
     "slab": "bluestone:block/greenstone_back",
     "top": "bluestone:block/greenstone_comparator",
-    "unlit": "bluestone:block/greenstone_torch_off",
-    "lit": "bluestone:block/greenstone_torch"
+    "unlit": "bluestone:block/old/greenstone_torch_off",
+    "lit": "bluestone:block/old/greenstone_torch"
   },
   "elements": [
     {
@@ -99,6 +99,16 @@
         13
       ],
       "faces": {
+        "east": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 270
+        },
         "west": {
           "texture": "#unlit",
           "uv": [
@@ -163,6 +173,16 @@
         13
       ],
       "faces": {
+        "east": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 270
+        },
         "west": {
           "texture": "#unlit",
           "uv": [
@@ -217,7 +237,7 @@
     },
     {
       "from": [
-        11,
+        12,
         7,
         2
       ],
@@ -227,6 +247,16 @@
         4
       ],
       "faces": {
+        "east": {
+          "texture": "#unlit",
+          "uv": [
+            7,
+            13,
+            9,
+            15
+          ],
+          "rotation": 270
+        },
         "west": {
           "texture": "#unlit",
           "uv": [
@@ -243,7 +273,7 @@
             7,
             6,
             9,
-            9
+            8
           ],
           "rotation": 90
         },
@@ -253,7 +283,7 @@
             7,
             6,
             9,
-            9
+            8
           ],
           "rotation": 270
         },
@@ -263,7 +293,7 @@
             7,
             6,
             9,
-            9
+            8
           ],
           "rotation": 270
         },
@@ -273,7 +303,7 @@
             7,
             6,
             9,
-            9
+            8
           ],
           "rotation": 270
         }
