@@ -40,20 +40,20 @@ def programmer_art(version):
 targets = {}
 for path in sorted((ROOT / "targets").glob("*.properties")):
     props = properties(path)
-    targets[path.stem] = props["minecraft_version"]
+    targets[path.stem] = (props["minecraft_version"], props["minecraft_range"].split("-")[0])
 
 work = Path(tempfile.mkdtemp(prefix="bluestone-gen-"))
 trees = {}
-for name, version in targets.items():
+for name, (version, first) in targets.items():
     out = work / name
     args = [sys.executable, str(ROOT / "dev/gen_resources.py"), version, str(LOOM / version / "minecraft-client.jar"), str(out), str(ART),
             str(programmer_art(version))]
-    # The 26.x pack has an overlay with the formats of 26.1 and 26.2.
-    if version.startswith("26"):
-        args.append(str(LOOM / "26.1/minecraft-client.jar"))
+    # The jar of the first version the target covers, for the formats that changed within its range.
+    if first != version:
+        args.append(str(LOOM / first / "minecraft-client.jar"))
     subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
     trees[name] = {p.relative_to(out).as_posix(): p for p in out.rglob("*") if p.is_file()}
-    print(f"{name} ({version}): {len(trees[name])} files")
+    print(f"{name} ({first}-{version}): {len(trees[name])} files")
 
 written = set()
 for path in sorted(set().union(*trees.values())):

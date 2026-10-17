@@ -161,11 +161,18 @@ public final class BluestoneBlocks {
         BluestoneRails.registerBlocks(blocks);
     }
 
+    // Items name the trim material they give from 1.21.5; before, the trim material names its ingredient.
+    private static Item.Properties trim(Item.Properties properties, String material) {
+        //#if MC >= 1.21.5
+        return properties.trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, material));
+        //#else
+        //$$ return properties;
+        //#endif
+    }
+
     public static void registerItems(Registrar<Item> items) {
-        dust = items.register("bluestone", key -> new BlockItem(wire, new Item.Properties().setId(key).useItemDescriptionPrefix()
-            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "bluestone"))));
-        purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, new Item.Properties().setId(key).useItemDescriptionPrefix()
-            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "purplestone"))));
+        dust = items.register("bluestone", key -> new BlockItem(wire, trim(new Item.Properties().setId(key).useItemDescriptionPrefix(), "bluestone")));
+        purplestone = items.register("purplestone", key -> new BlockItem(purplestoneWire, trim(new Item.Properties().setId(key).useItemDescriptionPrefix(), "purplestone")));
         blockItem = blockItem(items, "bluestone_block", block);
         purplestoneBlockItem = blockItem(items, "purplestone_block", purplestoneBlock);
         oreItem = blockItem(items, "bluestone_ore", ore);
@@ -175,8 +182,7 @@ public final class BluestoneBlocks {
         repeaterItem = blockItem(items, "bluestone_repeater", repeater);
         comparatorItem = blockItem(items, "bluestone_comparator", comparator);
         purplestoneConverterItem = blockItem(items, "purplestone_converter", purplestoneConverter);
-        pasteItem = items.register("greenstone_paste", key -> new BlockItem(paste, itemProps(key)
-            .trimMaterial(Bluestone.key(Registries.TRIM_MATERIAL, "greenstone"))));
+        pasteItem = items.register("greenstone_paste", key -> new BlockItem(paste, trim(itemProps(key), "greenstone")));
         greenstoneTorchItem = items.register("greenstone_torch", key -> new StandingAndWallBlockItem(greenstoneTorch, greenstoneWallTorch, Direction.DOWN, itemProps(key)));
         greenstoneBlockItem = blockItem(items, "greenstone_block", greenstoneBlock);
         greenstoneRepeaterItem = blockItem(items, "greenstone_repeater", greenstoneRepeater);

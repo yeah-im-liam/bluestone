@@ -1,5 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
+// Minecraft 1.21.5 and later; BlockStateModelLoaderMixin before.
+//#if MC >= 1.21.5
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import java.util.function.Function;
 import net.minecraft.client.resources.model.BlockStateDefinitions;
@@ -26,3 +28,4 @@ abstract class BlockStateDefinitionsMixin {
             : definitions.apply(id);
     }
 }
+//#endif

@@ -87,20 +87,34 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     private Function<BlockState, VoxelShape> makeShapes() {
+        // The shape helpers are new in 1.21.5; before, the boxes the game used then.
+        //#if MC >= 1.21.5
         VoxelShape dot = Block.column(10.0, 0.0, 1.0);
         Map<Direction, VoxelShape> floor = Shapes.rotateHorizontal(Block.boxZ(10.0, 0.0, 1.0, 0.0, 8.0));
         Map<Direction, VoxelShape> up = Shapes.rotateHorizontal(Block.boxZ(10.0, 16.0, 0.0, 1.0));
-        return getShapeForEachState(state -> {
-            VoxelShape shape = dot;
+        //#else
+        //$$ VoxelShape dot = Block.box(3.0, 0.0, 3.0, 13.0, 1.0, 13.0);
+        //$$ Map<Direction, VoxelShape> floor = Map.of(Direction.NORTH, Block.box(3.0, 0.0, 0.0, 13.0, 1.0, 13.0), Direction.SOUTH, Block.box(3.0, 0.0, 3.0, 13.0, 1.0, 16.0),
+        //$$     Direction.EAST, Block.box(3.0, 0.0, 3.0, 16.0, 1.0, 13.0), Direction.WEST, Block.box(0.0, 0.0, 3.0, 13.0, 1.0, 13.0));
+        //$$ Map<Direction, VoxelShape> up = Map.of(Direction.NORTH, Block.box(3.0, 0.0, 0.0, 13.0, 16.0, 1.0), Direction.SOUTH, Block.box(3.0, 0.0, 15.0, 13.0, 16.0, 16.0),
+        //$$     Direction.EAST, Block.box(15.0, 0.0, 3.0, 16.0, 16.0, 13.0), Direction.WEST, Block.box(0.0, 0.0, 3.0, 1.0, 16.0, 13.0));
+        //#endif
+        Function<BlockState, VoxelShape> shape = state -> {
+            VoxelShape result = dot;
             for (Map.Entry<Direction, EnumProperty<RedstoneSide>> entry : PROPERTY_BY_DIRECTION.entrySet()) {
-                shape = switch (state.getValue(entry.getValue())) {
-                    case UP -> Shapes.or(shape, floor.get(entry.getKey()), up.get(entry.getKey()));
-                    case SIDE -> Shapes.or(shape, floor.get(entry.getKey()));
-                    case NONE -> shape;
+                result = switch (state.getValue(entry.getValue())) {
+                    case UP -> Shapes.or(result, floor.get(entry.getKey()), up.get(entry.getKey()));
+                    case SIDE -> Shapes.or(result, floor.get(entry.getKey()));
+                    case NONE -> result;
                 };
             }
-            return shape;
-        }, defaultBlockState().hasProperty(WATERLOGGED) ? new Property<?>[] {POWER, WATERLOGGED} : new Property<?>[] {POWER});
+            return result;
+        };
+        //#if MC >= 1.21.5
+        return getShapeForEachState(shape, defaultBlockState().hasProperty(WATERLOGGED) ? new Property<?>[] {POWER, WATERLOGGED} : new Property<?>[] {POWER});
+        //#else
+        //$$ return getShapeForEachState(shape)::get;
+        //#endif
     }
 
     @Override
@@ -290,8 +304,18 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         }
     }
 
+    // Removal is affectNeighborsAfterRemoval from 1.21.5; before, onRemove also ran for changes within the block.
+    //#if MC >= 1.21.5
     @Override
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    //$$     super.onRemove(state, level, pos, newState, movedByPiston);
+    //$$     if (state.is(newState.getBlock()) || level.isClientSide()) {
+    //$$         return;
+    //$$     }
+    //#endif
         if (!movedByPiston) {
             for (Direction direction : Direction.values()) {
                 level.updateNeighborsAt(pos.relative(direction), this);

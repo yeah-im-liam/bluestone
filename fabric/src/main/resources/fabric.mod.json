@@ -23,6 +23,7 @@
   },
   "mixins": [
     "bluestone.mixins.json",
+    "bluestone-optional.mixins.json",
     "bluestone-fabric.mixins.json"
   ],
   "depends": {

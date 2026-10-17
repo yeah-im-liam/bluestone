@@ -149,8 +149,18 @@ public class ConverterBoxBlock extends Block implements SignalBlock, EntityBlock
         }
     }
 
+    // Removal is affectNeighborsAfterRemoval from 1.21.5; before, onRemove also ran for changes within the block.
+    //#if MC >= 1.21.5
     @Override
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    //#else
+    //$$ @Override
+    //$$ protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    //$$     super.onRemove(state, level, pos, newState, movedByPiston);
+    //$$     if (state.is(newState.getBlock()) || level.isClientSide()) {
+    //$$         return;
+    //$$     }
+    //#endif
         updateAround(level, pos);
     }
 

@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "yeah.im.liam.bluestone.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "ClientItemInfoLoaderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

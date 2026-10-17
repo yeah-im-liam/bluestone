@@ -42,7 +42,11 @@ abstract class EntityRenderDispatcherMixin {
         tilted(state, poseStack, () -> original.call(renderer, state, poseStack, collector, camera));
     }
     //#else
+    //#if MC >= 1.21.5
     //$$ @WrapOperation(method = "render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;DDDLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/EntityRenderer;)V", at = @At(value = "INVOKE",
+    //#else
+    //$$ @WrapOperation(method = "render(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/EntityRenderer;)V", at = @At(value = "INVOKE",
+    //#endif
     //$$     target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     //$$ private void bluestone$tilt(EntityRenderer<?, ?> renderer, EntityRenderState state, PoseStack poseStack, MultiBufferSource buffers, int light,
     //$$                             Operation<Void> original) {

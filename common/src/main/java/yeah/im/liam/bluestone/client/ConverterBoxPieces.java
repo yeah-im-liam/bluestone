@@ -102,6 +102,11 @@ public final class ConverterBoxPieces {
         }
     }
 
+    // The blockstate file a piece comes from.
+    public static Identifier id(BlockState piece) {
+        return piece.hasProperty(EDGE) ? LIGHT_ID : piece.hasProperty(COLOUR) ? CENTER_ID : FRAME_ID;
+    }
+
     private static boolean facesCamera(BlockPos pos, Direction face, Vec3 camera) {
         double plane = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? pos.get(face.getAxis()) + 1 : pos.get(face.getAxis());
         return (camera.get(face.getAxis()) - plane) * face.getAxisDirection().getStep() > 0;

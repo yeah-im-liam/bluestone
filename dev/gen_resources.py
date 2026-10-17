@@ -1,13 +1,14 @@
 """Writes Bluestone's assets and data for one Minecraft version, copying the matching vanilla files with redstone swapped
 for bluestone. dev/gen_all.py runs it for every target and sorts the results into the source folders.
 
-python dev/gen_resources.py <version> <client jar> <output folder> <art folder> <Programmer Art zip> [<26.1 client jar>]
+python dev/gen_resources.py <version> <client jar> <output folder> <art folder> <Programmer Art zip> [<oldest client jar>]
 
 The client jars are in the Loom cache (fabric-loom/<version>/minecraft-client.jar); the Programmer Art pack is
 resourcepacks/programmer_art.zip in the version's asset index. The art folder holds default/ and programmer art/,
 with one folder per thing (bluestone torch, purplestone converter, ...). Each of those has block/, item/ or palettes/
 folders that say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
-The 26.1 jar is given for the 26.x target, whose pack has an overlay with 26.1's formats.
+The oldest jar is that of the first version the target covers, when it differs: the 26.x pack gets an overlay with
+26.1's formats, and a range that starts before a format change gets the older files too.
 """
 import itertools
 import json
@@ -22,11 +23,24 @@ z = zipfile.ZipFile(sys.argv[2])
 OUT = Path(sys.argv[3])
 ART = Path(sys.argv[4])           # bluestone/textures (the user's art)
 programmer_art_zip = zipfile.ZipFile(sys.argv[5])
-legacy = zipfile.ZipFile(sys.argv[6]) if len(sys.argv) > 6 else None  # 26.1, whose formats 26.1 and 26.2 share
+oldest = zipfile.ZipFile(sys.argv[6]) if len(sys.argv) > 6 else z
+OLDEST = json.loads(oldest.read("version.json"))["id"]
+
+
+def at_least(version, than):
+    return tuple(int(x) for x in version.split(".")) >= tuple(int(x) for x in than.split("."))
 
 
 def since(version):
-    return tuple(int(x) for x in VERSION.split(".")) >= tuple(int(x) for x in version.split("."))
+    return at_least(VERSION, version)
+
+
+def oldest_since(version):
+    return at_least(OLDEST, version)
+
+
+# The 26.x pack has an overlay for 26.1 and 26.2, whose formats differ from 26.3's.
+legacy = oldest if since("26.1") and oldest is not z else None
 
 
 # Each format the pack is written in: the jar it is copied from and the folder it goes in (the overlay for 26.1).
@@ -515,7 +529,7 @@ for name, texture in GENERATED.items():
 for name in ["bluestone_block", "purplestone_block", "greenstone_block", "converter_box", "bluestone_ore", "deepslate_bluestone_ore"]:
     if since("1.21.4"):
         write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
-    else:
+    if not oldest_since("1.21.4"):
         write(A + f"models/item/{name}.json", {"parent": f"bluestone:block/{name}"})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
@@ -778,6 +792,9 @@ TRIM_ITEMS = {"bluestone": "bluestone:bluestone", "purplestone": "bluestone:purp
 MODEL_INDEX = {"bluestone": 0.41, "purplestone": 0.42, "greenstone": 0.43}
 for jar, prefix in FORMATS:
     redstone = vanilla("data/minecraft/trim_material/redstone.json", jar)
+    # A range starting before 1.21.4 needs the item model index too; later versions ignore it.
+    if "item_model_index" in vanilla("data/minecraft/trim_material/redstone.json", oldest):
+        redstone["item_model_index"] = 0.4
     for material, color in TRIMS.items():
         ours = {"description": {"color": color, "translate": "trim_material.bluestone." + material}}
         if "asset_name" in redstone:
@@ -813,6 +830,23 @@ for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/ite
         model = vanilla(f"assets/minecraft/models/item/{armor}_redstone_trim.json")
         model["textures"] = {k: v.replace("_trim_redstone", "_trim_" + material) for k, v in model["textures"].items()}
         write(A + f"models/item/{armor}_{material}_trim.json", model)
+
+# Before 1.21.4 an armor item's model picks the trimmed icon by the trim material's item model index ("trim_type"):
+# the game's armor models get the mod's materials added in order, since the last matching override wins.
+if not oldest_since("1.21.4"):
+    for name in sorted(n for n in oldest.namelist() if n.startswith("assets/minecraft/models/item/") and n.endswith(".json")):
+        model = json.loads(oldest.read(name))
+        overrides = model.get("overrides", [])
+        if not any(o.get("predicate", {}).get("trim_type") == 0.4 for o in overrides):
+            continue
+        armor = name.split("/")[-1][:-5]
+        for material in TRIMS:
+            trimmed = vanilla(f"assets/minecraft/models/item/{armor}_redstone_trim.json", oldest)
+            trimmed["textures"] = {k: v.replace("_trim_redstone", "_trim_" + material) for k, v in trimmed["textures"].items()}
+            write(A + f"models/item/{armor}_{material}_trim.json", trimmed)
+            overrides.append({"model": f"bluestone:item/{armor}_{material}_trim", "predicate": {"trim_type": MODEL_INDEX[material]}})
+        model["overrides"] = sorted(overrides, key=lambda o: o.get("predicate", {}).get("trim_type", 0))
+        write(name, model)
 
 # World generation: the redstone ore vein and heights, plus extra attempts in water biomes.
 WORLDGEN_IDS = ID_PAIRS + [("ore_redstone", "ore_bluestone")]

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": "bluestone:greenstone_torch",
+    "I": "minecraft:stone",
+    "X": "bluestone:greenstone_paste"
+  },
+  "pattern": [
+    "#X#",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "bluestone:greenstone_repeater"
+  }
+}

@@ -25,7 +25,6 @@
     "AbstractMinecartRendererMixin",
     "BlockStateDefinitionsMixin",
     "CameraMixin",
-    "ClientItemInfoLoaderMixin",
     "ClientLevelMixin",
     "EntityRenderDispatcherMixin",
     "EntityRenderStateMixin",

@@ -5,6 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
+//#if MC < 1.21.5
+//$$ import net.minecraft.client.renderer.block.BlockModelShaper;
+//#endif
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -37,9 +40,18 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
             return;
         }
         VertexConsumer consumer = buffers.getBuffer(RenderTypes.entityCutoutNoCullZOffset(TextureAtlas.LOCATION_BLOCKS));
+        //#if MC >= 1.21.5
         var models = Minecraft.getInstance().getBlockRenderer();
         ConverterBoxPieces.collect(level, converter.getBlockPos(), converter.getBlockState(), camera, piece ->
             ModelBlockRenderer.renderModel(poseStack.last(), consumer, models.getBlockModel(piece), 1.0F, 1.0F, 1.0F, FULL_BRIGHT, OverlayTexture.NO_OVERLAY));
+        //#else
+        //$$ // Before 1.21.5 the pieces' baked models are looked up by blockstate file and variant.
+        //$$ var models = Minecraft.getInstance().getModelManager();
+        //$$ ModelBlockRenderer renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+        //$$ ConverterBoxPieces.collect(level, converter.getBlockPos(), converter.getBlockState(), camera, piece ->
+        //$$     renderer.renderModel(poseStack.last(), consumer, null, models.getModel(BlockModelShaper.stateToModelLocation(ConverterBoxPieces.id(piece), piece)),
+        //$$         1.0F, 1.0F, 1.0F, FULL_BRIGHT, OverlayTexture.NO_OVERLAY));
+        //#endif
     }
 
     @Override
