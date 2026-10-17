@@ -1,0 +1,9 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "bluestone:ore_bluestone",
+    "bluestone:ore_bluestone_lower"
+  ],
+  "step": "underground_ores"
+}

@@ -43,7 +43,14 @@ public final class BluestoneNeoForge {
     //#if MC >= 1.21
     public BluestoneNeoForge(IEventBus modEventBus) {
     //#else
+    //#if FORGE
+    //$$ // Forge hands mods nothing; the bus and the container come from the loading context.
+    //$$ public BluestoneNeoForge() {
+    //$$     IEventBus modEventBus = net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus();
+    //$$     net.minecraftforge.fml.ModContainer container = net.minecraftforge.fml.ModLoadingContext.get().getActiveContainer();
+    //#else
     //$$ public BluestoneNeoForge(IEventBus modEventBus, net.neoforged.fml.ModContainer container) {
+    //#endif
     //$$     // NeoForge starts mods for one side (BluestoneNeoForgeClient) only from 20.6.
     //$$     if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
     //$$         new yeah.im.liam.bluestone.neoforge.client.BluestoneNeoForgeClient(modEventBus, container);
@@ -144,9 +151,12 @@ public final class BluestoneNeoForge {
             //$$         Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, java.util.Optional.empty()),
             //$$     net.minecraft.server.packs.repository.BuiltInPackSource.fromName(path -> new net.minecraft.server.packs.PathPackResources(path, root)),
             //$$     PackType.CLIENT_RESOURCES, new net.minecraft.server.packs.PackSelectionConfig(false, Pack.Position.TOP, false));
-            //#else
+            //#elseif MC >= 1.20.2
             //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id("programmer_art"), Component.translatable("pack.bluestone.programmer_art"), false,
             //$$     new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+            //#else
+            //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id("programmer_art"), Component.translatable("pack.bluestone.programmer_art"), false,
+            //$$     id -> new net.minecraft.server.packs.PathPackResources(id, root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
             //#endif
             //$$ if (pack != null) {
             //$$     event.addRepositorySource(packs -> packs.accept(pack));

@@ -136,7 +136,12 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
     //$$     LevelAccessor ticks = level;
     //$$     RandomSource random = level.getRandom();
     //#endif
+        // Diodes check the block they stand on with canSurviveOn from 1.20.2.
+        //#if MC >= 1.20.2
         if (directionToNeighbour == Direction.DOWN && !canSurviveOn(level, neighbourPos, neighbourState)) {
+        //#else
+        //$$ if (directionToNeighbour == Direction.DOWN && !canSupportRigidBlock(level, neighbourPos)) {
+        //#endif
             return Blocks.AIR.defaultBlockState();
         }
         if (!level.isClientSide() && directionToNeighbour.getAxis() != state.getValue(FACING).getAxis()) {

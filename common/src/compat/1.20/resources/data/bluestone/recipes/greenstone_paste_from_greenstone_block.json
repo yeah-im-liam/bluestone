@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "bluestone:greenstone_block"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "item": "bluestone:greenstone_paste"
+  }
+}

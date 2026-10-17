@@ -2,9 +2,16 @@ plugins {
     id 'com.gradleup.shadow'
 }
 
+// NeoForge for 1.20.1 is a Forge build: the module then builds a Forge jar (see targets/1.20.properties).
+def onForge = rootProject.neoforge_platform == 'forge'
+
 architectury {
     platformSetupLoomIde()
-    neoForge()
+    if (onForge) {
+        forge()
+    } else {
+        neoForge()
+    }
 }
 
 configurations {
@@ -14,7 +21,7 @@ configurations {
     }
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentNeoForge.extendsFrom common
+    (onForge ? developmentForge : developmentNeoForge).extendsFrom common
 
     shadowBundle {
         canBeResolved = true
@@ -30,19 +37,27 @@ repositories {
 }
 
 dependencies {
-    neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
+    if (onForge) {
+        forge "net.neoforged:forge:$rootProject.neoforge_version"
+    } else {
+        neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
+    }
     compileOnly "io.github.llamalad7:mixinextras-common:0.5.0"
     if (rootProject.obfuscated) {
         common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     } else {
         common(project(path: ':common')) { transitive false }
     }
-    shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
-    // NeoForge brings MixinExtras along, but in some of its builds (20.5, 21.0) one from before @WrapMethod; the
-    // newest copy among the loaded mods is the one used.
+    shadowBundle project(path: ':common', configuration: onForge ? 'transformProductionForge' : 'transformProductionNeoForge')
+    // NeoForge brings MixinExtras along, but in some of its builds (20.5, 21.0) one from before @WrapMethod, and Forge
+    // brings none; the newest copy among the loaded mods is the one used.
     if (rootProject.findProperty('bundle_mixinextras') == 'true') {
-        include "io.github.llamalad7:mixinextras-neoforge:0.5.0"
+        include "io.github.llamalad7:mixinextras-${onForge ? 'forge' : 'neoforge'}:0.5.0"
     }
+}
+
+base {
+    archivesName = "$rootProject.archives_name-$project.name-mc${rootProject.findProperty('neoforge_jar_range') ?: rootProject.minecraft_range}"
 }
 
 processResources {
@@ -52,6 +67,10 @@ processResources {
         neoforge_minecraft_range: rootProject.neoforge_minecraft_range
     ]
     inputs.properties tokens
+    // Forge reads its biome modifiers from data/<namespace>/forge (in src/compat/1.20).
+    if (onForge) {
+        exclude 'data/*/neoforge/**'
+    }
 
     filesMatching('META-INF/neoforge.mods.toml') {
         expand tokens
@@ -60,14 +79,30 @@ processResources {
             filter { it.replace('type = "required"', 'mandatory = true') }
             path = 'META-INF/mods.toml'
         }
+        // Forge's own mod id is forge, and it finds mixin configs in the jar manifest (see loom.forge below).
+        if (onForge) {
+            filter { it.replace('modId = "neoforge"', 'modId = "forge"') }
+        }
     }
 }
 
 shadowJar {
     configurations = [project.configurations.shadowBundle]
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    // NeoForge runs on Mojang names, so the Fabric refmap must not come along.
-    exclude 'bluestone-refmap.json'
+    // NeoForge runs on Mojang names, so the Fabric refmap must not come along; Forge runs on SRG names and Loom
+    // remaps the refmap for it.
+    if (!onForge) {
+        exclude 'bluestone-refmap.json'
+    }
+}
+
+if (onForge) {
+    loom {
+        forge {
+            mixinConfig 'bluestone.mixins.json'
+            mixinConfig 'bluestone-optional.mixins.json'
+        }
+    }
 }
 
 if (rootProject.obfuscated) {

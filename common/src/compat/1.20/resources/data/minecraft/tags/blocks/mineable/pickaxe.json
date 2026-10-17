@@ -1,0 +1,10 @@
+{
+  "values": [
+    "bluestone:bluestone_block",
+    "bluestone:purplestone_block",
+    "bluestone:greenstone_block",
+    "bluestone:converter_box",
+    "bluestone:bluestone_ore",
+    "bluestone:deepslate_bluestone_ore"
+  ]
+}

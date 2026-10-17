@@ -15,3 +15,9 @@
 1.21.2 getApproximateNearest getNearest
 1.21.2 ScheduledTickAccess LevelAccessor
 1.20.3 ofLegacyCopy copy
+# NeoForge for 1.20.1 is a Forge build, with Forge's packages (only the neoforge module uses them).
+1.20.2 net.neoforged.neoforge.common.NeoForge net.minecraftforge.common.MinecraftForge
+1.20.2 NeoForge.EVENT_BUS MinecraftForge.EVENT_BUS
+1.20.2 net.neoforged.neoforge. net.minecraftforge.
+1.20.2 net.neoforged.bus.api. net.minecraftforge.eventbus.api.
+1.20.2 net.neoforged. net.minecraftforge.
