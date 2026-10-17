@@ -17,7 +17,11 @@ public final class WireMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
+        //#if MC >= 26.1
         oldWire = WireMixinPlugin.class.getClassLoader().getResource(OLD_WIRE) != null;
+        //#else
+        //$$ oldWire = true;
+        //#endif
     }
 
     @Override

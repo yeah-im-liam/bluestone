@@ -56,7 +56,9 @@ public class BluestoneTorchBlock extends RedstoneTorchBlock implements SimpleWat
         }
     }
 
+    //#if MC >= 26.1
     @Override
+    //#endif
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return connectsToWire(state, Channel.REDSTONE, direction);
     }

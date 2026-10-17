@@ -28,8 +28,9 @@
     "ClientItemInfoLoaderMixin",
     "ClientLevelMixin",
     "EntityRenderDispatcherMixin",
-    "EntityRendererMixin",
     "EntityRenderStateMixin",
+    "EntityRendererMixin",
+    "ItemBlockRenderTypesAccessor",
     "MinecartRenderStateMixin"
   ],
   "injectors": {

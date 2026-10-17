@@ -51,8 +51,10 @@ final class ExperimentalWireEvaluator extends WireEvaluator {
     }
 
     private void causeNeighborUpdates(Level level) {
-        updatedWires.forEach((wirePos, packed) -> {
-            Orientation orientation = unpackOrientation(packed);
+        // A loop over the entries: Object2IntMap.forEach with an int consumer is missing from older fastutil.
+        for (Object2IntMap.Entry<BlockPos> entry : updatedWires.object2IntEntrySet()) {
+            BlockPos wirePos = entry.getKey();
+            Orientation orientation = unpackOrientation(entry.getIntValue());
             BlockState state = level.getBlockState(wirePos);
             for (Direction neighborDirection : orientation.getDirections()) {
                 if (!isConnected(state, neighborDirection)) {
@@ -70,7 +72,7 @@ final class ExperimentalWireEvaluator extends WireEvaluator {
                     }
                 }
             }
-        });
+        }
     }
 
     private static boolean isConnected(BlockState state, Direction direction) {

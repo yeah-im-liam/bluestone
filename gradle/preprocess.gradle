@@ -7,6 +7,8 @@
 //   //$$ oldCode();
 //   //#endif
 //
+// Renamed classes and members are listed in gradle/renames.txt instead.
+//
 // Conditions: MC <op> <version> (op is <, <=, >, >=, == or !=), FABRIC, NEOFORGE, FORGE, joined with !, && and ||
 // and grouped with parentheses. MC is the version the target compiles against.
 
@@ -88,6 +90,26 @@ static boolean evaluate(String condition, String mc, String loader, String where
     return value
 }
 
+// Pairs (pattern, replacement) from gradle/renames.txt that apply to a target compiling against mc.
+static List<List<String>> renamesFor(File file, String mc) {
+    def lines = file.readLines('UTF-8').findAll { it.trim() && !it.trim().startsWith('#') }.collect { it.trim().split('\\s+') }
+    // Package paths and dotted names match anywhere (descriptors write them as Lnet/...); plain names match whole words.
+    def word = { char c -> Character.isLetterOrDigit(c) || c == '_' as char }
+    return lines.findAll { compareVersions(mc, it[0]) < 0 }
+        .sort { a, b -> compareVersions(b[0], a[0]) }
+        .collect { entry ->
+            def from = entry[1]
+            def plain = !from.contains('.') && !from.contains('/')
+            def regex = (plain && word(from.charAt(0)) ? '(?<![\\w$])' : '') + java.util.regex.Pattern.quote(from) + (plain && word(from.charAt(from.length() - 1)) ? '(?![\\w$])' : '')
+            [regex, java.util.regex.Matcher.quoteReplacement(entry[2])]
+        }
+}
+
+static String rename(String text, List<List<String>> renames) {
+    renames.each { pair -> text = text.replaceAll(pair[0], pair[1]) }
+    return text
+}
+
 static String preprocess(String text, String mc, String loader, String name) {
     def eol = text.contains('\r\n') ? '\r\n' : '\n'
     def lines = text.split(/\r?\n/, -1)
@@ -138,13 +160,17 @@ def loader = project.name == 'common' ? 'common' : (project.name == 'neoforge' ?
 def sourceDirs = [file('src/main/java')] + rootProject.compat.split(/[ ,]+/).collect { file("src/compat/$it/java") }
 def outputDir = layout.buildDirectory.dir('preprocessed/java')
 
+def renamesFile = rootProject.file('gradle/renames.txt')
+
 def preprocessJava = tasks.register('preprocessJava') {
     def mc = rootProject.minecraft_version
     inputs.files(sourceDirs.findAll { it.exists() })
+    inputs.file(renamesFile)
     inputs.property('mc', mc)
     inputs.property('loader', loader)
     outputs.dir(outputDir)
     doLast {
+        def renames = renamesFor(renamesFile, mc)
         def out = outputDir.get().asFile
         project.delete(out)
         sourceDirs.findAll { it.exists() }.each { dir ->
@@ -155,7 +181,7 @@ def preprocessJava = tasks.register('preprocessJava') {
                     throw new GradleException("$relative is in more than one source folder")
                 }
                 target.parentFile.mkdirs()
-                target.setText(source.name.endsWith('.java') ? preprocess(source.getText('UTF-8'), mc, loader, relative) : source.getText('UTF-8'), 'UTF-8')
+                target.setText(source.name.endsWith('.java') ? rename(preprocess(source.getText('UTF-8'), mc, loader, relative), renames) : source.getText('UTF-8'), 'UTF-8')
             }
         }
     }

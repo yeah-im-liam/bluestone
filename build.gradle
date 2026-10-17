@@ -48,6 +48,8 @@ subprojects {
         if (rootProject.obfuscated) {
             mappings loom.officialMojangMappings()
         }
+        // Minecraft brings these annotations along only from 1.21.11; they are not needed at runtime.
+        compileOnly 'org.jspecify:jspecify:1.0.0'
     }
 
     java {

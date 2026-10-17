@@ -2,7 +2,7 @@ package yeah.im.liam.bluestone.registry;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -188,8 +188,9 @@ public final class BluestoneBlocks {
         BluestoneRails.registerItems(items);
     }
 
-    public static void registerBlockEntities(Registrar<BlockEntityType<?>> types) {
-        converterBoxEntity = types.register("converter_box", key -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(converterBox)));
+    // The loaders build the type: its constructor is only opened to them (Fabric API, NeoForge's access transformer).
+    public static void registerBlockEntities(Registrar<BlockEntityType<?>> types, Function<Block, BlockEntityType<ConverterBoxBlockEntity>> converterBoxType) {
+        converterBoxEntity = types.register("converter_box", key -> converterBoxType.apply(converterBox));
     }
 
     public static BlockEntityType<ConverterBoxBlockEntity> converterBoxEntity() {

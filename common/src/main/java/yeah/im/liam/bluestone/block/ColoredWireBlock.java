@@ -188,7 +188,7 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
     }
 
     @Override
-    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos, @Block.UpdateFlags int updateFlags, int updateLimit) {
+    protected void updateIndirectNeighbourShapes(BlockState state, LevelAccessor level, BlockPos pos, int updateFlags, int updateLimit) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             RedstoneSide value = state.getValue(PROPERTY_BY_DIRECTION.get(direction));
@@ -376,7 +376,9 @@ public abstract class ColoredWireBlock extends Block implements SignalBlock {
         return WireConnections.connects(state, level, pos, direction);
     }
 
+    //#if MC >= 26.1
     @Override
+    //#endif
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return connectsToWire(state, Channel.REDSTONE, direction);
     }

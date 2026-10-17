@@ -46,6 +46,13 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
             .setValue(POWERED, false));
     }
 
+    //#if MC < 26.1
+    //$$ @Override
+    //$$ protected com.mojang.serialization.MapCodec<? extends DiodeBlock> codec() {
+    //$$     return simpleCodec(PurplestoneConverterBlock::new);
+    //$$ }
+    //#endif
+
     @Override
     protected int getDelay(BlockState state) {
         return 2;
@@ -159,7 +166,9 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
         return wire == mode.input && direction == facing.getOpposite() || wire == mode.output && direction == facing;
     }
 
+    //#if MC >= 26.1
     @Override
+    //#endif
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return connectsToWire(state, Channel.REDSTONE, direction);
     }

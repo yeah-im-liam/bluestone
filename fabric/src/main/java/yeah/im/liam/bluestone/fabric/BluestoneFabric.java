@@ -1,13 +1,24 @@
 package yeah.im.liam.bluestone.fabric;
 
 import java.util.List;
+//#if MC >= 26.1
+import java.util.Set;
+//#endif
 import java.util.function.Function;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+//#if MC >= 26.1
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+//#else
+//$$ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+//$$ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+//#endif
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType;
+//#if MC < 26.1
+//$$ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+//#endif
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,8 +32,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import yeah.im.liam.bluestone.Bluestone;
+import yeah.im.liam.bluestone.block.ConverterBoxBlockEntity;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 import yeah.im.liam.bluestone.registry.Registrar;
 
@@ -31,9 +44,14 @@ public final class BluestoneFabric implements ModInitializer {
     public void onInitialize() {
         BluestoneBlocks.registerBlocks(registrar(BuiltInRegistries.BLOCK));
         BluestoneBlocks.registerItems(registrar(BuiltInRegistries.ITEM));
-        BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE));
+        //#if MC >= 26.1
+        BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE), block -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(block)));
         ((FabricBlockEntityType) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("comparator")))
             .addValidBlock(BluestoneBlocks.comparator());
+        //#else
+        //$$ BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE), block -> FabricBlockEntityTypeBuilder.create(ConverterBoxBlockEntity::new, block).build());
+        //$$ ((FabricBlockEntityType) BlockEntityType.COMPARATOR).addSupportedBlock(BluestoneBlocks.comparator());
+        //#endif
         registerCreativeTabs();
         addOres();
     }
@@ -50,24 +68,35 @@ public final class BluestoneFabric implements ModInitializer {
     }
 
     private static void registerCreativeTabs() {
+        //#if MC >= 26.1
         CreativeModeTab tab = FabricCreativeModeTab.builder()
+        //#else
+        //$$ CreativeModeTab tab = FabricItemGroup.builder()
+        //#endif
             .title(Component.translatable("itemGroup.bluestone.main"))
             .icon(() -> new ItemStack(BluestoneBlocks.dust()))
             .displayItems((parameters, output) -> BluestoneBlocks.creativeTabItems().forEach(output::accept))
             .build();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Bluestone.key(Registries.CREATIVE_MODE_TAB, "main"), tab);
 
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(output -> {
-            output.insertAfter(Items.COMPARATOR, stacks(BluestoneBlocks.components()));
-            output.insertAfter(Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
-            output.insertAfter(Items.REDSTONE_ORE, new ItemStack(Items.DEEPSLATE_REDSTONE_ORE));
-            output.insertAfter(Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
-        });
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> output.insertAfter(Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails())));
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.NATURAL_BLOCKS).register(output -> output.insertAfter(Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores())));
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(output -> output.insertAfter(Items.REDSTONE_BLOCK, stacks(BluestoneBlocks.storageBlocks())));
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> output.insertAfter(Items.REDSTONE_TORCH, stacks(BluestoneBlocks.torches())));
-        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> output.insertAfter(Items.REDSTONE, new ItemStack(BluestoneBlocks.dust()), new ItemStack(BluestoneBlocks.pasteItem()), new ItemStack(BluestoneBlocks.purplestone())));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.COMPARATOR, stacks(BluestoneBlocks.components()));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.REDSTONE_ORE, List.of(new ItemStack(Items.DEEPSLATE_REDSTONE_ORE)));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
+        after(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
+        after(CreativeModeTabs.NATURAL_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
+        after(CreativeModeTabs.BUILDING_BLOCKS, Items.REDSTONE_BLOCK, stacks(BluestoneBlocks.storageBlocks()));
+        after(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.REDSTONE_TORCH, stacks(BluestoneBlocks.torches()));
+        after(CreativeModeTabs.INGREDIENTS, Items.REDSTONE, List.of(new ItemStack(BluestoneBlocks.dust()), new ItemStack(BluestoneBlocks.pasteItem()),
+            new ItemStack(BluestoneBlocks.purplestone())));
+    }
+
+    private static void after(ResourceKey<CreativeModeTab> tab, Item anchor, List<ItemStack> stacks) {
+        //#if MC >= 26.1
+        CreativeModeTabEvents.modifyOutputEvent(tab).register(output -> output.insertAfter(anchor, stacks));
+        //#else
+        //$$ ItemGroupEvents.modifyEntriesEvent(tab).register(entries -> entries.addAfter(anchor, stacks));
+        //#endif
     }
 
     private static List<ItemStack> stacks(List<Item> items) {

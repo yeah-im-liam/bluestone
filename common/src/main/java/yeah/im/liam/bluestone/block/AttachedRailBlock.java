@@ -395,7 +395,9 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return kind == Kind.DETECTOR && direction != null && (wire == channel || wire == Channel.PURPLESTONE);
     }
 
+    //#if MC >= 26.1
     @Override
+    //#endif
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return connectsToWire(state, Channel.REDSTONE, direction);
     }

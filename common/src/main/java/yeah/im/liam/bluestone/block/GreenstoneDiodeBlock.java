@@ -248,7 +248,9 @@ public abstract class GreenstoneDiodeBlock extends Block implements SignalBlock 
         return false;
     }
 
+    //#if MC >= 26.1
     @Override
+    //#endif
     protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return false;
     }

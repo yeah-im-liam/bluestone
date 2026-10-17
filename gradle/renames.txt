@@ -1,0 +1,8 @@
+# Names the source uses (those of the newest Minecraft) and what older versions called them: a line applies to targets
+# older than its version, newest lines first. Plain names match whole words only; dotted names and paths match anywhere.
+1.21.11 net/minecraft/world/entity/vehicle/minecart/ net/minecraft/world/entity/vehicle/
+1.21.11 net.minecraft.world.entity.vehicle.minecart. net.minecraft.world.entity.vehicle.
+1.21.11 net.minecraft.client.renderer.rendertype.RenderTypes net.minecraft.client.renderer.RenderType
+1.21.11 net.minecraft.client.renderer.rendertype.RenderType net.minecraft.client.renderer.RenderType
+1.21.11 RenderTypes RenderType
+1.21.11 Identifier ResourceLocation

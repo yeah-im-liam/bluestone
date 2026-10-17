@@ -15,16 +15,20 @@ import org.jspecify.annotations.Nullable;
  * parts.
  */
 final class WireConnections {
-    // Minecraft 26.3 lets each block decide; 26.1 and 26.2 hard-code redstone dust, repeaters and observers.
+    // Minecraft 26.3 lets each block decide; older versions hard-code redstone dust, repeaters and observers.
+    //#if MC >= 26.1
     private static final boolean BLOCKS_DECIDE = hasBlockHook();
+    //#endif
 
     private WireConnections() {
     }
 
     static boolean connects(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+        //#if MC >= 26.1
         if (BLOCKS_DECIDE) {
             return state.shouldRedstoneWireConnectTo(level, pos, direction);
         }
+        //#endif
         if (state.is(Blocks.REDSTONE_WIRE)) {
             return true;
         }
@@ -38,6 +42,7 @@ final class WireConnections {
         return state.isSignalSource() && direction != null;
     }
 
+    //#if MC >= 26.1
     private static boolean hasBlockHook() {
         try {
             BlockBehaviour.BlockStateBase.class.getMethod("shouldRedstoneWireConnectTo", BlockGetter.class, BlockPos.class, Direction.class);
@@ -46,4 +51,5 @@ final class WireConnections {
             return false;
         }
     }
+    //#endif
 }

@@ -1,6 +1,7 @@
 package yeah.im.liam.bluestone.neoforge;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -24,6 +26,7 @@ import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import yeah.im.liam.bluestone.Bluestone;
+import yeah.im.liam.bluestone.block.ConverterBoxBlockEntity;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 import yeah.im.liam.bluestone.registry.Registrar;
 
@@ -39,7 +42,8 @@ public final class BluestoneNeoForge {
     private static void register(RegisterEvent event) {
         event.register(Registries.BLOCK, helper -> BluestoneBlocks.registerBlocks(registrar(Registries.BLOCK, helper)));
         event.register(Registries.ITEM, helper -> BluestoneBlocks.registerItems(registrar(Registries.ITEM, helper)));
-        event.register(Registries.BLOCK_ENTITY_TYPE, helper -> BluestoneBlocks.registerBlockEntities(registrar(Registries.BLOCK_ENTITY_TYPE, helper)));
+        event.register(Registries.BLOCK_ENTITY_TYPE, helper -> BluestoneBlocks.registerBlockEntities(registrar(Registries.BLOCK_ENTITY_TYPE, helper),
+            block -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(block))));
         event.register(Registries.CREATIVE_MODE_TAB, helper -> helper.register(
             Bluestone.key(Registries.CREATIVE_MODE_TAB, "main"),
             CreativeModeTab.builder()

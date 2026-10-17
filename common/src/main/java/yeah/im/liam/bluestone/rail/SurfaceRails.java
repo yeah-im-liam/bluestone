@@ -348,7 +348,11 @@ public final class SurfaceRails {
             if (rail.kind() == Kind.DETECTOR) {
                 rail.detect(level, pos, state);
             } else if (rail.kind() == Kind.ACTIVATOR) {
+                //#if MC >= 1.21.11
                 cart.activateMinecart(level, pos.getX(), pos.getY(), pos.getZ(), state.getValue(AttachedRailBlock.POWERED));
+                //#else
+                //$$ cart.activateMinecart(pos.getX(), pos.getY(), pos.getZ(), state.getValue(AttachedRailBlock.POWERED));
+                //#endif
             }
         }
     }

@@ -15,8 +15,14 @@ import yeah.im.liam.bluestone.block.RailPower;
  */
 @Mixin(PoweredRailBlock.class)
 abstract class PoweredRailBlockMixin {
+    // BlockState.is(Block) compiles to is(Object) from 26.1.
+    //#if MC >= 26.1
     @WrapOperation(method = "isSameRailWithPower", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z"))
     private boolean bluestone$samePower(BlockState state, Object block, Operation<Boolean> original) {
+    //#else
+    //$$ @WrapOperation(method = "isSameRailWithPower", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"))
+    //$$ private boolean bluestone$samePower(BlockState state, Block block, Operation<Boolean> original) {
+    //#endif
         return original.call(state, block) || RailPower.samePower(state, ((Block) (Object) this).defaultBlockState());
     }
 }

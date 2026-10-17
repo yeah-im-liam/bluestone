@@ -61,6 +61,12 @@ shadowJar {
 }
 
 if (rootProject.obfuscated) {
+    // Its own refmap, so it doesn't overwrite the one for the shared mixins.
+    loom {
+        mixin {
+            defaultRefmapName.set('bluestone-fabric-refmap.json')
+        }
+    }
     shadowJar {
         archiveClassifier = 'dev-shadow'
     }

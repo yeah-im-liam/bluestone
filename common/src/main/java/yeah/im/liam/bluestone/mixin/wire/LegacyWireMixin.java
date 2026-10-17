@@ -16,8 +16,12 @@ import yeah.im.liam.bluestone.signal.Channel;
 import yeah.im.liam.bluestone.signal.SignalBlock;
 import yeah.im.liam.bluestone.signal.Signals;
 
-// Minecraft 26.1 and 26.2, where the dust class was still called RedStoneWireBlock.
+// Minecraft 26.2 and older, where the dust class was still called RedStoneWireBlock.
+//#if MC >= 26.1
 @Mixin(targets = "net.minecraft.world.level.block.RedStoneWireBlock")
+//#else
+//$$ @Mixin(net.minecraft.world.level.block.RedStoneWireBlock.class)
+//#endif
 abstract class LegacyWireMixin {
     @WrapMethod(method = "getBlockSignal")
     private int bluestone$listen(Level level, BlockPos pos, Operation<Integer> original) {
