@@ -1,61 +1,61 @@
 # Bluestone: Over-Powered
 
-This mod adds new power alternatives to redstone with their own features!
+This mod adds new alternatives to redstone, each with features of its own!
 
 ## Bluestone
 
-Bluestone is a new alternative to redstone you can find in the world. Bluestone ore generates at the same levels as redstone but is much less common except when generating near or touching a water block, in that case its more common to find like in underwater caves.
+Bluestone is a new alternative to redstone that you can find in the world. Bluestone ore generates at the same heights as redstone ore but is much less common, except next to water: veins touching water are more common, so look in underwater caves.
 
 ### Bluestone: Functionality
 
-- Bluestone can be used in the exact same way as redstone _but it will never connect with it_. Bluestone acts as it's own seprate powerline.
-- Bluestone cannot be powered by redstone components (Redstone specific components have been renamed to match).
-- Unlike redstone, bluestone can be run underwater, giving it it's own specific purpose besides running seprate lines. 
+- Bluestone works exactly like redstone, _but it never connects to it_. Bluestone is its own separate power line.
+- Redstone components can't power bluestone (the redstone components have been renamed to make this clear).
+- Unlike redstone, bluestone can run underwater, which gives it a purpose of its own besides running separate lines.
 
 ## Purplestone
 
-Purplestone is another new alternative to redstone but is only crafted by mixing redstone dust and bluestone dust together.
+Purplestone is another alternative to redstone, crafted only by mixing redstone dust and bluestone dust.
 
 ### Purplestone: Functionality
 
-- Purplestone can be used in the exact same way as redstone _and it can connect to both redstone and bluestone_.
-- Redstone and bluestone signals get divided in half when being connected by purplestone.
-- Purplestone _cannot_ be placed underwater.
+- Purplestone works exactly like redstone, _and it connects to both redstone and bluestone_.
+- Redstone and bluestone signals are halved when they pass through purplestone.
+- Purplestone _can't_ be placed underwater.
 
 ### Purplestone Converter
 
-A purplestone conveter is a new block that can convert between redstone and bluestone while also acting like a repeater. The signals can be swapped by right-clicking the purplestone converter (Redstone-in Bluestone-out or Bluestone-in Redstone-out). The purplestone converter can also be locked like repeaters.
+The purplestone converter converts between redstone and bluestone while also acting like a repeater. Right-click it to swap the direction (redstone in and bluestone out, or bluestone in and redstone out). It can also be locked like a repeater.
 
 ## Greenstone
 
-Along with all those variant, I also added greenstone. Greenstone is also only crafted by mixing purplestone dust with a slimeball.
+Along with all those variants, there is also greenstone, crafted only by mixing purplestone dust with a slimeball.
 
 ### Greenstone: Functionality
 
-- Greenstone can be used in the exact same way as redstone and acts as its own powerline similarly to bluestone.
-- Greenstone can stick to walls allowing for vertical redstone to finally be possible.
+- Greenstone works exactly like redstone and is its own power line, like bluestone.
+- Greenstone sticks to walls, so vertical redstone is finally possible.
 
-## Converter Block
+## Converter Box
 
-The converter block is a new block that can take any input power and convert it to any output power allowing all types of powers to freely convert to one another.
+The converter box takes any type of power in and puts any type of power out, so every type of power can convert freely to every other.
 
 ## Chain Rails
 
-Along with all these new redstone alternative with their own features, I added a new powered rail variant.
+Along with all these new redstone alternatives, there is a new powered rail variant.
 
-## Chain Rails: Functionality
+### Chain Rails: Functionality
 
-- Chain rails act similarly to powered rails.
-- The chain rail is special in that it makes minecarts go at a consistent speed and only work one way.
-- One the minecart leaves the chain rail they do not transfer the speed they got from the chain rail onto other rails.
+- Chain rails act much like powered rails.
+- Chain rails move minecarts at a constant speed and only work in one direction.
+- Once a minecart leaves the chain rails, it doesn't keep the speed they gave it on other rails.
 
 ## Sticky Rails
 
-For the final addition, I added sticky rails and sticky variants for redstone rails. Sticky rails allow for all rails to be placed on walls. These rails can be ridden on by a minecart on walls and ceilings. If you start to lose speed while on a wall or ceiling the minecart will fall off the track so you must keep a consistant speed. If the mincart is on chain rails however, it does not matter how fast its going as the chain rails will keep it on the track.
+Last of all, there are sticky rails, and sticky versions of the redstone and bluestone rails. Sticky rails can be placed on walls and ceilings, and minecarts can ride along them there. A minecart that loses too much speed on a wall or ceiling falls off the track, so keep it moving. On chain rails speed doesn't matter, as the chain rails keep the minecart on the track.
 
 ### Minecart First-Person Camera
 
-The first-person camera on minecarts has gotten a little overhaul allowing for the sticky rails to actually rotate the players view. Because of this the first-person view might be a little nausiating for sensative player which is why I recommend to have the [Mod Menu](https://modrinth.com/mod/modmenu) mod for fabric as it will allow you to edit settings regarding the camera (Neoforge has a built in mod menu so you can do it without an additional mod).
+The first-person camera in minecarts has been reworked so that your view turns with the cart on sticky rails. This can be a little nauseating for sensitive players, so on Fabric I recommend [Mod Menu](https://modrinth.com/mod/modmenu), which lets you change the camera settings (NeoForge has a built-in mod list, so it needs no extra mod).
 
 ## Credits
 
