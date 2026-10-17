@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.block.ConverterBoxBlock;
 import yeah.im.liam.bluestone.signal.Channel;
@@ -109,6 +110,14 @@ public final class ConverterBoxPieces {
     // The blockstate file a piece comes from.
     public static Identifier id(BlockState piece) {
         return piece.hasProperty(EDGE) ? LIGHT_ID : piece.hasProperty(COLOUR) ? CENTER_ID : FRAME_ID;
+    }
+
+    // The made-up definition a piece belongs to, or null for any other state.
+    public static @Nullable StateDefinition<Block, BlockState> definition(BlockState state) {
+        if (state.getBlock() != Blocks.AIR || !state.hasProperty(FACE)) {
+            return null;
+        }
+        return state.hasProperty(EDGE) ? LIGHT_DEFINITION : state.hasProperty(COLOUR) ? CENTER_DEFINITION : FRAME_DEFINITION;
     }
 
     private static boolean facesCamera(BlockPos pos, Direction face, Vec3 camera) {

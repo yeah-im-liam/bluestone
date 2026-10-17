@@ -54,6 +54,10 @@ dependencies {
     if (rootProject.findProperty('bundle_mixinextras') == 'true') {
         include "io.github.llamalad7:mixinextras-${onForge ? 'forge' : 'neoforge'}:0.5.0"
     }
+    // Forge's dev runs need it on the class path too.
+    if (onForge) {
+        implementation "io.github.llamalad7:mixinextras-forge:0.5.0"
+    }
 }
 
 base {

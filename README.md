@@ -39,10 +39,25 @@ The redstone recipes, with bluestone dust and torches in place of redstone dust 
 
 ## Compatibility
 
-- Minecraft: Java Edition 26.1 to 26.3
+- Minecraft: Java Edition 1.20 to 26.3 (NeoForge from 1.20.1)
 - Loaders: Fabric (with Fabric API) and NeoForge
 - Optional: Mod Menu on Fabric, for the settings
 - Environment: client and server
+
+Each download covers a range of Minecraft versions, named in the file (for example `bluestone-fabric-mc1.21.2-1.21.4`):
+
+| Fabric | NeoForge |
+| --- | --- |
+| 1.20 – 1.20.1 | 1.20.1 |
+| 1.20.2 | 1.20.2 |
+| 1.20.3 – 1.20.4 | 1.20.3 – 1.20.4 |
+| 1.20.5 – 1.20.6 | 1.20.5 – 1.20.6 |
+| 1.21 – 1.21.1 | 1.21 – 1.21.1 |
+| 1.21.2 – 1.21.4 | 1.21.2 – 1.21.4 |
+| 1.21.5 – 1.21.8 | 1.21.5 – 1.21.8 |
+| 1.21.9 – 1.21.10 | 1.21.9 – 1.21.10 |
+| 1.21.11 | 1.21.11 |
+| 26.1 – 26.3 | 26.1 – 26.3 |
 
 On NeoForge, turn on the "Bluestone: Over-Powered Programmer Art" resource pack together with the Programmer Art pack. Fabric switches the textures over by itself.
 

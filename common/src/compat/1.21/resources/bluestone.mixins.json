@@ -26,7 +26,8 @@
     "EntityRenderDispatcherLegacyMixin",
     "ItemBlockRenderTypesAccessor",
     "LevelRendererMixin",
-    "MinecartRendererMixin"
+    "MinecartRendererMixin",
+    "ModelGroupKeyMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -27,7 +27,8 @@
     "ItemBlockRenderTypesAccessor",
     "LevelRendererMixin",
     "MinecartRendererMixin",
-    "ModelBakeryMixin"
+    "ModelBakeryMixin",
+    "ModelGroupKeyMixin"
   ],
   "injectors": {
     "defaultRequire": 1
