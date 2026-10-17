@@ -130,10 +130,11 @@ public final class BluestoneNeoForge {
         }
     }
 
-    // The textures in programmer_art/ go with the game's Programmer Art pack (see BluestoneNeoForgeClient); Alt Torches
-    // Programmer Art is a pack of its own.
+    // Fabric applies the textures in programmer_art/ together with the game's Programmer Art pack; NeoForge lists them
+    // as a pack of their own. Both list Alt Torches Programmer Art.
     private static void addPacks(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+            addPack(event, "programmer_art", "programmer_art");
             addPack(event, "resourcepacks/alt_torches_programmer_art", "alt_torches_programmer_art");
         }
     }

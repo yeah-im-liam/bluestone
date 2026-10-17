@@ -31,9 +31,6 @@ side = "BOTH"
 [[mixins]]
 config = "bluestone.mixins.json"
 
-[[mixins]]
-config = "bluestone-neoforge.mixins.json"
-
 # Client mixins on classes that some of the versions this jar covers don't have.
 [[mixins]]
 config = "bluestone-optional.mixins.json"
