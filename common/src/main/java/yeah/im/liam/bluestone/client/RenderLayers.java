@@ -2,6 +2,7 @@ package yeah.im.liam.bluestone.client;
 
 // Minecraft 26.1 and later pick each block's render layer by themselves.
 //#if MC < 26.1
+//$$ import java.util.List;
 //$$ import java.util.Map;
 //$$ import net.minecraft.core.registries.BuiltInRegistries;
 //$$ import net.minecraft.world.level.block.Block;
@@ -16,14 +17,19 @@ package yeah.im.liam.bluestone.client;
 //$$     private RenderLayers() {
 //$$     }
 //$$
+//$$     // Through the game's own table, which Fabric reads. NeoForge keeps a table of its own before 21.5 and sets
+//$$     // these blocks through its setRenderLayer then (see BluestoneNeoForgeClient).
 //$$     public static void useCutout() {
 //$$         Map<Block, Object> layers = ItemBlockRenderTypesAccessor.bluestone$typeByBlock();
 //$$         Object cutout = layers.get(Blocks.REDSTONE_WIRE);
-//$$         for (Block block : BuiltInRegistries.BLOCK) {
-//$$             if (BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Bluestone.MOD_ID) && !block.defaultBlockState().canOcclude()) {
-//$$                 layers.put(block, cutout);
-//$$             }
-//$$         }
+//$$         blocks().forEach(block -> layers.put(block, cutout));
+//$$     }
+//$$
+//$$     // The mod's blocks with see-through gaps.
+//$$     public static List<Block> blocks() {
+//$$         return BuiltInRegistries.BLOCK.stream()
+//$$             .filter(block -> BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Bluestone.MOD_ID) && !block.defaultBlockState().canOcclude())
+//$$             .toList();
 //$$     }
 //$$ }
 //#endif

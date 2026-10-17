@@ -71,9 +71,13 @@ processResources {
         neoforge_minecraft_range: rootProject.neoforge_minecraft_range
     ]
     inputs.properties tokens
-    // Forge reads its biome modifiers from data/<namespace>/forge (in src/compat/1.20).
+    // Forge reads its biome modifiers from data/<namespace>/forge (in src/compat/1.20). A dev run counts this module's
+    // resources as a mod of their own, which Forge refuses without pack metadata, so the common module's comes along.
     if (onForge) {
         exclude 'data/*/neoforge/**'
+        from(rootProject.file("common/src/compat/${rootProject.target}/resources")) {
+            include 'pack.mcmeta'
+        }
     }
 
     filesMatching('META-INF/neoforge.mods.toml') {

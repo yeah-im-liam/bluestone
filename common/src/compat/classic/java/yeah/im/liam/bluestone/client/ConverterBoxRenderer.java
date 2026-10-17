@@ -45,11 +45,12 @@ public final class ConverterBoxRenderer implements BlockEntityRenderer<Converter
         ConverterBoxPieces.collect(level, converter.getBlockPos(), converter.getBlockState(), camera, piece ->
             ModelBlockRenderer.renderModel(poseStack.last(), consumer, models.getBlockModel(piece), 1.0F, 1.0F, 1.0F, FULL_BRIGHT, OverlayTexture.NO_OVERLAY));
         //#else
-        //$$ // Before 1.21.5 the pieces' baked models are looked up by blockstate file and variant.
+        //$$ // Before 1.21.5 the pieces' baked models are looked up by blockstate file and variant. They are multipart
+        //$$ // models, which pick their parts by the state they are given.
         //$$ var models = Minecraft.getInstance().getModelManager();
         //$$ ModelBlockRenderer renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
         //$$ ConverterBoxPieces.collect(level, converter.getBlockPos(), converter.getBlockState(), camera, piece ->
-        //$$     renderer.renderModel(poseStack.last(), consumer, null, models.getModel(BlockModelShaper.stateToModelLocation(ConverterBoxPieces.id(piece), piece)),
+        //$$     renderer.renderModel(poseStack.last(), consumer, piece, models.getModel(BlockModelShaper.stateToModelLocation(ConverterBoxPieces.id(piece), piece)),
         //$$         1.0F, 1.0F, 1.0F, FULL_BRIGHT, OverlayTexture.NO_OVERLAY));
         //#endif
     }

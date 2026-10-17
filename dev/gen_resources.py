@@ -547,6 +547,12 @@ for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("program
             dst = dst_dir / folder / png.name
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(png, dst)
+    # Before 1.21.2 the game's torches are crossed planes over a texture with only the torch on it: the art drawn for
+    # those versions (in "before 1.21.2" folders) replaces the newer art.
+    if not since("1.21.2"):
+        for png in sorted((ART / style).glob("*/before 1.21.2/*/*.png")):
+            if OURS.search(png.name):
+                shutil.copyfile(png, dst_dir / png.parent.name / png.name)
 # Programmer Art puts the redstone torch on the old plain torch shape; the other torches follow it.
 torch_models(programmer_art, "programmer_art/" + A)
 # Pack formats are a range from 1.21.9 and a single number before.
@@ -829,7 +835,8 @@ write(f"data/minecraft/{ITEM_TAGS}/trim_materials.json", {"values": [TRIM_ITEMS[
 for jar, prefix in FORMATS:
     for name in sorted(n for n in jar.namelist() if n.startswith("assets/minecraft/atlases/") and n.endswith(".json")):
         for source in json.loads(jar.read(name))["sources"]:
-            if source["type"] == "minecraft:paletted_permutations" and "amethyst" in source.get("permutations", {}):
+            # Older versions leave the namespace off the source type.
+            if source["type"].removeprefix("minecraft:") == "paletted_permutations" and "amethyst" in source.get("permutations", {}):
                 palettes = source["permutations"]["amethyst"].removeprefix("minecraft:").rsplit("/", 1)[0]
                 write(prefix + name, {"sources": [{
                     "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],

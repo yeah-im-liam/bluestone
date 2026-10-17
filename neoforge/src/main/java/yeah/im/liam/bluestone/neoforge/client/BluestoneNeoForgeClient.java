@@ -47,7 +47,14 @@ public final class BluestoneNeoForgeClient {
         //$$     BluestoneBlocks.wires().forEach(wire -> event.register(BluestoneTint.wire(wire), wire));
         //$$     event.register(BluestoneTint.paste(BluestoneBlocks.paste()), BluestoneBlocks.paste());
         //$$ });
+        //$$ // The same layer as redstone dust. NeoForge reads its own table of layers, not the game's, before 21.5.
+        //#if MC >= 1.21.5
         //$$ modEventBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(RenderLayers::useCutout));
+        //#else
+        //$$ modEventBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(() -> RenderLayers.blocks().forEach(block ->
+        //$$     net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block,
+        //$$         net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(net.minecraft.world.level.block.Blocks.REDSTONE_WIRE.defaultBlockState())))));
+        //#endif
         //#endif
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) ->
             event.registerBlockEntityRenderer(BluestoneBlocks.converterBoxEntity(), ConverterBoxRenderer::new));

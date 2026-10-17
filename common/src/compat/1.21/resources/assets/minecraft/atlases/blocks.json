@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:paletted_permutations",
+      "palette_key": "trims/color_palettes/trim_palette",
+      "permutations": {
+        "bluestone": "bluestone:trims/color_palettes/bluestone",
+        "purplestone": "bluestone:trims/color_palettes/purplestone",
+        "greenstone": "bluestone:trims/color_palettes/greenstone"
+      },
+      "textures": [
+        "trims/items/leggings_trim",
+        "trims/items/chestplate_trim",
+        "trims/items/helmet_trim",
+        "trims/items/boots_trim"
+      ]
+    }
+  ]
+}
