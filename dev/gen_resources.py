@@ -1,11 +1,13 @@
-"""Writes Bluestone's assets and data, copying the matching vanilla files with redstone swapped for bluestone.
+"""Writes Bluestone's assets and data for one Minecraft version, copying the matching vanilla files with redstone swapped
+for bluestone. dev/gen_all.py runs it for every target and sorts the results into the source folders.
 
-python dev/gen_resources.py <26.3 client jar> common/src/main/resources <art folder> <26.1 client jar> <unzipped 26.3 Programmer Art pack>
+python dev/gen_resources.py <version> <client jar> <output folder> <art folder> <Programmer Art zip> [<26.1 client jar>]
 
 The client jars are in the Loom cache (fabric-loom/<version>/minecraft-client.jar); the Programmer Art pack is
-minecraft/resourcepacks/programmer_art.zip in the 26.3 asset index. The art folder holds default/ and programmer art/,
+resourcepacks/programmer_art.zip in the version's asset index. The art folder holds default/ and programmer art/,
 with one folder per thing (bluestone torch, purplestone converter, ...). Each of those has block/, item/ or palettes/
 folders that say where a texture goes, with the mod's textures next to the redstone originals they were drawn from.
+The 26.1 jar is given for the 26.x target, whose pack has an overlay with 26.1's formats.
 """
 import itertools
 import json
@@ -15,13 +17,28 @@ import sys
 import zipfile
 from pathlib import Path
 
-JAR = sys.argv[1]
-LEGACY_JAR = sys.argv[4]          # 26.1, whose loot table and advancement format 26.1 and 26.2 share
-PROGRAMMER_ART = Path(sys.argv[5])  # the game's Programmer Art pack, unzipped
-OUT = Path(sys.argv[2])          # common/src/main/resources
-ART = Path(sys.argv[3])          # bluestone/textures (the user's art)
-z = zipfile.ZipFile(JAR)
-legacy = zipfile.ZipFile(LEGACY_JAR)
+VERSION = sys.argv[1]
+z = zipfile.ZipFile(sys.argv[2])
+OUT = Path(sys.argv[3])
+ART = Path(sys.argv[4])           # bluestone/textures (the user's art)
+programmer_art_zip = zipfile.ZipFile(sys.argv[5])
+legacy = zipfile.ZipFile(sys.argv[6]) if len(sys.argv) > 6 else None  # 26.1, whose formats 26.1 and 26.2 share
+
+
+def since(version):
+    return tuple(int(x) for x in VERSION.split(".")) >= tuple(int(x) for x in version.split("."))
+
+
+# Each format the pack is written in: the jar it is copied from and the folder it goes in (the overlay for 26.1).
+FORMATS = [(z, "")] + ([(legacy, "mc26.1/")] if legacy else [])
+# Data folders were plural before 1.21.
+PLURAL = "" if since("1.21") else "s"
+RECIPE, LOOT, ADVANCEMENT = "recipe" + PLURAL, "loot_table" + PLURAL, "advancement" + PLURAL
+BLOCK_TAGS, ITEM_TAGS = "tags/block" + PLURAL, "tags/item" + PLURAL
+
+
+def programmer_art(path):
+    return json.loads(programmer_art_zip.read(path))
 
 
 def vanilla(path, jar=None):
@@ -131,11 +148,17 @@ for face in AXES:
         center_parts.append({"when": {"face": face, "color": colour}, "apply": {"model": f"bluestone:block/{name}"}})
 write(A + "blockstates/converter_box_center.json", {"multipart": center_parts})
 
-for stone in ["bluestone", "purplestone", "greenstone"]:
-    write(A + f"models/block/{stone}_torch.json", {"parent": "minecraft:block/template_redstone_torch", "textures": {"torch": f"bluestone:block/{stone}_torch"}})
-    write(A + f"models/block/{stone}_torch_off.json", {"parent": "minecraft:block/template_torch_unlit", "textures": {"torch": f"bluestone:block/{stone}_torch_off"}})
-    write(A + f"models/block/{stone}_wall_torch.json", {"parent": "minecraft:block/template_redstone_torch_wall", "textures": {"torch": f"bluestone:block/{stone}_torch"}})
-    write(A + f"models/block/{stone}_wall_torch_off.json", {"parent": "minecraft:block/template_torch_wall_unlit", "textures": {"torch": f"bluestone:block/{stone}_torch_off"}})
+# The game's redstone torch models with the mod's textures (their parents changed over the versions).
+def torch_models(source, prefix):
+    for stone in ["bluestone", "purplestone", "greenstone"]:
+        for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
+            model = source(f"assets/minecraft/models/block/{theirs}.json")
+            model["parent"] = "minecraft:" + model["parent"].removeprefix("minecraft:")
+            model["textures"] = {k: v.removeprefix("minecraft:").replace("block/redstone_torch", f"bluestone:block/{stone}_torch") for k, v in model["textures"].items()}
+            write(prefix + f"models/block/{theirs.replace('redstone', stone)}.json", model)
+
+
+torch_models(vanilla, A)
 
 TORCH_TEXTURES = {"unlit": "bluestone:block/bluestone_torch_off", "lit": "bluestone:block/bluestone_torch"}
 
@@ -199,7 +222,7 @@ def converter_models(source, prefix):
 
 
 converter_models(lambda name: vanilla("assets/minecraft/models/block/" + name + ".json"), A)
-converter_models(lambda name: json.loads((PROGRAMMER_ART / ("assets/minecraft/models/block/" + name + ".json")).read_text()), "programmer_art/" + A)
+converter_models(lambda name: programmer_art("assets/minecraft/models/block/" + name + ".json"), "programmer_art/" + A)
 ROTATION = {"south": 0, "west": 90, "north": 180, "east": 270}
 variants = {}
 for facing, y in ROTATION.items():
@@ -389,7 +412,9 @@ for name in ["dot", "side0", "side1", "side_alt0", "side_alt1"]:
     textures = {k: paste_sprite(v) for k, v in model.get("textures", {}).items()}
     if "parent" in model:
         textures.setdefault("particle", "bluestone:block/greenstone_paste_dot")
-        textures.setdefault("overlay", {"sprite": "bluestone:block/greenstone_paste_overlay", "force_translucent": True})
+        # Texture objects with force_translucent are new in 26.1.
+        textures.setdefault("overlay", {"sprite": "bluestone:block/greenstone_paste_overlay", "force_translucent": True} if since("26.1")
+                            else "bluestone:block/greenstone_paste_overlay")
     model["textures"] = textures
     write(A + f"models/block/greenstone_paste_{name}.json", model)
 
@@ -482,11 +507,16 @@ GENERATED = {
     "bluestone_detector_rail": "bluestone:block/bluestone_detector_rail",
 }
 GENERATED.update({rail: f"bluestone:block/{rail}" for rail in FLOOR_RAILS})
+# Item definitions (items/) are new in 1.21.4; before that the game reads models/item/<item>.json.
 for name, texture in GENERATED.items():
     write(A + f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": {"layer0": texture}})
-    write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:item/{name}"}})
+    if since("1.21.4"):
+        write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:item/{name}"}})
 for name in ["bluestone_block", "purplestone_block", "greenstone_block", "converter_box", "bluestone_ore", "deepslate_bluestone_ore"]:
-    write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
+    if since("1.21.4"):
+        write(A + f"items/{name}.json", {"model": {"type": "minecraft:model", "model": f"bluestone:block/{name}"}})
+    else:
+        write(A + f"models/item/{name}.json", {"parent": f"bluestone:block/{name}"})
 
 # Textures: the user's art, and the Programmer Art versions in the folder Fabric reads (NeoForge serves it as a pack).
 OURS = re.compile(r"bluestone|purplestone|greenstone|converter|sticky|chain_rail")
@@ -501,12 +531,17 @@ for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("program
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(png, dst)
 # Programmer Art puts the redstone torch on the old plain torch shape; the other torches follow it.
-for stone in ["bluestone", "purplestone", "greenstone"]:
-    for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
-        model = json.loads((PROGRAMMER_ART / f"assets/minecraft/models/block/{theirs}.json").read_text())
-        model["textures"] = {k: v.replace("minecraft:block/redstone_torch", f"bluestone:block/{stone}_torch") for k, v in model["textures"].items()}
-        write(f"programmer_art/assets/bluestone/models/block/{theirs.replace('redstone', stone)}.json", model)
-write("programmer_art/pack.mcmeta", {"pack": {"description": {"translate": "pack.bluestone.programmer_art.description"}, "min_format": 84, "max_format": 97}})
+torch_models(programmer_art, "programmer_art/" + A)
+# Pack formats are a range from 1.21.9 and a single number before.
+PACK_VERSION = json.loads(z.read("version.json"))["pack_version"]
+RESOURCE_FORMAT = PACK_VERSION.get("resource_major", PACK_VERSION.get("resource"))
+pack_description = {"translate": "pack.bluestone.programmer_art.description"}
+if legacy:
+    write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "min_format": 84, "max_format": 97}})
+elif since("1.21.9"):
+    write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "min_format": RESOURCE_FORMAT, "max_format": RESOURCE_FORMAT}})
+else:
+    write("programmer_art/pack.mcmeta", {"pack": {"description": pack_description, "pack_format": RESOURCE_FORMAT}})
 
 # Language
 write(A + "lang/en_us.json", {
@@ -581,29 +616,29 @@ ID_PAIRS = [
 ]
 # Minecraft 26.3 changed the loot table and advancement formats; mc26.1/ is a pack overlay with the old ones for 26.1
 # and 26.2.
-for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
+for jar, prefix in FORMATS:
     for old, new in ID_PAIRS[:-1]:
-        data = vanilla(f"data/minecraft/loot_table/blocks/{old}.json", jar)
-        write(prefix + D + f"loot_table/blocks/{new}.json", swap_ids(data, ID_PAIRS))
-    write(prefix + D + "loot_table/blocks/purplestone_wire.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
+        data = vanilla(f"data/minecraft/{LOOT}/blocks/{old}.json", jar)
+        write(prefix + D + f"{LOOT}/blocks/{new}.json", swap_ids(data, ID_PAIRS))
+    write(prefix + D + f"{LOOT}/blocks/purplestone_wire.json",
+          swap_ids(vanilla(f"data/minecraft/{LOOT}/blocks/redstone_wire.json", jar), [("redstone_wire", "purplestone_wire"), ("redstone", "purplestone")]))
     # One paste for each face, as glow lichen drops one for each face, but without needing shears.
-    paste_loot = vanilla("data/minecraft/loot_table/blocks/glow_lichen.json", jar)
+    paste_loot = vanilla(f"data/minecraft/{LOOT}/blocks/glow_lichen.json", jar)
     for entry in paste_loot["pools"][0]["entries"]:
         entry.pop("condition", None)
         entry.pop("conditions", None)
     paste_loot = json.loads(json.dumps(paste_loot).replace('"true"', '"face"').replace("minecraft:glow_lichen", "bluestone:greenstone_paste")
                             .replace("minecraft:blocks/glow_lichen", "bluestone:blocks/greenstone_paste"))
-    write(prefix + D + "loot_table/blocks/greenstone_paste.json", paste_loot)
+    write(prefix + D + f"{LOOT}/blocks/greenstone_paste.json", paste_loot)
     for ours, theirs in [("greenstone_torch", "redstone_torch"), ("greenstone_block", "redstone_block"), ("greenstone_repeater", "repeater"),
                          ("greenstone_comparator", "comparator"), ("converter_box", "repeater")] + [(rail, "rail") for rail in FLOOR_RAILS]:
-        write(prefix + D + f"loot_table/blocks/{ours}.json", swap_ids(vanilla(f"data/minecraft/loot_table/blocks/{theirs}.json", jar), [(theirs, ours)]))
-    write(prefix + D + "loot_table/blocks/purplestone_block.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_block.json", jar), [("redstone_block", "purplestone_block")]))
-    write(prefix + D + "loot_table/blocks/purplestone_torch.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/redstone_torch.json", jar), [("redstone_torch", "purplestone_torch")]))
-    write(prefix + D + "loot_table/blocks/purplestone_converter.json",
-          swap_ids(vanilla("data/minecraft/loot_table/blocks/repeater.json", jar), [("repeater", "purplestone_converter")]))
+        write(prefix + D + f"{LOOT}/blocks/{ours}.json", swap_ids(vanilla(f"data/minecraft/{LOOT}/blocks/{theirs}.json", jar), [(theirs, ours)]))
+    write(prefix + D + f"{LOOT}/blocks/purplestone_block.json",
+          swap_ids(vanilla(f"data/minecraft/{LOOT}/blocks/redstone_block.json", jar), [("redstone_block", "purplestone_block")]))
+    write(prefix + D + f"{LOOT}/blocks/purplestone_torch.json",
+          swap_ids(vanilla(f"data/minecraft/{LOOT}/blocks/redstone_torch.json", jar), [("redstone_torch", "purplestone_torch")]))
+    write(prefix + D + f"{LOOT}/blocks/purplestone_converter.json",
+          swap_ids(vanilla(f"data/minecraft/{LOOT}/blocks/repeater.json", jar), [("repeater", "purplestone_converter")]))
 
 # Recipes and their recipe-book advancements
 RECIPES = {
@@ -636,26 +671,41 @@ GREENSTONE_PAIRS = [("redstone_torch", "greenstone_torch"), ("redstone_block", "
 for ours, (theirs, folder) in RECIPES.items():
     stone, pairs = (("purplestone", PURPLESTONE_PAIRS) if ours.startswith("purplestone")
                     else ("greenstone", GREENSTONE_PAIRS) if ours.startswith("greenstone") else ("bluestone", ID_PAIRS))
-    recipe = swap_ids(vanilla(f"data/minecraft/recipe/{theirs}.json"), pairs)
+    recipe = swap_ids(vanilla(f"data/minecraft/{RECIPE}/{theirs}.json"), pairs)
     if recipe.get("group") == "redstone":
         recipe["group"] = "bluestone"
-    write(D + f"recipe/{ours}.json", recipe)
-    for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
-        advancement = swap_ids(vanilla(f"data/minecraft/advancement/recipes/{folder}/{theirs}.json", jar), pairs)
+    write(D + f"{RECIPE}/{ours}.json", recipe)
+    for jar, prefix in FORMATS:
+        advancement = swap_ids(vanilla(f"data/minecraft/{ADVANCEMENT}/recipes/{folder}/{theirs}.json", jar), pairs)
         unlock = advancement["criteria"]["has_the_recipe"]["conditions"]
         unlock[next(iter(unlock))] = f"bluestone:{ours}"
         advancement["rewards"]["recipes"] = [f"bluestone:{ours}"]
         text = re.sub(r'"has_[a-z_]+"', lambda m: m.group(0).replace("redstone", stone), json.dumps(advancement))
-        write(prefix + D + f"advancement/recipes/{folder}/{ours}.json", json.loads(text))
+        write(prefix + D + f"{ADVANCEMENT}/recipes/{folder}/{ours}.json", json.loads(text))
 
-write(D + "recipe/purplestone.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
-                                     "ingredients": ["minecraft:redstone", "bluestone:bluestone"], "result": {"count": 2, "id": "bluestone:purplestone"}})
-write(D + "recipe/greenstone_paste.json", {"type": "minecraft:crafting_shapeless", "category": "redstone",
-                                          "ingredients": ["bluestone:purplestone", "minecraft:slime_ball"], "result": {"count": 2, "id": "bluestone:greenstone_paste"}})
-write(D + "recipe/greenstone_paste_from_redstone_and_bluestone.json", {
-    "type": "minecraft:crafting_shapeless", "category": "redstone", "group": "greenstone_paste",
-    "ingredients": ["minecraft:redstone", "bluestone:bluestone", "minecraft:slime_ball", "minecraft:slime_ball"],
-    "result": {"count": 4, "id": "bluestone:greenstone_paste"}})
+# Ingredients are plain ids from 1.21.2 and {"item": id} before; the result's id was called "item" before 1.20.5.
+def ingredient(item):
+    return item if since("1.21.2") else {"item": item}
+
+
+def result(item, count=1):
+    return ({"count": count} if count != 1 else {}) | {"id" if since("1.20.5") else "item": item}
+
+
+def shapeless(name, ingredients, item, count, group=None):
+    recipe = {"type": "minecraft:crafting_shapeless", "category": "redstone"} | ({"group": group} if group else {})
+    write(D + f"{RECIPE}/{name}.json", recipe | {"ingredients": [ingredient(i) for i in ingredients], "result": result(item, count)})
+
+
+def shaped(name, category, key, pattern, item, count=1, group=None):
+    recipe = {"type": "minecraft:crafting_shaped", "category": category} | ({"group": group} if group else {})
+    write(D + f"{RECIPE}/{name}.json", recipe | {"key": {k: ingredient(v) for k, v in key.items()}, "pattern": pattern, "result": result(item, count)})
+
+
+shapeless("purplestone", ["minecraft:redstone", "bluestone:bluestone"], "bluestone:purplestone", 2)
+shapeless("greenstone_paste", ["bluestone:purplestone", "minecraft:slime_ball"], "bluestone:greenstone_paste", 2)
+shapeless("greenstone_paste_from_redstone_and_bluestone", ["minecraft:redstone", "bluestone:bluestone", "minecraft:slime_ball", "minecraft:slime_ball"],
+          "bluestone:greenstone_paste", 4, group="greenstone_paste")
 # The converter box: cobblestone in the corners, quartz in the middle and one of each dust around it, in any order.
 DUSTS = ["minecraft:redstone", "bluestone:bluestone", "bluestone:purplestone", "bluestone:greenstone_paste"]
 BOX_RECIPES = []
@@ -663,28 +713,24 @@ for top, left, right, bottom in itertools.permutations(range(4)):
     if left > right:
         continue
     name = "converter_box" if not BOX_RECIPES else f"converter_box_{len(BOX_RECIPES) + 1}"
-    write(D + f"recipe/{name}.json", {"type": "minecraft:crafting_shaped", "category": "redstone", "group": "converter_box",
-                                      "key": {"C": "minecraft:cobblestone", "Q": "minecraft:quartz",
-                                              "T": DUSTS[top], "L": DUSTS[left], "R": DUSTS[right], "B": DUSTS[bottom]},
-                                      "pattern": ["CTC", "LQR", "CBC"], "result": {"id": "bluestone:converter_box"}})
+    shaped(name, "redstone", {"C": "minecraft:cobblestone", "Q": "minecraft:quartz", "T": DUSTS[top], "L": DUSTS[left], "R": DUSTS[right], "B": DUSTS[bottom]},
+           ["CTC", "LQR", "CBC"], "bluestone:converter_box", group="converter_box")
     BOX_RECIPES.append(name)
-# Chain rails: like the powered rail, with iron, an iron chain and dust of their colour.
+# Chain rails: like the powered rail, with iron, an iron chain and dust of their colour. The chain was called "chain"
+# before 1.21.9.
+CHAIN = "minecraft:iron_chain" if since("1.21.9") else "minecraft:chain"
 for rail, dust in [("chain_rail", "minecraft:redstone"), ("bluestone_chain_rail", "bluestone:bluestone")]:
-    write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc",
-                                     "key": {"I": "minecraft:iron_ingot", "C": "minecraft:iron_chain", "R": dust},
-                                     "pattern": ["I I", "ICI", "IRI"], "result": {"count": 6, "id": f"bluestone:{rail}"}})
+    shaped(rail, "misc", {"I": "minecraft:iron_ingot", "C": CHAIN, "R": dust}, ["I I", "ICI", "IRI"], f"bluestone:{rail}", 6)
 STICKY_FROM = {"sticky_rail": "minecraft:rail", "sticky_powered_rail": "minecraft:powered_rail", "sticky_bluestone_powered_rail": "bluestone:bluestone_powered_rail",
                "sticky_detector_rail": "minecraft:detector_rail", "sticky_bluestone_detector_rail": "bluestone:bluestone_detector_rail",
                "sticky_activator_rail": "minecraft:activator_rail", "sticky_bluestone_activator_rail": "bluestone:bluestone_activator_rail",
                "sticky_chain_rail": "bluestone:chain_rail", "sticky_bluestone_chain_rail": "bluestone:bluestone_chain_rail"}
 for rail, made_from in STICKY_FROM.items():
-    write(D + f"recipe/{rail}.json", {"type": "minecraft:crafting_shaped", "category": "misc", "key": {"R": made_from, "#": "minecraft:slime_ball"},
-                                     "pattern": ["RRR", "R#R", "RRR"], "result": {"count": 8, "id": f"bluestone:{rail}"}})
-write(D + "recipe/purplestone_converter.json", {"type": "minecraft:crafting_shaped", "category": "redstone",
-                                   "key": {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
-                                   "pattern": ["R#B", "III"], "result": {"id": "bluestone:purplestone_converter"}})
-for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
-    template = vanilla("data/minecraft/advancement/recipes/redstone/repeater.json", jar)
+    shaped(rail, "misc", {"R": made_from, "#": "minecraft:slime_ball"}, ["RRR", "R#R", "RRR"], f"bluestone:{rail}", 8)
+shaped("purplestone_converter", "redstone", {"R": "minecraft:redstone_torch", "#": "bluestone:purplestone", "B": "bluestone:bluestone_torch", "I": "minecraft:stone"},
+       ["R#B", "III"], "bluestone:purplestone_converter")
+for jar, prefix in FORMATS:
+    template = vanilla(f"data/minecraft/{ADVANCEMENT}/recipes/redstone/repeater.json", jar)
     recipe_key = next(iter(template["criteria"]["has_the_recipe"]["conditions"]))
     box_unlocks = [(name, "greenstone_paste") for name in BOX_RECIPES]
     for recipe, unlocked_by in [("purplestone", "bluestone"), ("purplestone_converter", "purplestone"), ("greenstone_paste", "purplestone"),
@@ -692,55 +738,71 @@ for jar, prefix in [(z, ""), (legacy, "mc26.1/")]:
                                 ("chain_rail", "minecraft:rail"), ("bluestone_chain_rail", "minecraft:rail")] + box_unlocks + list(STICKY_FROM.items()):
         item = unlocked_by if ":" in unlocked_by else "bluestone:" + unlocked_by
         has = "has_" + item.split(":")[1]
-        write(prefix + D + "advancement/recipes/redstone/" + recipe + ".json", {
+        write(prefix + D + f"{ADVANCEMENT}/recipes/redstone/" + recipe + ".json", {
             "parent": "minecraft:recipes/root",
             "criteria": {
-                has: {"conditions": {"items": [{"items": item}]}, "trigger": "minecraft:inventory_changed"},
+                # An item predicate's items were a list before 1.20.5.
+                has: {"conditions": {"items": [{"items": item if since("1.20.5") else [item]}]}, "trigger": "minecraft:inventory_changed"},
                 "has_the_recipe": {"conditions": {recipe_key: "bluestone:" + recipe}, "trigger": "minecraft:recipe_unlocked"},
             },
             "requirements": [["has_the_recipe", has]],
             "rewards": {"recipes": ["bluestone:" + recipe]},
         })
 
-# Clerics sell 2 bluestone dust instead of 2 redstone dust a quarter of the time.
-trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json")
-trade["given_item_modifier"] = [{"type": "minecraft:set_item", "item": "bluestone:bluestone",
-                                 "condition": {"type": "minecraft:random_chance", "chance": 0.25}}]
-write("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
-trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", legacy)
-trade["given_item_modifiers"] = [{"function": "minecraft:set_item", "item": "bluestone:bluestone",
-                                  "conditions": [{"condition": "minecraft:random_chance", "chance": 0.25}]}]
-write("mc26.1/data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
+# Clerics sell 2 bluestone dust instead of 2 redstone dust a quarter of the time. Trades are data from 26.1; before that
+# the loaders add the trade in code.
+if legacy:
+    trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json")
+    trade["given_item_modifier"] = [{"type": "minecraft:set_item", "item": "bluestone:bluestone",
+                                     "condition": {"type": "minecraft:random_chance", "chance": 0.25}}]
+    write("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
+    trade = vanilla("data/minecraft/villager_trade/cleric/1/emerald_redstone.json", legacy)
+    trade["given_item_modifiers"] = [{"function": "minecraft:set_item", "item": "bluestone:bluestone",
+                                      "conditions": [{"condition": "minecraft:random_chance", "chance": 0.25}]}]
+    write("mc26.1/data/minecraft/villager_trade/cleric/1/emerald_redstone.json", trade)
 
-write("pack.mcmeta", {
-    "pack": {"description": "Bluestone", "min_format": 84, "max_format": 121},
-    # Resource formats 84-88 and data formats 101-107 are Minecraft 26.1 and 26.2.
-    "overlays": {"entries": [
-        {"min_format": 84, "max_format": 88, "directory": "mc26.1"},
-        {"min_format": 101, "max_format": 107, "directory": "mc26.1"},
-    ]},
-})
+    write("pack.mcmeta", {
+        "pack": {"description": "Bluestone", "min_format": 84, "max_format": 121},
+        # Resource formats 84-88 and data formats 101-107 are Minecraft 26.1 and 26.2.
+        "overlays": {"entries": [
+            {"min_format": 84, "max_format": 88, "directory": "mc26.1"},
+            {"min_format": 101, "max_format": 107, "directory": "mc26.1"},
+        ]},
+    })
 
 # Armor trims.
 TRIMS = {"bluestone": "#071697", "purplestone": "#5A1697", "greenstone": "#169707"}
 TRIM_ITEMS = {"bluestone": "bluestone:bluestone", "purplestone": "bluestone:purplestone", "greenstone": "bluestone:greenstone_paste"}
-for material, color in TRIMS.items():
-    description = {"color": color, "translate": "trim_material.bluestone." + material}
-    write(D + "trim_material/" + material + ".json", {"description": description, "palette_id": "bluestone:trim/" + material})
-    write("mc26.1/" + D + "trim_material/" + material + ".json", {"asset_name": material, "description": description})
-write("data/minecraft/tags/item/trim_materials.json", {"values": [TRIM_ITEMS[material] for material in TRIMS]})
+# Each version's trim material file is the game's redstone one with the mod's values: 26.3 names a palette, older
+# versions an asset name, 1.21.4 and older the ingredient too, and 1.21.3 and older an item model index.
+MODEL_INDEX = {"bluestone": 0.41, "purplestone": 0.42, "greenstone": 0.43}
+for jar, prefix in FORMATS:
+    redstone = vanilla("data/minecraft/trim_material/redstone.json", jar)
+    for material, color in TRIMS.items():
+        ours = {"description": {"color": color, "translate": "trim_material.bluestone." + material}}
+        if "asset_name" in redstone:
+            ours = {"asset_name": material} | ours
+        if "palette_id" in redstone:
+            ours["palette_id"] = "bluestone:trim/" + material
+        if "ingredient" in redstone:
+            ours["ingredient"] = TRIM_ITEMS[material]
+        if "item_model_index" in redstone:
+            ours["item_model_index"] = MODEL_INDEX[material]
+        write(prefix + D + "trim_material/" + material + ".json", ours)
+write(f"data/minecraft/{ITEM_TAGS}/trim_materials.json", {"values": [TRIM_ITEMS[material] for material in TRIMS]})
 
-items_atlas = vanilla("assets/minecraft/atlases/items.json")["sources"][1]
-write("assets/minecraft/atlases/items.json", {"sources": [{
-    "type": "minecraft:paletted_permutations", "palette_key": items_atlas["palette_key"],
-    "permutations": {material: "bluestone:trim/" + material for material in TRIMS}, "textures": items_atlas["textures"]}]})
-for atlas in ["items", "armor_trims"]:
-    source = [x for x in vanilla(f"assets/minecraft/atlases/{atlas}.json", legacy)["sources"] if x["type"] == "minecraft:paletted_permutations"][0]
-    write(f"mc26.1/assets/minecraft/atlases/{atlas}.json", {"sources": [{
-        "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],
-        "permutations": {material: "bluestone:trims/color_palettes/" + material for material in TRIMS}, "textures": source["textures"]}]})
+# The trim palettes go in every atlas that colours trims: the armor atlas, and the block atlas (items atlas from 1.21.11)
+# for inventory icons.
+for jar, prefix in FORMATS:
+    for name in sorted(n for n in jar.namelist() if n.startswith("assets/minecraft/atlases/") and n.endswith(".json")):
+        for source in json.loads(jar.read(name))["sources"]:
+            if source["type"] == "minecraft:paletted_permutations" and "amethyst" in source.get("permutations", {}):
+                palettes = source["permutations"]["amethyst"].removeprefix("minecraft:").rsplit("/", 1)[0]
+                write(prefix + name, {"sources": [{
+                    "type": "minecraft:paletted_permutations", "palette_key": source["palette_key"],
+                    "permutations": {material: f"bluestone:{palettes}/{material}" for material in TRIMS}, "textures": source["textures"]}]})
 
-# Inventory icons of trimmed armor: one model per armor piece and material.
+# Inventory icons of trimmed armor: one model per armor piece and material (from 1.21.4, whose item definitions pick them).
 for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/items/") and n.endswith(".json")):
     definition = json.loads(z.read(name))
     cases = definition["model"].get("cases", []) if definition["model"].get("type") == "minecraft:select" else []
@@ -754,9 +816,10 @@ for name in sorted(n for n in z.namelist() if n.startswith("assets/minecraft/ite
 
 # World generation: the redstone ore vein and heights, plus extra attempts in water biomes.
 WORLDGEN_IDS = ID_PAIRS + [("ore_redstone", "ore_bluestone")]
-write(D + "worldgen/feature/ore_bluestone.json", swap_ids(vanilla("data/minecraft/worldgen/feature/ore_redstone.json"), WORLDGEN_IDS))
-write("mc26.1/" + D + "worldgen/configured_feature/ore_bluestone.json",
-      swap_ids(vanilla("data/minecraft/worldgen/configured_feature/ore_redstone.json", legacy), WORLDGEN_IDS))
+# The ore's feature lives in worldgen/feature from 26.3 and worldgen/configured_feature before.
+for jar, prefix in FORMATS:
+    folder = "feature" if "data/minecraft/worldgen/feature/ore_redstone.json" in jar.namelist() else "configured_feature"
+    write(prefix + D + f"worldgen/{folder}/ore_bluestone.json", swap_ids(vanilla(f"data/minecraft/worldgen/{folder}/ore_redstone.json", jar), WORLDGEN_IDS))
 for theirs, ours in [("ore_redstone", "ore_bluestone"), ("ore_redstone_lower", "ore_bluestone_lower")]:
     placed = swap_ids(vanilla(f"data/minecraft/worldgen/placed_feature/{theirs}.json"), WORLDGEN_IDS)
     write(D + f"worldgen/placed_feature/{ours}.json", placed)
@@ -769,21 +832,22 @@ write(D + "tags/worldgen/biome/has_more_bluestone.json",
       {"values": ["#minecraft:is_ocean", "#minecraft:is_river", "minecraft:swamp", "minecraft:mangrove_swamp"]})
 
 # Tags
-write("data/minecraft/tags/block/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:converter_box", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
-write("data/minecraft/tags/block/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
+write(f"data/minecraft/{BLOCK_TAGS}/mineable/pickaxe.json", {"values": ["bluestone:bluestone_block", "bluestone:purplestone_block", "bluestone:greenstone_block", "bluestone:converter_box", "bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
+write(f"data/minecraft/{BLOCK_TAGS}/needs_iron_tool.json", {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]})
 RAILS = {"values": ["bluestone:bluestone_powered_rail", "bluestone:bluestone_detector_rail", "bluestone:bluestone_activator_rail",
                    ] + ["bluestone:" + rail for rail in FLOOR_RAILS]}
-write("data/minecraft/tags/block/rails.json", RAILS)
-write("data/minecraft/tags/item/rails.json", RAILS)
-# Since 26.3 flowing water only breaks blocks in this tag; 26.1 and 26.2 break anything that doesn't block movement.
-write("data/minecraft/tags/block/washed_away_by_fluids.json",
-      {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:purplestone_converter",
-                  "bluestone:greenstone_paste", "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater",
-                  "bluestone:greenstone_comparator"]})
-write("data/minecraft/tags/block/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch", "bluestone:greenstone_torch"]})
+write(f"data/minecraft/{BLOCK_TAGS}/rails.json", RAILS)
+write(f"data/minecraft/{ITEM_TAGS}/rails.json", RAILS)
+# Since 26.3 flowing water only breaks blocks in this tag; older versions break anything that doesn't block movement.
+if legacy:
+    write(f"data/minecraft/{BLOCK_TAGS}/washed_away_by_fluids.json",
+          {"values": ["bluestone:purplestone_wire", "bluestone:purplestone_torch", "bluestone:purplestone_wall_torch", "bluestone:purplestone_converter",
+                      "bluestone:greenstone_paste", "bluestone:greenstone_torch", "bluestone:greenstone_wall_torch", "bluestone:greenstone_repeater",
+                      "bluestone:greenstone_comparator"]})
+write(f"data/minecraft/{BLOCK_TAGS}/wall_post_override.json", {"values": ["bluestone:bluestone_torch", "bluestone:purplestone_torch", "bluestone:greenstone_torch"]})
 ORES = {"values": ["bluestone:bluestone_ore", "bluestone:deepslate_bluestone_ore"]}
-write(D + "tags/block/bluestone_ores.json", ORES)
-write(D + "tags/item/bluestone_ores.json", ORES)
-write("data/minecraft/tags/block/ores.json", {"values": ["#bluestone:bluestone_ores"]})
-write("data/minecraft/tags/item/ores.json", {"values": ["#bluestone:bluestone_ores"]})
+write(D + f"{BLOCK_TAGS}/bluestone_ores.json", ORES)
+write(D + f"{ITEM_TAGS}/bluestone_ores.json", ORES)
+write(f"data/minecraft/{BLOCK_TAGS}/ores.json", {"values": ["#bluestone:bluestone_ores"]})
+write(f"data/minecraft/{ITEM_TAGS}/ores.json", {"values": ["#bluestone:bluestone_ores"]})
 print("done")

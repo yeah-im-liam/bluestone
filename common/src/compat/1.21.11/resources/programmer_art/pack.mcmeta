@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "description": {
+      "translate": "pack.bluestone.programmer_art.description"
+    },
+    "min_format": 75,
+    "max_format": 75
+  }
+}

@@ -38,6 +38,9 @@ import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.block.ConverterBoxBlockEntity;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 import yeah.im.liam.bluestone.registry.Registrar;
+//#if MC < 26.1
+//$$ import yeah.im.liam.bluestone.trade.ClericTrades;
+//#endif
 
 public final class BluestoneFabric implements ModInitializer {
     @Override
@@ -54,6 +57,9 @@ public final class BluestoneFabric implements ModInitializer {
         //#endif
         registerCreativeTabs();
         addOres();
+        //#if MC < 26.1
+        //$$ ClericTrades.wrapGameTrades();
+        //#endif
     }
 
     // Same as the NeoForge biome modifiers in data/bluestone/neoforge/biome_modifier.

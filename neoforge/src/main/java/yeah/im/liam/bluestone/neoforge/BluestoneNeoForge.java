@@ -21,6 +21,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+//#if MC < 26.1
+//$$ import net.minecraft.world.entity.npc.villager.VillagerProfession;
+//$$ import net.neoforged.neoforge.common.NeoForge;
+//$$ import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+//$$ import yeah.im.liam.bluestone.trade.ClericTrades;
+//#endif
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -37,6 +43,13 @@ public final class BluestoneNeoForge {
         modEventBus.addListener(BluestoneNeoForge::addComparator);
         modEventBus.addListener(BluestoneNeoForge::fillCreativeTabs);
         modEventBus.addListener(BluestoneNeoForge::addPacks);
+        //#if MC < 26.1
+        //$$ NeoForge.EVENT_BUS.addListener((VillagerTradesEvent event) -> {
+        //$$     if (event.getType() == VillagerProfession.CLERIC) {
+        //$$         event.getTrades().get(1).replaceAll(ClericTrades::wrap);
+        //$$     }
+        //$$ });
+        //#endif
     }
 
     private static void register(RegisterEvent event) {
