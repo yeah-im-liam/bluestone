@@ -1,41 +1,65 @@
 # Bluestone: Over-Powered
 
-Blue redstone that keeps to itself.
+This mod adds new power alternatives to redstone with their own features!
+
+## Bluestone
+
+Bluestone is a new alternative to redstone you can find in the world. Bluestone ore generates at the same levels as redstone but is much less common except when generating near or touching a water block, in that case its more common to find like in underwater caves.
+
+### Bluestone: Functionality
+
+- Bluestone can be used in the exact same way as redstone _but it will never connect with it_. Bluestone acts as it's own seprate powerline.
+- Bluestone cannot be powered by redstone components (Redstone specific components have been renamed to match).
+- Unlike redstone, bluestone can be run underwater, giving it it's own specific purpose besides running seprate lines. 
+
+## Purplestone
+
+Purplestone is another new alternative to redstone but is only crafted by mixing redstone dust and bluestone dust together.
+
+### Purplestone: Functionality
+
+- Purplestone can be used in the exact same way as redstone _and it can connect to both redstone and bluestone_.
+- Redstone and bluestone signals get divided in half when being connected by purplestone.
+- Purplestone _cannot_ be placed underwater.
+
+### Purplestone Converter
+
+A purplestone conveter is a new block that can convert between redstone and bluestone while also acting like a repeater. The signals can be swapped by right-clicking the purplestone converter (Redstone-in Bluestone-out or Bluestone-in Redstone-out). The purplestone converter can also be locked like repeaters.
+
+## Greenstone
+
+Along with all those variant, I also added greenstone. Greenstone is also only crafted by mixing purplestone dust with a slimeball.
+
+### Greenstone: Functionality
+
+- Greenstone can be used in the exact same way as redstone and acts as its own powerline similarly to bluestone.
+- Greenstone can stick to walls allowing for vertical redstone to finally be possible.
+
+## Converter Block
+
+The converter block is a new block that can take any input power and convert it to any output power allowing all types of powers to freely convert to one another.
+
+## Chain Rails
+
+Along with all these new redstone alternative with their own features, I added a new powered rail variant.
+
+## Chain Rails: Functionality
+
+- Chain rails act similarly to powered rails.
+- The chain rail is special in that it makes minecarts go at a consistent speed and only work one way.
+- One the minecart leaves the chain rail they do not transfer the speed they got from the chain rail onto other rails.
+
+## Sticky Rails
+
+For the final addition, I added sticky rails and sticky variants for redstone rails. Sticky rails allow for all rails to be placed on walls. These rails can be ridden on by a minecart on walls and ceilings. If you start to lose speed while on a wall or ceiling the minecart will fall off the track so you must keep a consistant speed. If the mincart is on chain rails however, it does not matter how fast its going as the chain rails will keep it on the track.
+
+### Minecart First-Person Camera
+
+The first-person camera on minecarts has gotten a little overhaul allowing for the sticky rails to actually rotate the players view. Because of this the first-person view might be a little nausiating for sensative player which is why I recommend to have the [Mod Menu](https://modrinth.com/mod/modmenu) mod for fabric as it will allow you to edit settings regarding the camera (Neoforge has a built in mod menu so you can do it without an additional mod).
+
+## Credits
 
 Inspired by [ajjxf's bluestone mod](https://modrinth.com/mod/bluestone_ajjxf).
-
-## Features
-
-- **Bluestone:** dust, torches, repeaters, comparators, the Block of Bluestone, ores and powered, detector and activator rails, working exactly like their redstone versions.
-- **Kept apart:** redstone and bluestone ignore each other, so two circuits can run side by side without mixing. Levers, buttons, pressure plates, observers and other switches start either signal, and both power pistons, doors, lamps, TNT and the like. A lever's particles take the colour of the stones it powers.
-- **Underwater:** bluestone can be waterlogged and isn't washed away. Anything powered gives off bubbles underwater.
-- **Ore:** bluestone ore generates at redstone's heights, much more often in oceans, rivers and swamps and next to water.
-- **Purplestone:** dust, torches and a block that work with both redstone and bluestone. Purplestone dust takes a redstone or bluestone signal at half strength.
-- **Purplestone converter:** a repeater that turns redstone into bluestone or back. Right-click to swap the direction.
-- **Greenstone paste:** dust that sticks to floors, walls and ceilings, placed one face at a time and joining along its surface, with greenstone torches, blocks, repeaters and comparators to go with it.
-- **Converter box:** joins redstone, bluestone and purplestone dust and greenstone paste, passing a signal from any of them to all the others. Lights on its faces show, in each colour, where dust or paste meets it, and the box glows while any are lit.
-- **Sticky rails:** rails, powered, detector, activator and chain rails that stick to walls and ceilings. Carts ride from floor to wall to ceiling and turn to match the track.
-- **Chain rails:** move carts at a fixed speed in the direction they were placed, and hold them still when unpowered.
-- **Armor trims** in bluestone, purplestone and greenstone.
-- **Programmer Art** textures.
-
-## Settings
-
-The view of a rider turns with a cart on a wall or ceiling in first person, and not in third person. Both, and how fast carts turn, can be changed from Mod Menu on Fabric or the mod list on NeoForge.
-
-## Crafting
-
-The redstone recipes, with bluestone dust and torches in place of redstone dust and torches, and:
-
-- **Purplestone dust:** 1 redstone dust and 1 bluestone dust make 2.
-- **Purplestone torch:** purplestone dust on a stick.
-- **Block of Purplestone:** 9 purplestone dust, and back.
-- **Purplestone converter:** a redstone torch, purplestone dust and a bluestone torch on top of three stone.
-- **Greenstone paste:** 1 purplestone dust and 1 slimeball make 2, or 1 redstone dust, 1 bluestone dust and 2 slimeballs make 4.
-- **Greenstone torches, blocks, repeaters and comparators:** the redstone recipes with greenstone paste and greenstone torches.
-- **Converter box:** cobblestone in the corners, quartz in the middle and redstone, bluestone, purplestone and greenstone paste around it in any order.
-- **Chain rails:** like the powered rail, with an iron chain and the dust of their colour. Makes 6.
-- **Sticky rails:** 8 of a rail around a slimeball.
 
 ## Compatibility
 
@@ -59,7 +83,9 @@ Each download covers a range of Minecraft versions, named in the file (for examp
 | 1.21.11 | 1.21.11 |
 | 26.1 – 26.3 | 26.1 – 26.3 |
 
-The mod's Programmer Art textures come with the game's Programmer Art pack. The "Alt Torches Programmer Art" resource pack swaps in other Programmer Art bluestone, purplestone and greenstone torches; from 1.21.2 it also brings back the old torch, repeater and comparator shapes.
+On NeoForge, turn on the "Bluestone: Over-Powered Programmer Art" resource pack together with the Programmer Art pack. Fabric switches the textures over by itself.
+
+The "Alt Torches Programmer Art" resource pack swaps in other Programmer Art bluestone, purplestone and greenstone torches; from 1.21.2 it also brings back the old torch, repeater and comparator shapes.
 
 ## License
 
