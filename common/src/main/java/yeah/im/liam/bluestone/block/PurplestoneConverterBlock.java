@@ -47,7 +47,8 @@ public class PurplestoneConverterBlock extends DiodeBlock implements SignalBlock
             .setValue(POWERED, false));
     }
 
-    //#if MC < 26.1
+    // Blocks name a codec from 1.20.3 until 26.1.
+    //#if MC >= 1.20.3 && MC < 26.1
     //$$ @Override
     //$$ protected com.mojang.serialization.MapCodec<? extends DiodeBlock> codec() {
     //$$     return simpleCodec(PurplestoneConverterBlock::new);

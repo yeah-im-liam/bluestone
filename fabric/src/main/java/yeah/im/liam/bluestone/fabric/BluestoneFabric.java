@@ -15,7 +15,9 @@ import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 //$$ import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 //$$ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 //#endif
+//#if MC >= 1.21
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityType;
+//#endif
 //#if MC < 26.1
 //$$ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 //#endif

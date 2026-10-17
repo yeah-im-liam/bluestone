@@ -535,8 +535,15 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
         return InteractionResult.SUCCESS;
     }
 
+    // The state playerWillDestroy returns is the one dropped from 1.20.3; before, playerDestroy swaps it in.
+    //#if MC >= 1.20.3
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    //#else
+    //$$ @Override
+    //$$ public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    //$$     DROPPED.remove();
+    //#endif
         REMAINING.remove();
         if (faces(state).size() > 1) {
             Direction target = lookedAt(state, pos, player);
@@ -545,9 +552,29 @@ public class GreenstonePasteBlock extends Block implements SignalBlock {
             }
             REMAINING.set(new Remaining(level, pos.immutable(), state.setValue(SIDES.get(target), Side.NONE)));
             state = defaultBlockState().setValue(SIDES.get(target), Side.FACE).setValue(POWER, state.getValue(POWER));
+            //#if MC < 1.20.3
+            //$$ DROPPED.set(new Remaining(level, pos.immutable(), state));
+            //#endif
         }
+        //#if MC >= 1.20.3
         return super.playerWillDestroy(level, pos, state, player);
+        //#else
+        //$$ super.playerWillDestroy(level, pos, state, player);
+        //#endif
     }
+
+    //#if MC < 1.20.3
+    //$$ private static final ThreadLocal<@Nullable Remaining> DROPPED = new ThreadLocal<>();
+    //$$
+    //$$ @Override
+    //$$ public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, net.minecraft.world.level.block.entity.@Nullable BlockEntity blockEntity,
+    //$$                           net.minecraft.world.item.ItemStack tool) {
+    //$$     Remaining dropped = DROPPED.get();
+    //$$     DROPPED.remove();
+    //$$     boolean ours = dropped != null && dropped.level() == level && dropped.pos().equals(pos);
+    //$$     super.playerDestroy(level, player, pos, ours ? dropped.state() : state, blockEntity, tool);
+    //$$ }
+    //#endif
 
     @Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
