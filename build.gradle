@@ -62,6 +62,20 @@ subprojects {
     }
     apply from: rootProject.file('gradle/preprocess.gradle')
 
+    // Dev runs count only a loader module's own files as the mod's, so the packs from the common module come along
+    // (a jar keeps one copy of each).
+    if (project.name != 'common') {
+        def commonResources = ['common/src/main/resources'] + rootProject.compat.split(/[ ,]+/).collect { "common/src/compat/$it/resources" }
+        tasks.named('processResources', ProcessResources) {
+            from(commonResources.collect { rootProject.file(it) }) {
+                include 'programmer_art/**', 'resourcepacks/**'
+            }
+        }
+        tasks.matching { it.name == 'shadowJar' }.configureEach {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = 'UTF-8'
         it.options.release = rootProject.java_version as int

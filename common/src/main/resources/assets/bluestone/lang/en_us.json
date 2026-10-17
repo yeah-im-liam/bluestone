@@ -45,6 +45,8 @@
   "trim_material.bluestone.greenstone": "Greenstone Material",
   "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
   "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
+  "pack.bluestone.alt_torches_programmer_art": "Alt Torches Programmer Art",
+  "pack.bluestone.alt_torches_programmer_art.description": "Other Programmer Art torches for Bluestone: Over-Powered",
   "block.bluestone.bluestone_wall_torch": "Bluestone Wall Torch",
   "block.bluestone.purplestone_wall_torch": "Purplestone Wall Torch",
   "block.bluestone.greenstone_wall_torch": "Greenstone Wall Torch",

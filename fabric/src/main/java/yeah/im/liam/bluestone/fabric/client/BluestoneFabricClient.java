@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 //$$ import yeah.im.liam.bluestone.client.RenderLayers;
 //#endif
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.client.BluestoneTint;
 import yeah.im.liam.bluestone.client.ConverterBoxRenderer;
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
@@ -27,5 +28,10 @@ public final class BluestoneFabricClient implements ClientModInitializer {
         //$$ RenderLayers.useCutout();
         //#endif
         BlockEntityRendererRegistry.register(BluestoneBlocks.converterBoxEntity(), ConverterBoxRenderer::new);
+        // The optional pack in resourcepacks/alt_torches_programmer_art.
+        net.fabricmc.fabric.api.resource.ResourceManagerHelper.registerBuiltinResourcePack(Bluestone.id("alt_torches_programmer_art"),
+            net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(Bluestone.MOD_ID).orElseThrow(),
+            net.minecraft.network.chat.Component.translatable("pack.bluestone.alt_torches_programmer_art"),
+            net.fabricmc.fabric.api.resource.ResourcePackActivationType.NORMAL);
     }
 }

@@ -626,6 +626,8 @@ LANG = {
     "trim_material.bluestone.greenstone": "Greenstone Material",
     "pack.bluestone.programmer_art": "Bluestone: Over-Powered Programmer Art",
     "pack.bluestone.programmer_art.description": "Programmer Art textures for Bluestone: Over-Powered",
+    "pack.bluestone.alt_torches_programmer_art": "Alt Torches Programmer Art",
+    "pack.bluestone.alt_torches_programmer_art.description": "Other Programmer Art torches for Bluestone: Over-Powered",
 }
 # Wall torches and rails on walls share their block's name from 1.21.2; before that they need their own.
 for stone in ["bluestone", "purplestone", "greenstone"]:
@@ -963,4 +965,42 @@ if not since("1.21.11"):
         for part in data.get("multipart", []):
             part["apply"] = unturned_all(part["apply"])
         write(A + f"blockstates/{path.name}", data)
+
+# "Alt Torches Programmer Art", a pack of its own: the user's other Programmer Art bluestone, purplestone and greenstone
+# torches. From 1.21.2 it also brings back the Programmer Art shapes, of every torch (the game's too, with its
+# Programmer Art textures) and of the repeaters, comparators and converter; before 1.21.2 those are the normal ones.
+ALT = "resourcepacks/alt_torches_programmer_art/"
+for stone in ["bluestone", "purplestone", "greenstone"]:
+    for state, source in [("", ART / "alt torches programmer art" / f"{stone} torch/block/{stone}_torch.png"),
+                          ("_off", ART / "programmer art" / f"{stone} torch/block/{stone}_torch_off.png")]:
+        for folder in ["", OLD_TORCH] if OLD_TORCH else [""]:
+            dst = OUT / ALT / A / "textures/block" / folder / f"{stone}_torch{state}.png"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, dst)
+if since("1.21.2"):
+    for theirs, template in [("redstone_torch", "template_torch"), ("redstone_torch_off", "template_torch"),
+                             ("redstone_wall_torch", "template_torch_wall"), ("redstone_wall_torch_off", "template_torch_wall")]:
+        texture = "block/redstone_torch_off" if theirs.endswith("_off") else "block/redstone_torch"
+        write(ALT + f"assets/minecraft/models/block/{theirs}.json", {"parent": f"minecraft:block/{template}", "textures": {"torch": f"minecraft:{texture}"}})
+        for stone in ["bluestone", "purplestone", "greenstone"]:
+            write(ALT + A + f"models/block/{theirs.replace('redstone', stone)}.json",
+                  {"parent": f"minecraft:block/{template}", "textures": {"torch": "bluestone:" + texture.replace("redstone", stone)}})
+    # The game's Programmer Art repeaters and comparators, which the mod's build on, and its redstone torch textures.
+    for name in programmer_art_zip.namelist():
+        if re.fullmatch(r"assets/minecraft/models/block/(repeater|comparator)\w*\.json|assets/minecraft/textures/block/redstone_torch(_off)?\.png", name):
+            dst = OUT / ALT / name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(programmer_art_zip.read(name))
+    # The converter and the turned models are built from the Programmer Art shapes in the Programmer Art pack.
+    pa_models = OUT / "programmer_art" / A / "models/block"
+    for model in sorted(pa_models.rglob("*.json")):
+        relative = model.relative_to(pa_models).as_posix()
+        if relative.startswith(("purplestone_converter", "turned/")):
+            dst = OUT / ALT / A / "models/block" / relative
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(model, dst)
+(OUT / ALT / "pack.png").write_bytes(programmer_art_zip.read("pack.png"))
+alt_meta = json.loads((OUT / "programmer_art/pack.mcmeta").read_text(encoding="utf-8"))
+alt_meta["pack"]["description"] = {"translate": "pack.bluestone.alt_torches_programmer_art.description"}
+write(ALT + "pack.mcmeta", alt_meta)
 print("done")

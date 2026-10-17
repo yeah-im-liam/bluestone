@@ -131,38 +131,46 @@ public final class BluestoneNeoForge {
     }
 
     // Fabric applies the textures in programmer_art/ together with the game's Programmer Art pack; NeoForge lists them
-    // as a pack of their own. A NeoForge run from source doesn't count the common module's files as the mod's.
+    // as a pack of their own. Both list Alt Torches Programmer Art.
     private static void addPacks(AddPackFindersEvent event) {
-        //#if MC >= 1.21.9
-        boolean hasPack = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().getContents().containsFile("programmer_art/pack.mcmeta");
-        //#else
-        //$$ boolean hasPack = java.nio.file.Files.exists(ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art", "pack.mcmeta"));
-        //#endif
-        if (event.getPackType() == PackType.CLIENT_RESOURCES && hasPack) {
-            //#if MC >= 1.21
-            event.addPackFinders(Bluestone.id("programmer_art"), PackType.CLIENT_RESOURCES,
-                Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, false, Pack.Position.TOP);
-            //#else
-            //$$ // NeoForge 20.5 and older have no addPackFinders; this is what it does from 20.6.
-            //$$ java.nio.file.Path root = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art");
-            //#if MC >= 1.20.5
-            //$$ Pack pack = Pack.readMetaAndCreate(
-            //$$     new net.minecraft.server.packs.PackLocationInfo("mod/" + Bluestone.id("programmer_art"),
-            //$$         Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, java.util.Optional.empty()),
-            //$$     net.minecraft.server.packs.repository.BuiltInPackSource.fromName(path -> new net.minecraft.server.packs.PathPackResources(path, root)),
-            //$$     PackType.CLIENT_RESOURCES, new net.minecraft.server.packs.PackSelectionConfig(false, Pack.Position.TOP, false));
-            //#elseif MC >= 1.20.2
-            //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id("programmer_art"), Component.translatable("pack.bluestone.programmer_art"), false,
-            //$$     new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
-            //#else
-            //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id("programmer_art"), Component.translatable("pack.bluestone.programmer_art"), false,
-            //$$     id -> new net.minecraft.server.packs.PathPackResources(id, root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
-            //#endif
-            //$$ if (pack != null) {
-            //$$     event.addRepositorySource(packs -> packs.accept(pack));
-            //$$ }
-            //#endif
+        if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+            addPack(event, "programmer_art", "programmer_art");
+            addPack(event, "resourcepacks/alt_torches_programmer_art", "alt_torches_programmer_art");
         }
+    }
+
+    // A NeoForge run from source doesn't count the common module's files as the mod's.
+    private static void addPack(AddPackFindersEvent event, String folder, String name) {
+        //#if MC >= 1.21.9
+        boolean hasPack = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().getContents().containsFile(folder + "/pack.mcmeta");
+        //#else
+        //$$ boolean hasPack = java.nio.file.Files.exists(ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource(folder, "pack.mcmeta"));
+        //#endif
+        if (!hasPack) {
+            return;
+        }
+        Component title = Component.translatable("pack.bluestone." + name);
+        //#if MC >= 1.21
+        event.addPackFinders(Bluestone.id(folder), PackType.CLIENT_RESOURCES, title, PackSource.BUILT_IN, false, Pack.Position.TOP);
+        //#else
+        //$$ // NeoForge 20.5 and older have no addPackFinders; this is what it does from 20.6.
+        //$$ java.nio.file.Path root = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource(folder);
+        //#if MC >= 1.20.5
+        //$$ Pack pack = Pack.readMetaAndCreate(
+        //$$     new net.minecraft.server.packs.PackLocationInfo("mod/" + Bluestone.id(folder), title, PackSource.BUILT_IN, java.util.Optional.empty()),
+        //$$     net.minecraft.server.packs.repository.BuiltInPackSource.fromName(path -> new net.minecraft.server.packs.PathPackResources(path, root)),
+        //$$     PackType.CLIENT_RESOURCES, new net.minecraft.server.packs.PackSelectionConfig(false, Pack.Position.TOP, false));
+        //#elseif MC >= 1.20.2
+        //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id(folder), title, false,
+        //$$     new net.minecraft.server.packs.PathPackResources.PathResourcesSupplier(root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+        //#else
+        //$$ Pack pack = Pack.readMetaAndCreate("mod/" + Bluestone.id(folder), title, false,
+        //$$     id -> new net.minecraft.server.packs.PathPackResources(id, root, true), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+        //#endif
+        //$$ if (pack != null) {
+        //$$     event.addRepositorySource(packs -> packs.accept(pack));
+        //$$ }
+        //#endif
     }
 
     private static <T> Registrar<T> registrar(ResourceKey<? extends Registry<T>> registry, RegisterEvent.RegisterHelper<T> helper) {

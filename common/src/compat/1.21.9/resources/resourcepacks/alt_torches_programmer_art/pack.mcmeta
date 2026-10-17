@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "description": {
+      "translate": "pack.bluestone.alt_torches_programmer_art.description"
+    },
+    "min_format": 69,
+    "max_format": 69
+  }
+}
