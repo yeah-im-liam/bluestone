@@ -22,7 +22,10 @@ import yeah.im.liam.bluestone.client.ConverterBoxRenderer;
 //#endif
 import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 
+// Before 1.21 BluestoneNeoForge starts this on the client.
+//#if MC >= 1.21
 @Mod(value = Bluestone.MOD_ID, dist = Dist.CLIENT)
+//#endif
 public final class BluestoneNeoForgeClient {
     public BluestoneNeoForgeClient(IEventBus modEventBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, (mod, parent) -> new CartViewScreen(parent));

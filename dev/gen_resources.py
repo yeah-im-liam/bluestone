@@ -52,6 +52,9 @@ BLOCK_TAGS, ITEM_TAGS = "tags/block" + PLURAL, "tags/item" + PLURAL
 
 
 def programmer_art(path):
+    # The pack only has the models it changes (before 1.21 not the repeater's); the rest are the game's own.
+    if path not in programmer_art_zip.namelist():
+        return vanilla(path)
     return json.loads(programmer_art_zip.read(path))
 
 

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:blasting",
+  "category": "blocks",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "group": "bluestone",
+  "ingredient": {
+    "item": "bluestone:bluestone_ore"
+  },
+  "result": {
+    "id": "bluestone:bluestone"
+  }
+}

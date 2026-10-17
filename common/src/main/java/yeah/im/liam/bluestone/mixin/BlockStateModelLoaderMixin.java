@@ -1,7 +1,7 @@
 package yeah.im.liam.bluestone.mixin;
 
-// Minecraft 1.21.4 and earlier; BlockStateDefinitionsMixin from 1.21.5.
-//#if MC < 1.21.5
+// Minecraft 1.21 to 1.21.4; ModelBakeryMixin before, BlockStateDefinitionsMixin from 1.21.5.
+//#if MC >= 1.21 && MC < 1.21.5
 //$$ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 //$$ import java.util.function.Function;
 //$$ import net.minecraft.client.resources.model.BlockStateModelLoader;

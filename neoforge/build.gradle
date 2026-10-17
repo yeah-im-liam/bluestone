@@ -38,6 +38,11 @@ dependencies {
         common(project(path: ':common')) { transitive false }
     }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
+    // NeoForge brings MixinExtras along, but in some of its builds (20.5, 21.0) one from before @WrapMethod; the
+    // newest copy among the loaded mods is the one used.
+    if (rootProject.findProperty('bundle_mixinextras') == 'true') {
+        include "io.github.llamalad7:mixinextras-neoforge:0.5.0"
+    }
 }
 
 processResources {

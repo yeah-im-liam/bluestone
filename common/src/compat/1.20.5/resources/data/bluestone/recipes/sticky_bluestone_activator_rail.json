@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": {
+      "item": "bluestone:bluestone_activator_rail"
+    },
+    "#": {
+      "item": "minecraft:slime_ball"
+    }
+  },
+  "pattern": [
+    "RRR",
+    "R#R",
+    "RRR"
+  ],
+  "result": {
+    "count": 8,
+    "id": "bluestone:sticky_bluestone_activator_rail"
+  }
+}

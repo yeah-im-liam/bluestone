@@ -28,7 +28,9 @@ import net.neoforged.fml.common.Mod;
 //$$ import yeah.im.liam.bluestone.trade.ClericTrades;
 //#endif
 import net.neoforged.neoforge.event.AddPackFindersEvent;
+//#if MC >= 1.21
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
+//#endif
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import yeah.im.liam.bluestone.Bluestone;
@@ -38,9 +40,19 @@ import yeah.im.liam.bluestone.registry.Registrar;
 
 @Mod(Bluestone.MOD_ID)
 public final class BluestoneNeoForge {
+    //#if MC >= 1.21
     public BluestoneNeoForge(IEventBus modEventBus) {
+    //#else
+    //$$ public BluestoneNeoForge(IEventBus modEventBus, net.neoforged.fml.ModContainer container) {
+    //$$     // NeoForge starts mods for one side (BluestoneNeoForgeClient) only from 20.6.
+    //$$     if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+    //$$         new yeah.im.liam.bluestone.neoforge.client.BluestoneNeoForgeClient(modEventBus, container);
+    //$$     }
+    //#endif
         modEventBus.addListener(BluestoneNeoForge::register);
+        //#if MC >= 1.21
         modEventBus.addListener(BluestoneNeoForge::addComparator);
+        //#endif
         modEventBus.addListener(BluestoneNeoForge::fillCreativeTabs);
         modEventBus.addListener(BluestoneNeoForge::addPacks);
         //#if MC < 26.1
@@ -71,9 +83,12 @@ public final class BluestoneNeoForge {
         ));
     }
 
+    // Before 1.21 BlockEntityTypeMixin does this.
+    //#if MC >= 1.21
     private static void addComparator(BlockEntityTypeAddBlocksEvent event) {
-        event.modify(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.withDefaultNamespace("comparator")), BluestoneBlocks.comparator());
+        event.modify(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Bluestone.vanilla("comparator")), BluestoneBlocks.comparator());
     }
+    //#endif
 
     private static void fillCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         ResourceKey<CreativeModeTab> tab = event.getTabKey();
@@ -99,7 +114,11 @@ public final class BluestoneNeoForge {
         ItemStack previous = new ItemStack(anchor);
         for (Item item : items) {
             ItemStack stack = new ItemStack(item);
+            //#if MC >= 1.21
             event.insertAfter(previous, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            //#else
+            //$$ event.getEntries().putAfter(previous, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            //#endif
             previous = stack;
         }
     }
@@ -113,8 +132,21 @@ public final class BluestoneNeoForge {
         //$$ boolean hasPack = java.nio.file.Files.exists(ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art", "pack.mcmeta"));
         //#endif
         if (event.getPackType() == PackType.CLIENT_RESOURCES && hasPack) {
+            //#if MC >= 1.21
             event.addPackFinders(Bluestone.id("programmer_art"), PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, false, Pack.Position.TOP);
+            //#else
+            //$$ // NeoForge 20.5 has no addPackFinders; this is what it does from 20.6.
+            //$$ java.nio.file.Path root = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art");
+            //$$ Pack pack = Pack.readMetaAndCreate(
+            //$$     new net.minecraft.server.packs.PackLocationInfo("mod/" + Bluestone.id("programmer_art"),
+            //$$         Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, java.util.Optional.empty()),
+            //$$     net.minecraft.server.packs.repository.BuiltInPackSource.fromName(path -> new net.minecraft.server.packs.PathPackResources(path, root)),
+            //$$     PackType.CLIENT_RESOURCES, new net.minecraft.server.packs.PackSelectionConfig(false, Pack.Position.TOP, false));
+            //$$ if (pack != null) {
+            //$$     event.addRepositorySource(packs -> packs.accept(pack));
+            //$$ }
+            //#endif
         }
     }
 

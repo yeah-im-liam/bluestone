@@ -1,0 +1,9 @@
+{
+  "asset_name": "purplestone",
+  "description": {
+    "color": "#5A1697",
+    "translate": "trim_material.bluestone.purplestone"
+  },
+  "ingredient": "bluestone:purplestone",
+  "item_model_index": 0.42
+}

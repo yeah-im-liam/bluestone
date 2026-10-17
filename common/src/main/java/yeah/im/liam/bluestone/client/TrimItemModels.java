@@ -16,10 +16,10 @@ import yeah.im.liam.bluestone.Bluestone;
  */
 public final class TrimItemModels {
     private static final List<String> MATERIALS = List.of("bluestone", "purplestone", "greenstone");
-    private static final Identifier SELECT = Identifier.withDefaultNamespace("select");
-    private static final Identifier MODEL = Identifier.withDefaultNamespace("model");
-    private static final Identifier TRIM_MATERIAL = Identifier.withDefaultNamespace("trim_material");
-    private static final Identifier REDSTONE = Identifier.withDefaultNamespace("redstone");
+    private static final Identifier SELECT = Bluestone.vanilla("select");
+    private static final Identifier MODEL = Bluestone.vanilla("model");
+    private static final Identifier TRIM_MATERIAL = Bluestone.vanilla("trim_material");
+    private static final Identifier REDSTONE = Bluestone.vanilla("redstone");
 
     private TrimItemModels() {
     }

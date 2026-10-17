@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "yeah.im.liam.bluestone.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "AbstractMinecartMixin",
+    "LanguageMixin",
+    "PoweredRailBlockMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "asset_name": "greenstone",
+  "description": {
+    "color": "#169707",
+    "translate": "trim_material.bluestone.greenstone"
+  },
+  "ingredient": "bluestone:greenstone_paste",
+  "item_model_index": 0.43
+}

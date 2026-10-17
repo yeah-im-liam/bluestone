@@ -49,11 +49,13 @@ public final class BluestoneFabric implements ModInitializer {
         BluestoneBlocks.registerItems(registrar(BuiltInRegistries.ITEM));
         //#if MC >= 26.1
         BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE), block -> new BlockEntityType<>(ConverterBoxBlockEntity::new, Set.of(block)));
-        ((FabricBlockEntityType) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("comparator")))
+        ((FabricBlockEntityType) BuiltInRegistries.BLOCK_ENTITY_TYPE.getValue(Bluestone.vanilla("comparator")))
             .addValidBlock(BluestoneBlocks.comparator());
         //#else
         //$$ BluestoneBlocks.registerBlockEntities(registrar(BuiltInRegistries.BLOCK_ENTITY_TYPE), block -> FabricBlockEntityTypeBuilder.create(ConverterBoxBlockEntity::new, block).build());
+        //#if MC >= 1.21
         //$$ ((FabricBlockEntityType) BlockEntityType.COMPARATOR).addSupportedBlock(BluestoneBlocks.comparator());
+        //#endif
         //#endif
         registerCreativeTabs();
         addOres();
