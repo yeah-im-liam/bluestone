@@ -85,16 +85,28 @@ abstract class AbstractMinecartRendererMixin {
         ((SurfaceCart) state).bluestone$set(turned != null ? turned.turn() : null, turned != null ? turned.pivot() : Vec3.ZERO);
     }
 
+    // The cart is drawn in submit from 1.21.9 and in render before.
+    //#if MC >= 1.21.9
     @WrapOperation(method = "submit", at = @At(value = "INVOKE",
         target = "Lnet/minecraft/client/renderer/entity/AbstractMinecartRenderer;newRender(Lnet/minecraft/client/renderer/entity/state/MinecartRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
+    //#else
+    //$$ @WrapOperation(method = "render", at = @At(value = "INVOKE",
+    //$$     target = "Lnet/minecraft/client/renderer/entity/AbstractMinecartRenderer;newRender(Lnet/minecraft/client/renderer/entity/state/MinecartRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
+    //#endif
     private void bluestone$turnNew(MinecartRenderState state, PoseStack poseStack, Operation<Void> original) {
         if (!bluestone$turn(state, poseStack)) {
             original.call(state, poseStack);
         }
     }
 
+    // The cart is drawn in submit from 1.21.9 and in render before.
+    //#if MC >= 1.21.9
     @WrapOperation(method = "submit", at = @At(value = "INVOKE",
         target = "Lnet/minecraft/client/renderer/entity/AbstractMinecartRenderer;oldRender(Lnet/minecraft/client/renderer/entity/state/MinecartRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
+    //#else
+    //$$ @WrapOperation(method = "render", at = @At(value = "INVOKE",
+    //$$     target = "Lnet/minecraft/client/renderer/entity/AbstractMinecartRenderer;oldRender(Lnet/minecraft/client/renderer/entity/state/MinecartRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V"))
+    //#endif
     private void bluestone$turnOld(MinecartRenderState state, PoseStack poseStack, Operation<Void> original) {
         if (!bluestone$turn(state, poseStack)) {
             original.call(state, poseStack);

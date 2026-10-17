@@ -22,7 +22,8 @@ abstract class LevelMixin {
     @WrapOperation(method = "updateNeighbourForOutputSignal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z"))
     private boolean bluestone$alsoBluestoneComparator(BlockState state, Object block, Operation<Boolean> original) {
     //#else
-    //$$ @WrapOperation(method = "updateNeighbourForOutputSignal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"))
+    //$$ // Optional: some NeoForge versions update comparators through their own neighbour hook instead, which reaches ours too.
+    //$$ @WrapOperation(method = "updateNeighbourForOutputSignal", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"), require = 0)
     //$$ private boolean bluestone$alsoBluestoneComparator(BlockState state, Block block, Operation<Boolean> original) {
     //#endif
         return original.call(state, block) || block == Blocks.COMPARATOR && state.getBlock() instanceof BluestoneComparatorBlock;

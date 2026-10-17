@@ -103,8 +103,12 @@ public final class BluestoneNeoForge {
     // Fabric applies the textures in programmer_art/ together with the game's Programmer Art pack; NeoForge lists them
     // as a pack of their own. A NeoForge run from source doesn't count the common module's files as the mod's.
     private static void addPacks(AddPackFindersEvent event) {
-        if (event.getPackType() == PackType.CLIENT_RESOURCES
-            && ModList.get().getModFileById(Bluestone.MOD_ID).getFile().getContents().containsFile("programmer_art/pack.mcmeta")) {
+        //#if MC >= 1.21.9
+        boolean hasPack = ModList.get().getModFileById(Bluestone.MOD_ID).getFile().getContents().containsFile("programmer_art/pack.mcmeta");
+        //#else
+        //$$ boolean hasPack = java.nio.file.Files.exists(ModList.get().getModFileById(Bluestone.MOD_ID).getFile().findResource("programmer_art", "pack.mcmeta"));
+        //#endif
+        if (event.getPackType() == PackType.CLIENT_RESOURCES && hasPack) {
             event.addPackFinders(Bluestone.id("programmer_art"), PackType.CLIENT_RESOURCES,
                 Component.translatable("pack.bluestone.programmer_art"), PackSource.BUILT_IN, false, Pack.Position.TOP);
         }

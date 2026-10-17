@@ -38,14 +38,14 @@ public class BluestoneComparatorBlock extends ComparatorBlock implements SimpleW
         BlockPos targetPos = pos.relative(direction);
         BlockState targetState = level.getBlockState(targetPos);
         if (targetState.hasAnalogOutputSignal()) {
-            resultSignal = targetState.getAnalogOutputSignal(level, targetPos, direction.getOpposite());
+            resultSignal = BluestoneDiodes.analogOutput(targetState, level, targetPos, direction.getOpposite());
         } else if (resultSignal < 15 && targetState.isRedstoneConductor(level, targetPos)) {
             targetPos = targetPos.relative(direction);
             targetState = level.getBlockState(targetPos);
             ItemFrame itemFrame = getItemFrame(level, direction, targetPos);
             int itemFrameOrBlockSignal = Math.max(
                 itemFrame == null ? Integer.MIN_VALUE : itemFrame.getAnalogOutput(),
-                targetState.hasAnalogOutputSignal() ? targetState.getAnalogOutputSignal(level, targetPos, direction.getOpposite()) : Integer.MIN_VALUE
+                targetState.hasAnalogOutputSignal() ? BluestoneDiodes.analogOutput(targetState, level, targetPos, direction.getOpposite()) : Integer.MIN_VALUE
             );
             if (itemFrameOrBlockSignal != Integer.MIN_VALUE) {
                 resultSignal = itemFrameOrBlockSignal;

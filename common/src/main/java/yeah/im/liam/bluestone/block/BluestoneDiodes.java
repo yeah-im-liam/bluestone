@@ -62,4 +62,13 @@ final class BluestoneDiodes {
         }
         return state.isSignalSource() ? level.getDirectSignal(pos, direction) : 0;
     }
+
+    // A comparator reading a block: the side it reads from is passed along from 1.21.9.
+    static int analogOutput(BlockState state, Level level, BlockPos pos, Direction side) {
+        //#if MC >= 1.21.9
+        return state.getAnalogOutputSignal(level, pos, side);
+        //#else
+        //$$ return state.getAnalogOutputSignal(level, pos);
+        //#endif
+    }
 }

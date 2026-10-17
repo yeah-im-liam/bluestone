@@ -60,13 +60,13 @@ public class GreenstoneComparatorBlock extends GreenstoneDiodeBlock {
         BlockPos behind = pos.relative(input);
         BlockState behindState = level.getBlockState(behind);
         if (behindState.hasAnalogOutputSignal()) {
-            return behindState.getAnalogOutputSignal(level, behind, input.getOpposite());
+            return BluestoneDiodes.analogOutput(behindState, level, behind, input.getOpposite());
         }
         if (signal < 15 && behindState.isRedstoneConductor(level, behind)) {
             BlockPos further = behind.relative(input);
             BlockState furtherState = level.getBlockState(further);
             if (furtherState.hasAnalogOutputSignal()) {
-                return furtherState.getAnalogOutputSignal(level, further, input.getOpposite());
+                return BluestoneDiodes.analogOutput(furtherState, level, further, input.getOpposite());
             }
         }
         return signal;

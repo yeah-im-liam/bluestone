@@ -7,3 +7,4 @@
 1.21.11 RenderTypes RenderType
 1.21.11 Identifier ResourceLocation
 1.21.11 net.minecraft.world.entity.npc.villager. net.minecraft.world.entity.npc.
+1.21.9 noCollision noCollission
