@@ -190,19 +190,21 @@ def newer_model(name):
     return vanilla(f"assets/minecraft/models/block/{name}.json", z if since("1.21.2") else modern)
 
 
-def torch_models(source, prefix):
+# Before 1.21.2 the mod's torches are their Programmer Art versions, on the game's torch shape of then; the textures
+# are copied under block/old/ so the repeaters and comparators keep the normal ones.
+OLD_TORCH = "" if since("1.21.2") else "old/"
+
+
+def torch_models(source, prefix, textures=""):
     for stone in ["bluestone", "purplestone", "greenstone"]:
         for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
             model = source(f"assets/minecraft/models/block/{theirs}.json")
-            if prefix == A:
-                model["parent"] = newer_shape(model["parent"].removeprefix("minecraft:").removeprefix("block/"))
-            else:
-                model["parent"] = "minecraft:" + model["parent"].removeprefix("minecraft:")
-            model["textures"] = {k: v.removeprefix("minecraft:").replace("block/redstone_torch", f"bluestone:block/{stone}_torch") for k, v in model["textures"].items()}
+            model["parent"] = "minecraft:" + model["parent"].removeprefix("minecraft:")
+            model["textures"] = {k: v.removeprefix("minecraft:").replace("block/redstone_torch", f"bluestone:block/{textures}{stone}_torch") for k, v in model["textures"].items()}
             write(prefix + f"models/block/{theirs.replace('redstone', stone)}.json", model)
 
 
-torch_models(lambda path: vanilla(path, None if since("1.21.2") else modern), A)
+torch_models(vanilla, A, OLD_TORCH)
 
 TORCH_TEXTURES = {"unlit": "bluestone:block/bluestone_torch_off", "lit": "bluestone:block/bluestone_torch"}
 
@@ -538,10 +540,10 @@ GENERATED = {
     "bluestone": "bluestone:item/bluestone",
     "purplestone": "bluestone:item/purplestone",
     "purplestone_converter": "bluestone:item/purplestone_converter",
-    "bluestone_torch": "bluestone:block/bluestone_torch",
-    "purplestone_torch": "bluestone:block/purplestone_torch",
+    "bluestone_torch": f"bluestone:block/{OLD_TORCH}bluestone_torch",
+    "purplestone_torch": f"bluestone:block/{OLD_TORCH}purplestone_torch",
     "greenstone_paste": "bluestone:item/greenstone_paste",
-    "greenstone_torch": "bluestone:block/greenstone_torch",
+    "greenstone_torch": f"bluestone:block/{OLD_TORCH}greenstone_torch",
     "greenstone_repeater": "bluestone:item/greenstone_repeater",
     "greenstone_comparator": "bluestone:item/greenstone_comparator",
     "bluestone_repeater": "bluestone:item/bluestone_repeater",
@@ -574,6 +576,12 @@ for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("program
             dst = dst_dir / folder / png.name
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(png, dst)
+if OLD_TORCH:
+    for stone in ["bluestone", "purplestone", "greenstone"]:
+        for state in ["", "_off"]:
+            dst = OUT / A / "textures/block/old" / f"{stone}_torch{state}.png"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ART / "programmer art" / f"{stone} torch/block/{stone}_torch{state}.png", dst)
 # Programmer Art puts the redstone torch on the old plain torch shape; the other torches follow it.
 torch_models(programmer_art, "programmer_art/" + A)
 # Pack formats are a range from 1.21.9 and a single number before.

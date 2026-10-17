@@ -1,6 +1,6 @@
 {
-  "parent": "bluestone:block/template/template_redstone_torch_wall",
+  "parent": "minecraft:block/template_torch_wall",
   "textures": {
-    "torch": "bluestone:block/greenstone_torch"
+    "torch": "bluestone:block/old/greenstone_torch"
   }
 }

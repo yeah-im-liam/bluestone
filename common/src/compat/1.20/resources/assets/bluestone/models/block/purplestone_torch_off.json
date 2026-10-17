@@ -1,6 +1,6 @@
 {
-  "parent": "bluestone:block/template/template_torch_unlit",
+  "parent": "minecraft:block/template_torch",
   "textures": {
-    "torch": "bluestone:block/purplestone_torch_off"
+    "torch": "bluestone:block/old/purplestone_torch_off"
   }
 }
