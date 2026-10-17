@@ -19,6 +19,7 @@ import yeah.im.liam.bluestone.Bluestone;
 import yeah.im.liam.bluestone.client.BluestoneTint;
 import yeah.im.liam.bluestone.client.CartViewScreen;
 import yeah.im.liam.bluestone.client.ConverterBoxRenderer;
+import yeah.im.liam.bluestone.client.ProgrammerArtExtras;
 //#if MC < 26.1
 //$$ import yeah.im.liam.bluestone.client.RenderLayers;
 //#endif
@@ -29,6 +30,14 @@ import yeah.im.liam.bluestone.registry.BluestoneBlocks;
 @Mod(value = Bluestone.MOD_ID, dist = Dist.CLIENT)
 //#endif
 public final class BluestoneNeoForgeClient {
+    //#if MC >= 1.20.5
+    private static net.minecraft.server.packs.PackLocationInfo programmerArt() {
+        return new net.minecraft.server.packs.PackLocationInfo("mod/" + Bluestone.id("programmer_art"),
+            net.minecraft.network.chat.Component.translatable("resourcePack.programmer_art.name"),
+            net.minecraft.server.packs.repository.PackSource.BUILT_IN, java.util.Optional.empty());
+    }
+    //#endif
+
     public BluestoneNeoForgeClient(IEventBus modEventBus, ModContainer container) {
         // The settings screen factory is a ConfigScreenFactory record before 20.5.
         //#if MC >= 1.20.5
@@ -55,6 +64,17 @@ public final class BluestoneNeoForgeClient {
         //$$     net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block,
         //$$         net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(net.minecraft.world.level.block.Blocks.REDSTONE_WIRE.defaultBlockState())))));
         //#endif
+        //#endif
+        // The mod's Programmer Art textures go with the game's Programmer Art pack, as Fabric API does it on Fabric.
+        //#if MC >= 1.21.9
+        ProgrammerArtExtras.use(() -> new net.neoforged.neoforge.resource.JarContentsPackResources(programmerArt(),
+            container.getModInfo().getOwningFile().getFile().getContents(), "programmer_art"));
+        //#elseif MC >= 1.20.5
+        //$$ ProgrammerArtExtras.use(() -> new net.minecraft.server.packs.PathPackResources(programmerArt(),
+        //$$     container.getModInfo().getOwningFile().getFile().findResource("programmer_art")));
+        //#else
+        //$$ ProgrammerArtExtras.use(() -> new net.minecraft.server.packs.PathPackResources("mod/" + Bluestone.id("programmer_art"),
+        //$$     container.getModInfo().getOwningFile().getFile().findResource("programmer_art"), true));
         //#endif
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) ->
             event.registerBlockEntityRenderer(BluestoneBlocks.converterBoxEntity(), ConverterBoxRenderer::new));

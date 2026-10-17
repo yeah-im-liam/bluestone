@@ -59,7 +59,7 @@ Each download covers a range of Minecraft versions, named in the file (for examp
 | 1.21.11 | 1.21.11 |
 | 26.1 – 26.3 | 26.1 – 26.3 |
 
-On NeoForge, turn on the "Bluestone: Over-Powered Programmer Art" resource pack together with the Programmer Art pack. Fabric switches the textures over by itself.
+The mod's Programmer Art textures come with the game's Programmer Art pack. The "Alt Torches Programmer Art" resource pack swaps in other Programmer Art bluestone, purplestone and greenstone torches; from 1.21.2 it also brings back the old torch, repeater and comparator shapes.
 
 ## License
 

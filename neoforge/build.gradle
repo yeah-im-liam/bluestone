@@ -108,6 +108,7 @@ if (onForge) {
     loom {
         forge {
             mixinConfig 'bluestone.mixins.json'
+            mixinConfig 'bluestone-neoforge.mixins.json'
             mixinConfig 'bluestone-optional.mixins.json'
         }
     }
