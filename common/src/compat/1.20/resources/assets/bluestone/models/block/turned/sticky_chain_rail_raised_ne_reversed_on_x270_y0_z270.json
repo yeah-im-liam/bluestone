@@ -1,0 +1,53 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "bluestone:block/sticky_chain_rail_on",
+    "rail": "bluestone:block/sticky_chain_rail_on"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        9
+      ],
+      "to": [
+        16,
+        16,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#rail",
+          "uv": [
+            0,
+            16,
+            16,
+            0
+          ],
+          "rotation": 270
+        },
+        "south": {
+          "texture": "#rail",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "rotation": 270
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          9
+        ],
+        "axis": "y",
+        "angle": 45,
+        "rescale": true
+      }
+    }
+  ]
+}

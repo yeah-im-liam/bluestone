@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/comparator_on_subtract",
+  "textures": {
+    "particle": "bluestone:block/bluestone_comparator_on",
+    "top": "bluestone:block/bluestone_comparator_on",
+    "unlit": "bluestone:block/bluestone_torch_off",
+    "lit": "bluestone:block/bluestone_torch"
+  }
+}

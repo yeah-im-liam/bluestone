@@ -1,0 +1,652 @@
+{
+  "variants": {
+    "attached=down,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator"
+    },
+    "attached=down,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator"
+    },
+    "attached=down,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator"
+    },
+    "attached=down,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "y": 180
+    },
+    "attached=down,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "y": 90
+    },
+    "attached=down,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "y": 270
+    },
+    "attached=up,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180
+    },
+    "attached=up,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180,
+      "y": 270
+    },
+    "attached=up,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 180,
+      "y": 90
+    },
+    "attached=north,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270
+    },
+    "attached=north,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90
+    },
+    "attached=south,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "z": 90
+    },
+    "attached=east,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 270
+    },
+    "attached=east,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 270
+    },
+    "attached=east,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 270
+    },
+    "attached=west,mode=compare,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,mode=compare,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,mode=compare,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 90
+    },
+    "attached=west,mode=compare,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,mode=compare,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 90
+    },
+    "attached=west,mode=compare,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator",
+      "z": 90
+    },
+    "attached=down,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on"
+    },
+    "attached=down,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on"
+    },
+    "attached=down,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on"
+    },
+    "attached=down,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "y": 180
+    },
+    "attached=down,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "y": 90
+    },
+    "attached=down,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "y": 270
+    },
+    "attached=up,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180
+    },
+    "attached=up,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180,
+      "y": 270
+    },
+    "attached=up,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 180,
+      "y": 90
+    },
+    "attached=north,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270
+    },
+    "attached=north,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90
+    },
+    "attached=south,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "z": 90
+    },
+    "attached=east,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 270
+    },
+    "attached=east,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 270
+    },
+    "attached=east,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 270
+    },
+    "attached=west,mode=compare,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,mode=compare,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,mode=compare,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 90
+    },
+    "attached=west,mode=compare,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,mode=compare,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 90
+    },
+    "attached=west,mode=compare,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on",
+      "z": 90
+    },
+    "attached=down,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract"
+    },
+    "attached=down,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract"
+    },
+    "attached=down,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract"
+    },
+    "attached=down,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "y": 180
+    },
+    "attached=down,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "y": 90
+    },
+    "attached=down,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "y": 270
+    },
+    "attached=up,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180
+    },
+    "attached=up,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180,
+      "y": 270
+    },
+    "attached=up,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 180,
+      "y": 90
+    },
+    "attached=north,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270
+    },
+    "attached=north,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90
+    },
+    "attached=south,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "z": 90
+    },
+    "attached=east,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 270
+    },
+    "attached=west,mode=subtract,output=down,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,mode=subtract,output=up,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,mode=subtract,output=north,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=south,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=east,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=west,powered=false": {
+      "model": "bluestone:block/greenstone_comparator_subtract",
+      "z": 90
+    },
+    "attached=down,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract"
+    },
+    "attached=down,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract"
+    },
+    "attached=down,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract"
+    },
+    "attached=down,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "y": 180
+    },
+    "attached=down,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "y": 90
+    },
+    "attached=down,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "y": 270
+    },
+    "attached=up,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180,
+      "y": 180
+    },
+    "attached=up,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180
+    },
+    "attached=up,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180,
+      "y": 270
+    },
+    "attached=up,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 180,
+      "y": 90
+    },
+    "attached=north,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "y": 180
+    },
+    "attached=north,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270
+    },
+    "attached=north,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "z": 90
+    },
+    "attached=north,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90
+    },
+    "attached=south,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "y": 180
+    },
+    "attached=south,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "z": 270
+    },
+    "attached=south,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "z": 90
+    },
+    "attached=east,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "y": 270
+    },
+    "attached=east,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "y": 90
+    },
+    "attached=east,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "y": 180,
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 270
+    },
+    "attached=east,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 270
+    },
+    "attached=west,mode=subtract,output=down,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 90,
+      "y": 90
+    },
+    "attached=west,mode=subtract,output=up,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "x": 270,
+      "y": 270
+    },
+    "attached=west,mode=subtract,output=north,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=south,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "y": 180,
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=east,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 90
+    },
+    "attached=west,mode=subtract,output=west,powered=true": {
+      "model": "bluestone:block/greenstone_comparator_on_subtract",
+      "z": 90
+    }
+  }
+}

@@ -48,9 +48,9 @@ for name, (version, first) in targets.items():
     out = work / name
     args = [sys.executable, str(ROOT / "dev/gen_resources.py"), version, str(LOOM / version / "minecraft-client.jar"), str(out), str(ART),
             str(programmer_art(version))]
-    # The jar of the first version the target covers, for the formats that changed within its range.
-    if first != version:
-        args.append(str(LOOM / first / "minecraft-client.jar"))
+    # The jar of the first version the target covers, for the formats that changed within its range, and 1.21.4's,
+    # whose torch, repeater and comparator models older targets copy.
+    args += [str(LOOM / first / "minecraft-client.jar"), str(LOOM / "1.21.4" / "minecraft-client.jar")]
     subprocess.run(args, check=True, stdout=subprocess.DEVNULL)
     trees[name] = {p.relative_to(out).as_posix(): p for p in out.rglob("*") if p.is_file()}
     print(f"{name} ({first}-{version}): {len(trees[name])} files")

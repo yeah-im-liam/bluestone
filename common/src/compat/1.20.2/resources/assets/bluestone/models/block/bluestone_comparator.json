@@ -1,0 +1,9 @@
+{
+  "parent": "bluestone:block/template/comparator",
+  "textures": {
+    "particle": "bluestone:block/bluestone_comparator",
+    "top": "bluestone:block/bluestone_comparator",
+    "unlit": "bluestone:block/bluestone_torch_off",
+    "lit": "bluestone:block/bluestone_torch"
+  }
+}

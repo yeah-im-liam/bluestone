@@ -25,10 +25,11 @@ package yeah.im.liam.bluestone.client;
 //$$         blocks().forEach(block -> layers.put(block, cutout));
 //$$     }
 //$$
-//$$     // The mod's blocks with see-through gaps.
+//$$     // The mod's blocks that aren't full cubes, so may have see-through gaps.
 //$$     public static List<Block> blocks() {
 //$$         return BuiltInRegistries.BLOCK.stream()
-//$$             .filter(block -> BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Bluestone.MOD_ID) && !block.defaultBlockState().canOcclude())
+//$$             .filter(block -> BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Bluestone.MOD_ID)
+//$$                 && !Block.isShapeFullBlock(block.defaultBlockState().getShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO)))
 //$$             .toList();
 //$$     }
 //$$ }

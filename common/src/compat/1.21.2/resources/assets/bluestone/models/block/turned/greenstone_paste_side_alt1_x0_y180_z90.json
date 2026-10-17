@@ -1,0 +1,82 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "bluestone:block/greenstone_paste_dot",
+    "overlay": "bluestone:block/greenstone_paste_overlay",
+    "line": "bluestone:block/greenstone_paste_line1"
+  },
+  "elements": [
+    {
+      "shade": false,
+      "from": [
+        0.25,
+        0,
+        0
+      ],
+      "to": [
+        0.25,
+        16,
+        8
+      ],
+      "faces": {
+        "east": {
+          "texture": "#line",
+          "tintindex": 0,
+          "uv": [
+            0,
+            8,
+            16,
+            16
+          ],
+          "rotation": 270
+        },
+        "west": {
+          "texture": "#line",
+          "tintindex": 0,
+          "uv": [
+            0,
+            16,
+            16,
+            8
+          ],
+          "rotation": 270
+        }
+      }
+    },
+    {
+      "shade": false,
+      "from": [
+        0.25,
+        0,
+        0
+      ],
+      "to": [
+        0.25,
+        16,
+        8
+      ],
+      "faces": {
+        "east": {
+          "texture": "#overlay",
+          "uv": [
+            0,
+            8,
+            16,
+            16
+          ],
+          "rotation": 270
+        },
+        "west": {
+          "texture": "#overlay",
+          "uv": [
+            0,
+            16,
+            16,
+            8
+          ],
+          "rotation": 270
+        }
+      }
+    }
+  ]
+}

@@ -24,6 +24,7 @@
   "client": [
     "CameraMixin",
     "EntityRenderDispatcherLegacyMixin",
+    "GameRendererMixin",
     "ItemBlockRenderTypesAccessor",
     "LevelRendererMixin",
     "MinecartRendererMixin",

@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/template_torch",
+  "parent": "bluestone:block/template/template_redstone_torch",
   "textures": {
     "torch": "bluestone:block/greenstone_torch"
   }

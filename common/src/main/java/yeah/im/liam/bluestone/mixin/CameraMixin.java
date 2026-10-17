@@ -21,13 +21,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import yeah.im.liam.bluestone.client.CartTurns;
 import yeah.im.liam.bluestone.client.CartViewSettings;
+import yeah.im.liam.bluestone.client.TiltedCamera;
 
 /**
  * The view of a rider in a cart on a wall or ceiling rail turns with the cart, tilted the way the rider is drawn and
  * about the cart's pivot: in first person, and in third person if the settings say so (CartViewSettings).
  */
 @Mixin(Camera.class)
-abstract class CameraMixin {
+abstract class CameraMixin implements TiltedCamera {
     @Shadow
     private @Nullable Entity entity;
     @Shadow
@@ -62,6 +63,14 @@ abstract class CameraMixin {
     //#endif
 
     @Unique
+    private @Nullable Quaternionf bluestone$viewTilt;
+
+    @Override
+    public @Nullable Quaternionf bluestone$viewTilt() {
+        return bluestone$viewTilt;
+    }
+
+    @Unique
     private Vec3 bluestone$position() {
         //#if MC >= 1.21.9
         return position();
@@ -82,6 +91,7 @@ abstract class CameraMixin {
     //#endif
         CartViewSettings settings = CartViewSettings.get();
         CartTurns.Tilt tilt = entity != null && (detached ? settings.thirdPerson : settings.firstPerson) ? CartTurns.tilt(entity, partialTicks) : null;
+        bluestone$viewTilt = tilt == null ? null : tilt.tilt();
         if (tilt == null) {
             return;
         }

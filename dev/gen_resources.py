@@ -24,6 +24,9 @@ OUT = Path(sys.argv[3])
 ART = Path(sys.argv[4])           # bluestone/textures (the user's art)
 programmer_art_zip = zipfile.ZipFile(sys.argv[5])
 oldest = zipfile.ZipFile(sys.argv[6]) if len(sys.argv) > 6 else z
+# A 1.21.2+ jar (1.21.4's): the game's torches, repeaters and comparators changed shape in 1.21.2 and the mod's art
+# follows the newer ones, so before 1.21.2 the mod's own blocks get copies of the newer models.
+modern = zipfile.ZipFile(sys.argv[7]) if len(sys.argv) > 7 else z
 OLDEST = json.loads(oldest.read("version.json"))["id"]
 
 
@@ -166,27 +169,51 @@ for face in AXES:
 write(A + "blockstates/converter_box_center.json", {"multipart": center_parts})
 
 # The game's redstone torch models with the mod's textures (their parents changed over the versions).
+def newer_shape(name):
+    """The id to build on for the game's model block/<name>: before 1.21.2 a copy of 1.21.4's under
+    bluestone:block/template/, with any parent the older game lacks copied too."""
+    if since("1.21.2"):
+        return f"minecraft:block/{name}"
+    model = vanilla(f"assets/minecraft/models/block/{name}.json", modern)
+    if "parent" in model:
+        parent = model["parent"].removeprefix("minecraft:")
+        exists = f"assets/minecraft/models/{parent}.json" in z.namelist()
+        model["parent"] = "minecraft:" + parent if exists else newer_shape(parent.removeprefix("block/"))
+    write(A + f"models/block/template/{name}.json", model)
+    # Programmer Art keeps the old shapes, as it does from 1.21.2 by replacing the game's models.
+    if f"assets/minecraft/models/block/{name}.json" in z.namelist():
+        write(f"programmer_art/{A}models/block/template/{name}.json", {"parent": f"minecraft:block/{name}"})
+    return f"bluestone:block/template/{name}"
+
+
+def newer_model(name):
+    return vanilla(f"assets/minecraft/models/block/{name}.json", z if since("1.21.2") else modern)
+
+
 def torch_models(source, prefix):
     for stone in ["bluestone", "purplestone", "greenstone"]:
         for theirs in ["redstone_torch", "redstone_torch_off", "redstone_wall_torch", "redstone_wall_torch_off"]:
             model = source(f"assets/minecraft/models/block/{theirs}.json")
-            model["parent"] = "minecraft:" + model["parent"].removeprefix("minecraft:")
+            if prefix == A:
+                model["parent"] = newer_shape(model["parent"].removeprefix("minecraft:").removeprefix("block/"))
+            else:
+                model["parent"] = "minecraft:" + model["parent"].removeprefix("minecraft:")
             model["textures"] = {k: v.removeprefix("minecraft:").replace("block/redstone_torch", f"bluestone:block/{stone}_torch") for k, v in model["textures"].items()}
             write(prefix + f"models/block/{theirs.replace('redstone', stone)}.json", model)
 
 
-torch_models(vanilla, A)
+torch_models(lambda path: vanilla(path, None if since("1.21.2") else modern), A)
 
 TORCH_TEXTURES = {"unlit": "bluestone:block/bluestone_torch_off", "lit": "bluestone:block/bluestone_torch"}
 
 
 def diode_model(vanilla_name, ours, top, torches=TORCH_TEXTURES):
-    parent = vanilla(f"assets/minecraft/models/block/{vanilla_name}.json")
+    parent = newer_model(vanilla_name)
     textures = {"particle": top, "top": top}
     for key, value in torches.items():
         if key in parent["textures"]:
             textures[key] = value
-    write(A + f"models/block/{ours}.json", {"parent": f"minecraft:block/{vanilla_name}", "textures": textures})
+    write(A + f"models/block/{ours}.json", {"parent": newer_shape(vanilla_name), "textures": textures})
 
 
 for delay in range(1, 5):
@@ -238,7 +265,7 @@ def converter_models(source, prefix):
                 write(prefix + "models/block/purplestone_converter_" + mode + on + locked + ".json", model)
 
 
-converter_models(lambda name: vanilla("assets/minecraft/models/block/" + name + ".json"), A)
+converter_models(newer_model, A)
 converter_models(lambda name: programmer_art("assets/minecraft/models/block/" + name + ".json"), "programmer_art/" + A)
 ROTATION = {"south": 0, "west": 90, "north": 180, "east": 270}
 variants = {}
@@ -547,12 +574,6 @@ for style, dst_dir in [("default", OUT / "assets/bluestone/textures"), ("program
             dst = dst_dir / folder / png.name
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(png, dst)
-    # Before 1.21.2 the game's torches are crossed planes over a texture with only the torch on it: the art drawn for
-    # those versions (in "before 1.21.2" folders) replaces the newer art.
-    if not since("1.21.2"):
-        for png in sorted((ART / style).glob("*/before 1.21.2/*/*.png")):
-            if OURS.search(png.name):
-                shutil.copyfile(png, dst_dir / png.parent.name / png.name)
 # Programmer Art puts the redstone torch on the old plain torch shape; the other torches follow it.
 torch_models(programmer_art, "programmer_art/" + A)
 # Pack formats are a range from 1.21.9 and a single number before.
@@ -907,4 +928,54 @@ write(D + f"{BLOCK_TAGS}/bluestone_ores.json", ORES)
 write(D + f"{ITEM_TAGS}/bluestone_ores.json", ORES)
 write(f"data/minecraft/{BLOCK_TAGS}/ores.json", {"values": ["#bluestone:bluestone_ores"]})
 write(f"data/minecraft/{ITEM_TAGS}/ores.json", {"values": ["#bluestone:bluestone_ores"]})
+
+
+def full_model(model_id, programmer=False):
+    """A model with its parents' elements and textures folded in, from the files written above or the game's."""
+    namespace, _, path = model_id.rpartition(":")
+    if namespace == "bluestone":
+        file = OUT / ("programmer_art/" + A if programmer else A) / "models" / f"{path}.json"
+        model = json.loads((file if file.exists() else OUT / A / "models" / f"{path}.json").read_text(encoding="utf-8"))
+    else:
+        location = f"assets/minecraft/models/{path}.json"
+        model = programmer_art(location) if programmer else vanilla(location)
+    if "parent" not in model:
+        return model
+    parent_id = model["parent"] if ":" in model["parent"] else "minecraft:" + model["parent"]
+    parent = full_model(parent_id, programmer)
+    merged = {**parent, **{k: v for k, v in model.items() if k != "parent"}}
+    merged["textures"] = {**parent.get("textures", {}), **model.get("textures", {})}
+    return merged
+
+
+# Before 1.21.11 a blockstate can't turn a model about z: those variants get a model turned beforehand (and a
+# Programmer Art one where that pack's models differ).
+if not since("1.21.11"):
+    import model_rotation
+    turned = {}
+
+    def unturned(variant):
+        if not variant.get("z"):
+            return variant
+        key = (variant["model"], variant.get("x", 0), variant.get("y", 0), variant["z"])
+        if key not in turned:
+            name = key[0].rpartition(":")[2].removeprefix("block/").replace("/", "_") + "_x%d_y%d_z%d" % key[1:]
+            model = model_rotation.turn(full_model(key[0]), *key[1:])
+            write(A + f"models/block/turned/{name}.json", model)
+            programmer = model_rotation.turn(full_model(key[0], True), *key[1:])
+            if programmer != model:
+                write(f"programmer_art/{A}models/block/turned/{name}.json", programmer)
+            turned[key] = f"bluestone:block/turned/{name}"
+        return {"model": turned[key], **{k: v for k, v in variant.items() if k not in ("model", "x", "y", "z")}}
+
+    def unturned_all(value):
+        return [unturned(v) for v in value] if isinstance(value, list) else unturned(value)
+
+    for path in sorted((OUT / A / "blockstates").glob("*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for key in data.get("variants", {}):
+            data["variants"][key] = unturned_all(data["variants"][key])
+        for part in data.get("multipart", []):
+            part["apply"] = unturned_all(part["apply"])
+        write(A + f"blockstates/{path.name}", data)
 print("done")
