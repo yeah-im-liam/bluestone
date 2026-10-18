@@ -109,7 +109,16 @@ public final class WallRails {
                 ways.add(direction);
             }
         }
-        if (ways.contains(way) || connections.size() == 2) {
+        if (ways.contains(way)) {
+            // Already heading for the wall rail: it may still need to slope up to it.
+            RailShape shape = state.getValue(rail.getShapeProperty());
+            RailShape slope = sloped(level, pos, shape);
+            if (slope != shape) {
+                level.setBlock(pos, state.setValue(rail.getShapeProperty(), slope), Block.UPDATE_ALL);
+            }
+            return;
+        }
+        if (connections.size() == 2) {
             return;
         }
         ways.add(way);
