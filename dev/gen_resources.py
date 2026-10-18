@@ -978,13 +978,17 @@ for stone in ["bluestone", "purplestone", "greenstone"]:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, dst)
 if since("1.21.2"):
-    for theirs, template in [("redstone_torch", "template_torch"), ("redstone_torch_off", "template_torch"),
-                             ("redstone_wall_torch", "template_torch_wall"), ("redstone_wall_torch_off", "template_torch_wall")]:
+    # The Programmer Art torch shapes, under the mod's own names: the pack is often used without Programmer Art, and
+    # the game's own templates are the new shapes.
+    for template in ["template_torch", "template_torch_wall"]:
+        write(ALT + A + f"models/block/old_{template}.json", json.loads(programmer_art_zip.read(f"assets/minecraft/models/block/{template}.json")))
+    for theirs, template in [("redstone_torch", "old_template_torch"), ("redstone_torch_off", "old_template_torch"),
+                             ("redstone_wall_torch", "old_template_torch_wall"), ("redstone_wall_torch_off", "old_template_torch_wall")]:
         texture = "block/redstone_torch_off" if theirs.endswith("_off") else "block/redstone_torch"
-        write(ALT + f"assets/minecraft/models/block/{theirs}.json", {"parent": f"minecraft:block/{template}", "textures": {"torch": f"minecraft:{texture}"}})
+        write(ALT + f"assets/minecraft/models/block/{theirs}.json", {"parent": f"bluestone:block/{template}", "textures": {"torch": f"minecraft:{texture}"}})
         for stone in ["bluestone", "purplestone", "greenstone"]:
             write(ALT + A + f"models/block/{theirs.replace('redstone', stone)}.json",
-                  {"parent": f"minecraft:block/{template}", "textures": {"torch": "bluestone:" + texture.replace("redstone", stone)}})
+                  {"parent": f"bluestone:block/{template}", "textures": {"torch": "bluestone:" + texture.replace("redstone", stone)}})
     # The game's Programmer Art repeaters and comparators, which the mod's build on, and its redstone torch textures.
     for name in programmer_art_zip.namelist():
         if re.fullmatch(r"assets/minecraft/models/block/(repeater|comparator)\w*\.json|assets/minecraft/textures/block/redstone_torch(_off)?\.png", name):

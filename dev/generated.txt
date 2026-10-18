@@ -3302,6 +3302,8 @@ common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/ass
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_torch_off.json
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch.json
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch_off.json
+common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch.json
+common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch_wall.json
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red.json
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_locked.json
 common/src/compat/1.21.11/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_on.json
@@ -4282,6 +4284,8 @@ common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/asse
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_torch_off.json
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch.json
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch_off.json
+common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch.json
+common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch_wall.json
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red.json
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_locked.json
 common/src/compat/1.21.2/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_on.json
@@ -5391,6 +5395,8 @@ common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/asse
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_torch_off.json
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch.json
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch_off.json
+common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch.json
+common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch_wall.json
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red.json
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_locked.json
 common/src/compat/1.21.5/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_on.json
@@ -6512,6 +6518,8 @@ common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/asse
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_torch_off.json
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch.json
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch_off.json
+common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch.json
+common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch_wall.json
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red.json
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_locked.json
 common/src/compat/1.21.9/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_on.json
@@ -7835,6 +7843,8 @@ common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/b
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_torch_off.json
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch.json
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/greenstone_wall_torch_off.json
+common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch.json
+common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/old_template_torch_wall.json
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red.json
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_locked.json
 common/src/compat/26/resources/resourcepacks/alt_torches_programmer_art/assets/bluestone/models/block/purplestone_converter_blue_to_red_on.json
