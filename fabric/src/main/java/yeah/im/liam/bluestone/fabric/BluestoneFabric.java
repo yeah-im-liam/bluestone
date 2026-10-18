@@ -89,23 +89,23 @@ public final class BluestoneFabric implements ModInitializer {
             .build();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Bluestone.key(Registries.CREATIVE_MODE_TAB, "main"), tab);
 
-        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.COMPARATOR, stacks(BluestoneBlocks.components()));
-        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
-        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.REDSTONE_ORE, List.of(new ItemStack(Items.DEEPSLATE_REDSTONE_ORE)));
-        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
-        after(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.ACTIVATOR_RAIL, stacks(BluestoneBlocks.rails()));
-        after(CreativeModeTabs.NATURAL_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, stacks(BluestoneBlocks.ores()));
-        after(CreativeModeTabs.BUILDING_BLOCKS, Items.REDSTONE_BLOCK, stacks(BluestoneBlocks.storageBlocks()));
-        after(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.REDSTONE_TORCH, stacks(BluestoneBlocks.torches()));
-        after(CreativeModeTabs.INGREDIENTS, Items.REDSTONE, List.of(new ItemStack(BluestoneBlocks.dust()), new ItemStack(BluestoneBlocks.pasteItem()),
-            new ItemStack(BluestoneBlocks.purplestone())));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.COMPARATOR, BluestoneBlocks.components());
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.ACTIVATOR_RAIL, BluestoneBlocks.rails());
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.REDSTONE_ORE, List.of(Items.DEEPSLATE_REDSTONE_ORE));
+        after(CreativeModeTabs.REDSTONE_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, BluestoneBlocks.ores());
+        after(CreativeModeTabs.TOOLS_AND_UTILITIES, Items.ACTIVATOR_RAIL, BluestoneBlocks.rails());
+        after(CreativeModeTabs.NATURAL_BLOCKS, Items.DEEPSLATE_REDSTONE_ORE, BluestoneBlocks.ores());
+        after(CreativeModeTabs.BUILDING_BLOCKS, Items.REDSTONE_BLOCK, BluestoneBlocks.storageBlocks());
+        after(CreativeModeTabs.FUNCTIONAL_BLOCKS, Items.REDSTONE_TORCH, BluestoneBlocks.torches());
+        after(CreativeModeTabs.INGREDIENTS, Items.REDSTONE, List.of(BluestoneBlocks.dust(), BluestoneBlocks.pasteItem(), BluestoneBlocks.purplestone()));
     }
 
-    private static void after(ResourceKey<CreativeModeTab> tab, Item anchor, List<ItemStack> stacks) {
+    // The stacks are made when the tab fills: 26.3 gives items their components only after mods have started.
+    private static void after(ResourceKey<CreativeModeTab> tab, Item anchor, List<Item> items) {
         //#if MC >= 26.1
-        CreativeModeTabEvents.modifyOutputEvent(tab).register(output -> output.insertAfter(anchor, stacks));
+        CreativeModeTabEvents.modifyOutputEvent(tab).register(output -> output.insertAfter(anchor, stacks(items)));
         //#else
-        //$$ ItemGroupEvents.modifyEntriesEvent(tab).register(entries -> entries.addAfter(anchor, stacks));
+        //$$ ItemGroupEvents.modifyEntriesEvent(tab).register(entries -> entries.addAfter(anchor, stacks(items)));
         //#endif
     }
 
