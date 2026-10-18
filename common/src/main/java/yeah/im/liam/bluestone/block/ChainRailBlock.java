@@ -12,8 +12,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.redstone.Orientation;
 import org.jspecify.annotations.Nullable;
+import yeah.im.liam.bluestone.rail.SurfaceRails;
 import yeah.im.liam.bluestone.signal.Channel;
 
 /**
@@ -59,10 +61,35 @@ public class ChainRailBlock extends RailBlock {
         return drive == null ? state : state.setValue(REVERSED, drive == Direction.NORTH || drive == Direction.WEST);
     }
 
+    // Unless placed while sneaking, it drives the way of a chain rail it joins, or of one beside it.
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
-        return state == null ? null : withDrive(state, context.getHorizontalDirection());
+        if (state == null) {
+            return null;
+        }
+        Direction follow = context.isSecondaryUseActive() ? null : follow(context.getLevel(), context.getClickedPos());
+        if (follow != null) {
+            return withDrive(state.setValue(SHAPE, follow.getAxis() == Direction.Axis.X ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH), follow);
+        }
+        return withDrive(state, context.getHorizontalDirection());
+    }
+
+    private static @Nullable Direction follow(Level level, BlockPos pos) {
+        for (Direction exit : Direction.Plane.HORIZONTAL) {
+            Direction drive = SurfaceRails.chainDrive(level, new SurfaceRails.Track(pos, Direction.DOWN, exit.getAxis(), AttachedRailBlock.Kind.CHAIN, false, exit), exit);
+            if (drive != null) {
+                return drive;
+            }
+        }
+        for (Direction side : Direction.Plane.HORIZONTAL) {
+            BlockState next = level.getBlockState(pos.relative(side));
+            Direction drive = next.getBlock() instanceof ChainRailBlock ? drive(next) : null;
+            if (drive != null) {
+                return drive;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -174,6 +174,12 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         }
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
+        // Unless placed while sneaking, a chain rail drives the way of a chain rail it joins, or of one beside it.
+        Direction follow = kind == Kind.CHAIN && !context.isSecondaryUseActive() ? followChain(level, pos, attached) : null;
+        if (follow != null) {
+            BlockState state = defaultBlockState().setValue(ATTACHED, attached).setValue(TRAVEL, follow).setValue(BEND, bend(level, pos, attached, follow));
+            return state.canSurvive(level, pos) ? Waterlogging.place(state, context) : null;
+        }
         Direction looking = null;
         for (Direction direction : context.getNearestLookingDirections()) {
             if (direction.getAxis() != attached.getAxis()) {
@@ -239,6 +245,25 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
         return best;
     }
 
+    private static @Nullable Direction followChain(Level level, BlockPos pos, Direction attached) {
+        for (Direction exit : Direction.values()) {
+            if (exit.getAxis() != attached.getAxis()) {
+                Direction drive = SurfaceRails.chainDrive(level, new SurfaceRails.Track(pos, attached, exit.getAxis(), Kind.CHAIN, false, exit), exit);
+                if (drive != null) {
+                    return drive;
+                }
+            }
+        }
+        for (Direction side : Direction.values()) {
+            BlockState next = level.getBlockState(pos.relative(side));
+            if (side.getAxis() != attached.getAxis() && next.getBlock() instanceof AttachedRailBlock rail && rail.kind == Kind.CHAIN
+                && next.getValue(ATTACHED) == attached) {
+                return next.getValue(TRAVEL);
+            }
+        }
+        return null;
+    }
+
     private static @Nullable Direction following(Level level, BlockPos pos, Direction attached, Direction.Axis axis) {
         for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {
             BlockState next = level.getBlockState(pos.relative(Direction.fromAxisAndDirection(axis, sign)));
@@ -264,7 +289,8 @@ public class AttachedRailBlock extends Block implements SimpleWaterloggedBlock, 
     private void turn(Level level, BlockPos pos, BlockState state) {
         Direction attached = state.getValue(ATTACHED);
         Shape current = new Shape(state.getValue(TRAVEL), state.getValue(CURVE));
-        Shape shape = bestShape(level, pos, attached, current);
+        // Chain rails keep the way they were placed.
+        Shape shape = kind == Kind.CHAIN ? current : bestShape(level, pos, attached, current);
         boolean turning = !shape.equals(current);
         Direction travel = shape.travel();
         if (turning && shape.curve() == Curve.NONE) {

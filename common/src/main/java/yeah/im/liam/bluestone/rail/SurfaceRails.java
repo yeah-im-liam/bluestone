@@ -115,6 +115,19 @@ public final class SurfaceRails {
         return next(level, from, exit, strict) != null;
     }
 
+    /**
+     * The way a chain rail at {@code from} drives to keep the drive of the chain rail it joins through {@code exit}, or
+     * null if no chain rail joins there.
+     */
+    public static @Nullable Direction chainDrive(Level level, Track from, Direction exit) {
+        Step step = next(level, from, exit, true);
+        if (step == null || step.track().kind() != Kind.CHAIN || step.track().travel() == null) {
+            return null;
+        }
+        Direction drive = step.track().travel();
+        return drive == step.exit() ? exit : drive == step.exit().getOpposite() ? exit.getOpposite() : null;
+    }
+
     private static @Nullable Step next(Level level, Track from, Direction exit, boolean strict) {
         Direction attached = from.attached();
         BlockPos ahead = from.pos().relative(exit);
